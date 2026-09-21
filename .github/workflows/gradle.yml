@@ -64,4 +64,11 @@ jobs:
     # Generates and submits a dependency graph, enabling Dependabot Alerts for all project dependencies.
     # See: https://github.com/gradle/actions/blob/main/dependency-submission/README.md
     - name: Generate and submit dependency graph
+      id: dependency_submission
+      continue-on-error: true
       uses: gradle/actions/dependency-submission@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+
+    - name: Warn when dependency graph submission is unavailable
+      if: steps.dependency_submission.outcome == 'failure'
+      run: |
+        echo "::warning::Dependency graph submission failed. This repository can still build successfully, but GitHub dependency graph snapshots will not be uploaded until dependency graph submission is enabled in the repository settings or the underlying submission error is resolved."
