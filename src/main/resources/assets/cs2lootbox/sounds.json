@@ -1,0 +1,65 @@
+{
+  "buttonclick": {
+    "sounds": ["cs2lootbox:buttonclick"]
+  },
+  "case_awarded_0_common": {
+    "sounds": ["cs2lootbox:case_awarded_0_common_01"]
+  },
+  "case_awarded_1_uncommon": {
+    "sounds": ["cs2lootbox:case_awarded_1_uncommon_01"]
+  },
+  "case_awarded_2_rare": {
+    "sounds": ["cs2lootbox:case_awarded_2_rare_01"]
+  },
+  "case_awarded_3_mythical": {
+    "sounds": ["cs2lootbox:case_awarded_3_mythical_01"]
+  },
+  "case_awarded_4_legendary": {
+    "sounds": ["cs2lootbox:case_awarded_4_legendary_01"]
+  },
+  "case_awarded_5_ancient": {
+    "sounds": ["cs2lootbox:case_awarded_5_ancient_01"]
+  },
+  "case_drop": {
+    "sounds": ["cs2lootbox:case_drop_01"]
+  },
+  "case_patch_fall": {
+    "sounds": ["cs2lootbox:case_patch_fall_01"]
+  },
+  "case_pins_fall": {
+    "sounds": ["cs2lootbox:case_pins_fall_01"]
+  },
+  "case_purchase_key": {
+    "sounds": ["cs2lootbox:case_purchase_key_01"]
+  },
+  "case_reveal_rare": {
+    "sounds": ["cs2lootbox:case_reveal_rare_01"]
+  },
+  "case_reveal_mythical": {
+    "sounds": ["cs2lootbox:case_reveal_mythical_01"]
+  },
+  "case_reveal_legendary": {
+    "sounds": ["cs2lootbox:case_reveal_legendary_01"]
+  },
+  "case_reveal_ancient": {
+    "sounds": ["cs2lootbox:case_reveal_ancient_01"]
+  },
+  "case_unlock": {
+    "sounds": ["cs2lootbox:case_unlock_01"]
+  },
+  "case_unlock_immediate": {
+    "sounds": ["cs2lootbox:case_unlock_immediate_01"]
+  },
+  "csgo_ui_crate_item_scroll": {
+    "sounds": ["cs2lootbox:csgo_ui_crate_item_scroll"]
+  },
+  "csgo_ui_crate_result": {
+    "sounds": ["cs2lootbox:csgo_ui_crate_result"]
+  },
+  "menu_accept": {
+    "sounds": ["cs2lootbox:menu_accept"]
+  },
+  "menu_invalid": {
+    "sounds": ["cs2lootbox:menu_invalid"]
+  }
+}

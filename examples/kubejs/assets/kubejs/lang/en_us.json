@@ -1,0 +1,14 @@
+{
+  "item.kubejs.revolution_case": "Revolution Case",
+  "item.kubejs.revolution_key": "Revolution Case Key",
+  "rarity.kubejs.industrial": "Industrial Grade",
+  "rarity.kubejs.milspec": "Mil-Spec Grade",
+  "rarity.kubejs.classified": "Classified",
+  "rarity.kubejs.covert": "Covert",
+  "rarity.kubejs.special": "★ Rare Special Item ★",
+  "loot.kubejs.iron.description": "A common reward from the Revolution Case.",
+  "loot.kubejs.diamond.description": "A valuable high-tier reward.",
+  "loot.kubejs.emerald.description": "A rare reward from the Revolution Case.",
+  "loot.kubejs.netherite.description": "An exceedingly rare reward hidden behind the legendary panel.",
+  "loot.kubejs.nether_star.description": "One of the rarest rewards in the Revolution Case."
+}

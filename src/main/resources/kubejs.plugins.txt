@@ -1,0 +1,1 @@
+net.tokyosu.cs2lootbox.integration.kubejs.CS2LootboxKubeJSPlugin
