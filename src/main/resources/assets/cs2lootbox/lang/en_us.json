@@ -69,5 +69,8 @@
   "loot.cs2lootbox.gloves": "★ Gloves ★",
   "tooltip.cs2lootbox.rare_gloves": "or the Exceedingly Rare Gloves!",
   "item.cs2lootbox.csgo_case_weapon": "CS:GO Weapon Case",
-  "item.cs2lootbox.csgo_case_weapon_key": "CS:GO Case Key"
+  "item.cs2lootbox.csgo_case_weapon_key": "CS:GO Case Key",
+  "loot.cs2lootbox.apple": "CS:GO Apple",
+  "legendary.kubejs.rare_gloves": "★ Rare Gloves ★",
+  "tooltip.kubejs.rare_gloves": "or an exceedingly rare pair of gloves!"
 }

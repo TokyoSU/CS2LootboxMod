@@ -5,6 +5,7 @@
   "rarity.kubejs.milspec": "Mil-Spec Grade",
   "rarity.kubejs.classified": "Classified",
   "rarity.kubejs.covert": "Covert",
+  "tooltip.kubejs.rare_item": "★ Rare Special Item ★",
   "rarity.kubejs.special": "★ Rare Special Item ★",
   "loot.kubejs.iron.description": "A common reward from the Revolution Case.",
   "loot.kubejs.diamond.description": "A valuable high-tier reward.",

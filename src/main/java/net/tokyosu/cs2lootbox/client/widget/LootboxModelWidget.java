@@ -398,6 +398,38 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
         }
     }
 
+    /**
+     * Once OPEN has been pressed, the case opening is a committed presentation
+     * flow. Vanilla {@code AbstractContainerScreen} treats the inventory key
+     * (normally E) and Escape as close shortcuts; allowing those shortcuts here
+     * would close LDLib's container and the server close listener would correctly
+     * finalize the already-rolled reward, effectively letting the player skip the
+     * animation/carousel/result UI.
+     *
+     * Consume those close shortcuts after the opening flow starts. Before OPEN is
+     * pressed they retain their normal behavior, so the idle case screen can still
+     * be dismissed with E/Escape. Explicit prize buttons remain the only way to
+     * finish the committed flow from the UI.
+     */
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        Minecraft minecraft = Minecraft.getInstance();
+        boolean inventoryKey = minecraft.options.keyInventory.matches(keyCode, scanCode);
+        boolean escapeKey = keyCode == org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
+
+        if ((inventoryKey || escapeKey) && isKeyboardCloseLocked()) {
+            return true;
+        }
+
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    private boolean isKeyboardCloseLocked() {
+        return clientPhase != ClientPhase.CASE || waitingForServer || openingCommitted;
+    }
+
     @Override
     @OnlyIn(Dist.CLIENT)
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
@@ -687,8 +719,17 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
             return;
         }
 
-        carouselStage = CarouselStage.PRIMARY;
         LootboxDefinition definition = definition();
+
+        // A roulette containing only one possible configured result adds no
+        // information and only delays the already-authoritative reward. Skip
+        // the visual roll entirely and reveal the result panel immediately.
+        if (LootboxLootRoller.primaryVisualOptionCount(definition) <= 1) {
+            showPrize();
+            return;
+        }
+
+        carouselStage = CarouselStage.PRIMARY;
         RandomSource random = RandomSource.create(visualSeed);
         List<CarouselSlot> slots = new ArrayList<>(CAROUSEL_SLOT_COUNT);
 
@@ -751,6 +792,13 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
 
         LegendaryLoot legendary = definition().legendaryLoot().get(clientWinningLegendaryIndex);
         if (clientWinningLegendaryEntryIndex < 0 || clientWinningLegendaryEntryIndex >= legendary.subLoot().size()) {
+            showPrize();
+            return;
+        }
+
+        // Same rule as the primary carousel: if this legendary table has only
+        // one valid configured reward, there is nothing meaningful to spin.
+        if (LootboxLootRoller.validEntryCount(legendary.subLoot()) <= 1) {
             showPrize();
             return;
         }
@@ -1159,10 +1207,25 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
 
         if (clientPhase == ClientPhase.SNAP && elapsed >= SNAP_DURATION_MS) {
             if (carouselStage == CarouselStage.PRIMARY && clientWinningLegendary) {
-                // CS2 uses the Legendary/Classified awarded sting for the gold
-                // rare-special hit before the second, legendary-only carousel.
+                // The server has already selected the exact legendary sub-loot
+                // reward. By default we visualize that result with a second
+                // legendary-only carousel. KubeJS may disable that stage per
+                // legendary panel, in which case the final item is revealed
+                // immediately after the primary gold card stops.
                 playDefaultUiSound(ModSounds.CASE_AWARDED_LEGENDARY.getId());
-                beginLegendaryCarousel();
+
+                LegendaryLoot legendary = winningLegendary();
+                if (legendary != null
+                        && legendary.subLootCarousel()
+                        && LootboxLootRoller.validEntryCount(legendary.subLoot()) > 1) {
+                    beginLegendaryCarousel();
+                } else {
+                    // The gold-card sting is the stop/reveal sound for this
+                    // shortened flow. Prevent showPrize() from immediately
+                    // stacking a second reveal sound on the same frame.
+                    prizeRevealSoundPlayed = true;
+                    showPrize();
+                }
             } else {
                 showPrize();
             }
@@ -1258,6 +1321,17 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
 
     private @NotNull LootboxDefinition definition() {
         return LootboxRegistry.getOrDefault(lootboxId);
+    }
+
+    private @Nullable LegendaryLoot winningLegendary() {
+        if (!clientWinningLegendary) {
+            return null;
+        }
+        LootboxDefinition definition = definition();
+        if (clientWinningLegendaryIndex < 0 || clientWinningLegendaryIndex >= definition.legendaryLoot().size()) {
+            return null;
+        }
+        return definition.legendaryLoot().get(clientWinningLegendaryIndex);
     }
 
     private @Nullable LootEntry winningEntry() {
@@ -1998,6 +2072,25 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
             int span = (int) Math.round(Math.sqrt(radius * radius - dy * dy));
             graphics.fill(cx - span, cy + dy, cx + span + 1, cy + dy + 1, color);
         }
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    private static void drawCenteredScaled(
+            @NotNull GuiGraphics graphics,
+            @NotNull Font font,
+            @NotNull Component component,
+            int centerX,
+            int y,
+            int maxWidth,
+            int color) {
+        int textWidth = Math.max(1, font.width(component));
+        float scale = Math.min(1.0F, Math.max(0.55F, maxWidth / (float) textWidth));
+        PoseStack pose = graphics.pose();
+        pose.pushPose();
+        pose.translate(centerX, y, 0.0F);
+        pose.scale(scale, scale, 1.0F);
+        graphics.drawString(font, component, -textWidth / 2, 0, color, true);
+        pose.popPose();
     }
 
     @OnlyIn(Dist.CLIENT)

@@ -374,9 +374,28 @@ public final class LootboxOverlayWidget extends Widget {
         blitTinted(graphics, model.getDefinition().uiSkin().slotBorderTexture(),
                 x, y, width, height, LEGENDARY_GOLD, 0.34F);
 
-        String name = Component.translatable("cs2lootbox.legendary.special_item").getString();
-        name = ellipsize(font, name, width - 8);
+        String configuredName = legendary.itemListName();
+        if (configuredName == null || configuredName.isBlank()) {
+            // Backwards compatibility with scripts written before itemListName()/name().
+            configuredName = legendary.tooltipText();
+        }
+        Component nameComponent = configuredName == null || configuredName.isBlank()
+                ? Component.translatable("cs2lootbox.legendary.special_item")
+                : configuredText(configuredName);
+        String name = ellipsize(font, nameComponent.getString(), width - 8);
         graphics.drawString(font, name, x + 4, y + height - 12, 0xFFFFFFFF, false);
+    }
+
+    /**
+     * Legendary labels supplied by KubeJS accept either literal text or a
+     * translation key. Keep the same convention as the case-item tooltip.
+     */
+    @OnlyIn(Dist.CLIENT)
+    private static @NotNull Component configuredText(@NotNull String value) {
+        String trimmed = value.trim();
+        return trimmed.indexOf('.') < 0
+                ? Component.literal(trimmed)
+                : Component.translatable(trimmed);
     }
 
     @OnlyIn(Dist.CLIENT)

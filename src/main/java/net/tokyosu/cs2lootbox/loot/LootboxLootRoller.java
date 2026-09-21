@@ -322,6 +322,31 @@ public final class LootboxLootRoller {
         return total;
     }
 
+    /** Returns the number of configured entries that can actually participate in a roll. */
+    public static int validEntryCount(@NotNull List<LootEntry> entries) {
+        int count = 0;
+        for (LootEntry entry : entries) {
+            if (isValid(entry)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /**
+     * Returns the number of distinct cards that can appear as a first-stage result.
+     * Normal loot entries and valid legendary panels each count as one choice.
+     */
+    public static int primaryVisualOptionCount(@NotNull LootboxDefinition definition) {
+        int count = validEntryCount(definition.loot());
+        for (LegendaryLoot legendary : definition.legendaryLoot()) {
+            if (validLegendaryWeight(legendary) > 0.0D) {
+                count++;
+            }
+        }
+        return count;
+    }
+
 
     private static double validLegendaryWeight(@Nullable LegendaryLoot legendary) {
         if (legendary == null

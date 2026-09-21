@@ -143,9 +143,19 @@ CS2LootboxEvents.register(event => {
         // a filler gold panel averages roughly once every 385 carousel slots.
         // The server-selected winning slot is always forced.
         //
+        // tooltip() accepts literal text or a translation key. The same text
+        // is used in the case tooltip AND on the gold primary-carousel card.
+        //
         // foreground() is optional. When omitted, the mod automatically uses:
         //   cs2lootbox:textures/gui/default_rare_item.png
+        //
+        // The second legendary-only carousel is enabled by default. Use
+        // subLootCarousel(false) to skip it and reveal the server-selected
+        // sub-loot item directly after the primary gold card stops.
         crate.legendary(0.26)
+            .itemListName('tooltip.kubejs.rare_item')
+            .tooltip('tooltip.kubejs.rare_item')
+            .subLootCarousel(false)
             .subLoot()
                 .add('minecraft:netherite_ingot', 5.0, loot => {
                     loot.rarity('rarity.kubejs.covert', 0xEB4B4B)

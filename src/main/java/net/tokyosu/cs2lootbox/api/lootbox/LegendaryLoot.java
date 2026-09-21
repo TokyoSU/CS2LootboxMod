@@ -14,11 +14,16 @@ import org.jetbrains.annotations.Nullable;
  * {@code weight} is an absolute 0..100 percent chance for this panel in the
  * first-stage legendary roll. It is NOT added to the normal loot-table total.
  * The entries in {@link #subLoot()} are a separate second-stage weighted table.
+ * When {@link #subLootCarousel()} is false, that server-selected sub-loot reward
+ * is revealed directly after the primary legendary panel instead of playing a
+ * second legendary-only carousel.
  */
 public record LegendaryLoot(
         @NotNull ResourceLocation foreground,
         double weight,
         @Nullable String tooltipText,
+        @Nullable String itemListName,
+        boolean subLootCarousel,
         @NotNull List<LootEntry> subLoot) {
 
     public static final @NotNull ResourceLocation DEFAULT_FOREGROUND =

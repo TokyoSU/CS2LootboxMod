@@ -164,14 +164,20 @@ public final class BuiltInLootboxes {
         // ---------------------------------------------------------------------
         // Legendary / gold — absolute 0.26%
         // ---------------------------------------------------------------------
-        builder.legendary(0.26D)
-                .tooltip("tooltip.cs2lootbox.rare_gloves")
+        builder.legendary(20.0D)
+                .name("legendary.kubejs.rare_gloves")
+                .tooltip("tooltip.kubejs.rare_gloves")
+                .subCarousel(false)
                 .subLoot()
                 // Temporary glove placeholder. Replace this with the real
                 // glove/knife item ids when those registries are available.
-                .add("minecraft:leather_boots", 100.0D, loot -> loot
+                .add("minecraft:leather_boots", 60.0D, loot -> loot
                         .count(1)
                         .name("loot.cs2lootbox.gloves")
+                        .rarity("cs2lootbox.rarity.special", 0xFFAE39))
+                .add("minecraft:apple", 40.0D, loot -> loot
+                        .count(1)
+                        .name("loot.cs2lootbox.apple")
                         .rarity("cs2lootbox.rarity.special", 0xFFAE39));
 
         LootboxRegistrationService.register(builder);

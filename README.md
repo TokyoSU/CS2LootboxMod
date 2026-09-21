@@ -26,6 +26,7 @@ CS2 Lootbox provides a reusable, registry-driven case system designed for modpac
   - Roulette-style item carousel
   - Rarity-colored cards and glow effects
   - Legendary / special reward stage
+  - Optional second legendary sub-loot carousel
   - Prize reveal and result screen
   - Responsive UI scaling for different GUI sizes and resolutions
 
@@ -159,7 +160,12 @@ CS2LootboxEvents.register(event => {
 
         // Absolute first-stage chance: 0.26%.
         crate.legendary(0.26)
+            .itemListName('tooltip.kubejs.rare_item')
+            .tooltip('tooltip.kubejs.rare_item')
             .foreground('kubejs:textures/gui/revolution_rare_item.png')
+            // Optional: skip the second legendary-only carousel.
+            // The server still rolls subLoot() and the final item is revealed directly.
+            .subLootCarousel(false)
             .subLoot()
                 .add('minecraft:netherite_ingot', 5)
                 .add('minecraft:nether_star', 4)
@@ -295,6 +301,34 @@ is an **absolute first-stage percentage**, so `0.26` means exactly `0.26%` per o
 It is not added to the normal loot weight total.
 
 The entries inside `subLoot()` form a second independent weighted table. They do not need to total `100`.
+
+The second legendary-only carousel is enabled by default. It can be disabled per legendary panel:
+
+```js
+crate.legendary(0.26)
+    .itemListName('tooltip.kubejs.rare_item')
+    .tooltip('tooltip.kubejs.rare_item')
+    .subLootCarousel(false)
+    .subLoot()
+        .add('minecraft:netherite_ingot', 5)
+        .add('minecraft:nether_star', 4)
+```
+
+When disabled, the server still performs the authoritative `subLoot()` roll immediately. After the primary gold card stops, the UI skips the second carousel and reveals the already-selected final item directly. `subCarousel(false)` and `subListCarousel(false)` are aliases.
+
+The UI also skips pointless roulette stages automatically: if the primary carousel has only **one valid configured result**, it goes directly to the prize panel; if a legendary `subLoot()` table has only **one valid entry**, its second carousel is skipped even when `subLootCarousel(true)` is left enabled.
+
+Legendary display text is split cleanly between the case contents and the case tooltip:
+
+```js
+crate.legendary(0.26)
+    .itemListName('legendary.kubejs.rare_gloves') // name under the gold item_list entry
+    .tooltip('tooltip.kubejs.rare_gloves')        // case-item hover tooltip line
+```
+
+`itemListName(...)` (or its short alias `name(...)`) accepts literal text or a translation key and controls only the legendary entry shown in the case contents `item_list`. `tooltip(...)` / `tooltipText(...)` controls the case item's hover tooltip. For backwards compatibility, the `item_list` falls back to `tooltip(...)` when no explicit item-list name is configured.
+
+The **primary legendary roulette card renders no text at all**; it only shows the gold panel/foreground artwork.
 
 For example:
 
@@ -486,9 +520,9 @@ The opening sequence is intentionally server-authoritative.
 4. The server rolls and locks the actual reward.
 5. The matching key is consumed.
 6. The case-opening animation plays.
-7. The client displays the cosmetic roulette.
-8. The carousel snaps the winning card to the center marker.
-9. A legendary result can transition into a second legendary-only carousel.
+7. If the primary pool has more than one valid configured result, the client displays the cosmetic roulette; otherwise it goes directly to the prize screen.
+8. When shown, the carousel snaps the winning card to the center marker.
+9. A legendary result transitions into its second legendary-only carousel only when that carousel is enabled **and** the `subLoot()` table contains more than one valid entry.
 10. The final prize screen is shown.
 11. Accept grants the already-rolled reward and consumes the case.
 12. If the UI closes after the roll is committed, the same pending prize is finalized rather than lost.
