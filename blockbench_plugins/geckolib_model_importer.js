@@ -2,6 +2,13 @@
  * GeckoLib glTF importer / Mesh → Cubes
  * Imports glTF as cubes by default, with an optional Poly Mesh mode that keeps
  * the original triangle geometry instead of approximating it with boxes.
+ * CS2/Source 2 skin support:
+ * - pivots for skinned joints are reconstructed from inverseBindMatrices;
+ * - JOINTS_0 + WEIGHTS_0 can be preserved exactly in a cs2_skinning extension;
+ * - native weighted meshes preview their real smooth deformation in Blockbench animation mode;
+ * - the updated CS2 Lootbox renderer lets GeckoLib evaluate the bones, then
+ *   performs linear-blend vertex skinning from those GeckoLib bone poses.
+ * - legacy rigid GeckoMesh approximation modes remain selectable.
  *
  * The core (solveBox) does not depend on Blockbench and is covered by
  * tools/verify-conversion.mjs, which runs it against a real OBJ file.
@@ -624,6 +631,24 @@ function matMul(a, b) {
 		}
 	}
 	return out;
+}
+
+/**
+ * Invert a glTF column-major 4x4 matrix.
+ *
+ * Skin inverse-bind matrices are authoritative for the bind-pose location of a
+ * joint relative to the skinned mesh.  Using THREE here also avoids maintaining
+ * a second hand-written matrix inverse next to Blockbench's own math library.
+ */
+function matInverse(m) {
+	try {
+		const tm = new THREE.Matrix4().fromArray(m);
+		const det = tm.determinant();
+		if (!Number.isFinite(det) || Math.abs(det) < 1e-12) return null;
+		return tm.invert().toArray();
+	} catch (e) {
+		return null;
+	}
 }
 
 /**
@@ -1463,6 +1488,14 @@ function parseGLTFFiles(files, opts) {
 	});
 
 	const objects = [];
+	// Bind-pose pivots recovered from skin.inverseBindMatrices.  For skinned
+	// assets this is more reliable than assuming the joint node's scene-world
+	// origin is the pivot: Source 2 exporters commonly keep a mesh transform and
+	// skeleton transform in different branches, while the inverse-bind matrix is
+	// precisely the relation the renderer uses to make them coincide at rest.
+	const skinBindCandidates = new Map();
+	let skinBindMatricesRead = 0;
+	let skinBindMatricesInvalid = 0;
 	// The node hierarchy is needed twice: as GeckoLib bones and as animation
 	// targets, which reference nodes by index.
 	const hierarchy = [];
@@ -1569,6 +1602,40 @@ function parseGLTFFiles(files, opts) {
 			// perfectly; blended triangles use the strongest accumulated influence.
 			const skin = node.skin !== undefined ? (gltf.skins || [])[node.skin] : null;
 
+			// IMPORTANT: derive animated joint pivots from the skin bind pose.
+			//
+			// glTF skinning uses (in mesh-local space):
+			//   inverse(meshWorld) * jointWorld * inverseBindMatrix
+			// which is identity in the bind pose. Therefore:
+			//   bindJointWorld = meshWorld * inverse(inverseBindMatrix)
+			//
+			// This gives the pivot in EXACTLY the same corrected world/reference
+			// space as the baked Poly Mesh vertices below.  Using only the joint
+			// node world origin works for simple files, but is wrong for Source 2
+			// exports where the skinned mesh and skeleton live under different
+			// transforms.  The symptom is exactly a strip/lid that is correct at rest
+			// then swings around a point several pixels away during animation.
+			if (skin && skin.inverseBindMatrices !== undefined && skin.joints && skin.joints.length) {
+				try {
+					const ibm = readAccessor(gltf, buffers, skin.inverseBindMatrices);
+					for (let ji = 0; ji < skin.joints.length && ji < ibm.length; ji++) {
+						const jointNode = skin.joints[ji];
+						const invBind = ibm[ji];
+						if (!invBind || invBind.length !== 16) { skinBindMatricesInvalid++; continue; }
+						const bindLocal = matInverse(invBind);
+						if (!bindLocal) { skinBindMatricesInvalid++; continue; }
+						const bindWorld = matMul(world, bindLocal);
+						const p = matApply(bindWorld, [0, 0, 0]).map((v, i) => v * scale + offset[i]);
+						if (!p.every(Number.isFinite)) { skinBindMatricesInvalid++; continue; }
+						if (!skinBindCandidates.has(jointNode)) skinBindCandidates.set(jointNode, []);
+						skinBindCandidates.get(jointNode).push({ pivot: p, meshNode: nodeIndex, skin: node.skin });
+						skinBindMatricesRead++;
+					}
+				} catch (e) {
+					warnings.push(`skin on “${node.name || nodeIndex}”: inverse bind matrices could not be read (${(e && e.message) || e})`);
+				}
+			}
+
 			for (const prim of mesh.primitives || []) {
 				if (prim.mode !== undefined && !TRIANGULATE[prim.mode]) {
 					warnings.push(`${node.name || mesh.name}: primitive mode ${prim.mode} skipped (points and lines are not geometry)`);
@@ -1614,34 +1681,70 @@ function parseGLTFFiles(files, opts) {
 				const joints = skin && jointsIdx !== undefined ? readAccessor(gltf, buffers, jointsIdx) : null;
 				const weights = skin && weightsIdx !== undefined ? readAccessor(gltf, buffers, weightsIdx) : null;
 
-				const boneForTriangle = tri => {
-					if (!skin || !joints || !skin.joints || !skin.joints.length) return nodeIndex;
-					const score = new Map();
-					for (const vertex of tri) {
-						const js = joints[vertex] || [];
-						const ws = weights ? (weights[vertex] || []) : [];
-						for (let j = 0; j < js.length; j++) {
-							const jointSlot = js[j];
-							const boneNode = skin.joints[jointSlot];
-							if (boneNode === undefined) continue;
-							const weight = weights ? Number(ws[j] || 0) : (j === 0 ? 1 : 0);
-							if (weight <= 1e-8) continue;
-							score.set(boneNode, (score.get(boneNode) || 0) + weight);
-						}
+				// Preserve the REAL glTF skinning data per vertex.  GeckoMesh's normal
+				// bone.poly_mesh path is rigid, but CS2 Lootbox now has a GeckoLib-driven
+				// weighted renderer.  Keeping JOINTS_0 + WEIGHTS_0 here lets the export
+				// embed exact weights instead of destructively assigning each triangle to
+				// one dominant bone.  The dominant metadata is still computed so the old
+				// approximation modes remain available for non-CS2 projects.
+				const vertexSkin = pos.map((_, vertex) => {
+					if (!skin || !joints || !skin.joints || !skin.joints.length) return [];
+					const js = joints[vertex] || [];
+					const ws = weights ? (weights[vertex] || []) : [];
+					const influences = [];
+					for (let j = 0; j < js.length; j++) {
+						const jointSlot = Number(js[j]);
+						const boneNode = skin.joints[jointSlot];
+						if (boneNode === undefined) continue;
+						const weight = weights ? Number(ws[j] || 0) : (j === 0 ? 1 : 0);
+						if (!Number.isFinite(weight) || weight <= 1e-8) continue;
+						influences.push({ node: boneNode, weight });
 					}
+					influences.sort((a, b) => b.weight - a.weight);
+					const kept = influences.slice(0, 4);
+					const sum = kept.reduce((v, x) => v + x.weight, 0);
+					if (sum > 1e-8) for (const x of kept) x.weight /= sum;
+					return kept;
+				});
+
+				const skinForTriangle = tri => {
+					if (!skin || !joints || !skin.joints || !skin.joints.length) {
+						return { boneNode: nodeIndex, skinNodes: [], blended: false };
+					}
+
+					const score = new Map();
+					const skinNodes = new Set();
+					const rigidVertexBones = [];
+					let blended = false;
+					for (const vertex of tri) {
+						const inf = vertexSkin[vertex] || [];
+						for (const x of inf) {
+							skinNodes.add(x.node);
+							score.set(x.node, (score.get(x.node) || 0) + x.weight);
+						}
+						const strongest = inf[0];
+						if (inf.length > 1 || (strongest && strongest.weight < 0.999)) blended = true;
+						rigidVertexBones.push(strongest && strongest.node);
+					}
+					if (new Set(rigidVertexBones.filter(v => v !== undefined)).size > 1) blended = true;
+
 					let best = nodeIndex, bestWeight = -1;
 					for (const [boneNode, weight] of score) {
 						if (weight > bestWeight) { bestWeight = weight; best = boneNode; }
 					}
-					return best;
+					return { boneNode: best, skinNodes: [...skinNodes], blended };
 				};
 
 				for (const tri of TRIANGULATE[prim.mode === undefined ? 4 : prim.mode](idx)) {
+					const triSkin = skinForTriangle(tri);
 					faces.push({
 						positions: tri.map(k => pos[k]),
 						uvs: tri.map(k => uv ? uv[k] : null),
-						// metadata used only by the importer; solveBox ignores it
-						boneNode: boneForTriangle(tri),
+						// metadata used only by the importer/exporter; solveBox ignores it
+						boneNode: triSkin.boneNode,
+						skinNodes: triSkin.skinNodes,
+						skinBlended: triSkin.blended,
+						skinVertices: tri.map(k => (vertexSkin[k] || []).map(x => ({ node: x.node, weight: x.weight }))),
 						image: primImageIndex,
 						wrapS,
 						wrapT,
@@ -1661,7 +1764,49 @@ function parseGLTFFiles(files, opts) {
 	const base = matFromTRS([0, 0, 0], corr, [1, 1, 1]);
 	for (const r of roots) visit(r, base, -1, corr.slice());
 
-	return { objects, images, warnings, hierarchy, animations: parseAnimations(gltf, buffers, warnings), unitScale: scale };
+	// Replace pivots of skinned joints with the bind-pose pivots recovered above.
+	// A joint can appear in more than one skin/mesh. Valid glTF files produce the
+	// same world bind point in every occurrence; use their average to remove tiny
+	// floating-point differences and report any real disagreement for debugging.
+	let bindPivotOverrides = 0;
+	let bindPivotMaxCorrection = 0;
+	let bindPivotMaxSpread = 0;
+	let bindPivotWorst = '';
+	for (const h of hierarchy) {
+		const candidates = skinBindCandidates.get(h.index);
+		if (!candidates || !candidates.length) continue;
+		const pivot = [0, 0, 0];
+		for (const c of candidates) for (let k = 0; k < 3; k++) pivot[k] += c.pivot[k];
+		for (let k = 0; k < 3; k++) pivot[k] /= candidates.length;
+
+		let spread = 0;
+		for (const c of candidates) spread = Math.max(spread, Math.hypot(
+			c.pivot[0] - pivot[0], c.pivot[1] - pivot[1], c.pivot[2] - pivot[2]));
+		bindPivotMaxSpread = Math.max(bindPivotMaxSpread, spread);
+
+		const correction = Math.hypot(
+			h.pivot[0] - pivot[0], h.pivot[1] - pivot[1], h.pivot[2] - pivot[2]);
+		if (correction > bindPivotMaxCorrection) {
+			bindPivotMaxCorrection = correction;
+			bindPivotWorst = h.name;
+		}
+		h.nodePivot = h.pivot.slice();
+		h.pivot = pivot;
+		h.pivotSource = 'inverseBindMatrices';
+		h.bindPivotCorrection = correction;
+		bindPivotOverrides++;
+	}
+
+	const bindPivotStats = {
+		matricesRead: skinBindMatricesRead,
+		invalid: skinBindMatricesInvalid,
+		overrides: bindPivotOverrides,
+		maxCorrection: bindPivotMaxCorrection,
+		maxSpread: bindPivotMaxSpread,
+		worstBone: bindPivotWorst,
+	};
+
+	return { objects, images, warnings, hierarchy, animations: parseAnimations(gltf, buffers, warnings), unitScale: scale, bindPivotStats };
 }
 
 /**
@@ -1918,6 +2063,23 @@ function snapGrid(v, step) {
 	return Object.is(r, -0) ? 0 : r;
 }
 function snapVec(v, step) { return v.map(x => snapGrid(x, step)); }
+
+/**
+ * Bone pivots must not be snapped to the modelling grid. Poly Mesh vertices are
+ * preserved at their exact glTF coordinates, so snapping a joint from e.g.
+ * 3.137 px to 3.25 px changes the centre of rotation and makes thin animated
+ * parts (case lids, envelope strips, weapon pieces, etc.) detach while rotating.
+ *
+ * Keep the glTF pivot essentially exact and only remove floating-point noise.
+ */
+function preciseBonePivot(v) {
+	return (v || [0, 0, 0]).map(value => {
+		const n = Number(value);
+		if (!Number.isFinite(n) || Math.abs(n) < 1e-9) return 0;
+		const r = Math.round(n * 1e6) / 1e6;
+		return Object.is(r, -0) ? 0 : r;
+	});
+}
 
 /** Angles: strip floating-point noise but keep the value. */
 function snapAngle(deg) {
@@ -3031,7 +3193,7 @@ function meshToFaces(mesh) {
  * reversed again by compileBlockbenchMeshIntoPolyMesh(), so what is written to
  * poly_mesh is the original atlas UV.
  */
-function meshFromTriangleFaces(name, faces, texture) {
+function meshFromTriangleFaces(name, faces, texture, preserveSkinVertices = false) {
 	const mesh = new Mesh({
 		name,
 		origin: [0, 0, 0],
@@ -3041,18 +3203,37 @@ function meshFromTriangleFaces(name, faces, texture) {
 	});
 	const keyByPosition = new Map();
 	const meshFaces = [];
+	const vertexSkin = {};
 	const posKey = p => p.map(v => Math.round(Number(v) * 1e6) / 1e6).join(',');
+	const skinKey = influences => {
+		if (!preserveSkinVertices || !Array.isArray(influences) || !influences.length) return '';
+		return influences
+			.filter(x => x && x.node !== undefined && Number(x.weight) > 1e-8)
+			.map(x => `${x.node}:${Math.round(Number(x.weight) * 1e7) / 1e7}`)
+			.sort()
+			.join('|');
+	};
 
 	for (const face of faces || []) {
 		if (!face.positions || face.positions.length < 3) continue;
 		const keys = [];
-		for (const pos of face.positions) {
-			const pk = posKey(pos);
+		for (let vi = 0; vi < face.positions.length; vi++) {
+			const pos = face.positions[vi];
+			const influences = face.skinVertices && face.skinVertices[vi];
+			// A glTF file can duplicate a position at a UV seam and, more rarely,
+			// give those duplicates different skin weights.  Native preview must not
+			// merge such vertices or the two weight sets become impossible to represent.
+			const pk = posKey(pos) + (preserveSkinVertices ? `#${skinKey(influences)}` : '');
 			let key = keyByPosition.get(pk);
 			if (!key) {
 				key = typeof guid === 'function' ? guid() : `v_${keyByPosition.size}`;
 				keyByPosition.set(pk, key);
 				mesh.vertices[key] = pos.slice(0, 3);
+				if (preserveSkinVertices && Array.isArray(influences) && influences.length) {
+					vertexSkin[key] = influences
+						.filter(x => x && x.node !== undefined && Number(x.weight) > 1e-8)
+						.map(x => ({ node: x.node, weight: Number(x.weight) }));
+				}
 			}
 			keys.push(key);
 		}
@@ -3076,6 +3257,7 @@ function meshFromTriangleFaces(name, faces, texture) {
 	}
 
 	mesh.addFaces(...meshFaces);
+	if (Object.keys(vertexSkin).length) mesh.__cs2VertexSkin = vertexSkin;
 	return mesh;
 }
 
@@ -3193,14 +3375,314 @@ function compileBlockbenchMeshIntoPolyMesh(polyMesh, mesh) {
 	return polyMesh;
 }
 
+// ------------------------------------------------------------- CS2 weighted skin preview
+//
+// GeckoLib projects use ordinary Group bones, not Blockbench Armature bones, so
+// Blockbench cannot apply glTF JOINTS_0/WEIGHTS_0 by itself.  The runtime mod
+// already performs true linear-blend skinning from GeckoLib's live bone poses;
+// this preview mirrors the same idea inside Blockbench without modifying the
+// actual Mesh vertices.  It writes only to the THREE preview geometry through
+// Mesh.preview_controller.displayDeformation(), so export always uses the clean
+// bind-pose source data.
+let weightedSkinPreviewAnimationHandler = null;
+let weightedSkinPreviewDefaultPoseHandler = null;
+
+function weightedPreviewMeshes() {
+	if (typeof Mesh === 'undefined') return [];
+	return Mesh.all.filter(mesh => mesh && mesh.__cs2WeightedSource && mesh.__cs2WeightedPreviewEnabled !== false);
+}
+
+function prepareWeightedSkinPreview(mesh) {
+	if (!mesh || !mesh.__cs2WeightedSource || !mesh.__cs2VertexSkin || typeof THREE === 'undefined') return false;
+	const source = mesh.__cs2WeightedSource;
+	const meshObject = mesh.scene_object || mesh.mesh;
+	if (!meshObject || !meshObject.matrixWorld) return false;
+
+	try {
+		if (typeof Canvas !== 'undefined' && Canvas.scene && Canvas.scene.updateMatrixWorld) {
+			Canvas.scene.updateMatrixWorld(true);
+		} else if (meshObject.updateWorldMatrix) {
+			meshObject.updateWorldMatrix(true, false);
+		}
+
+		const bindMeshWorld = new THREE.Matrix4().copy(meshObject.matrixWorld);
+		const bindWorldPositions = {};
+		for (const vkey in mesh.vertices) {
+			bindWorldPositions[vkey] = new THREE.Vector3().fromArray(mesh.vertices[vkey]).applyMatrix4(bindMeshWorld);
+		}
+
+		const boneNodes = new Set();
+		for (const vkey in mesh.__cs2VertexSkin) {
+			for (const inf of mesh.__cs2VertexSkin[vkey] || []) {
+				if (inf && inf.node !== undefined && Number(inf.weight) > 1e-8) boneNodes.add(inf.node);
+			}
+		}
+
+		const bindBoneWorldInverse = new Map();
+		const missingBones = [];
+		for (const node of boneNodes) {
+			const group = source.groupByNode && source.groupByNode[node];
+			const boneObject = group && (group.scene_object || group.mesh);
+			if (!boneObject || !boneObject.matrixWorld) {
+				missingBones.push(node);
+				continue;
+			}
+			if (boneObject.updateWorldMatrix) boneObject.updateWorldMatrix(true, false);
+			bindBoneWorldInverse.set(node, new THREE.Matrix4().copy(boneObject.matrixWorld).invert());
+		}
+
+		source.preview = {
+			bindMeshWorld,
+			bindWorldPositions,
+			bindBoneWorldInverse,
+			boneNodes: [...boneNodes],
+			missingBones,
+		};
+		return true;
+	} catch (e) {
+		console.warn('[geckolib-import] could not prepare weighted Blockbench preview for', mesh.name, e);
+		return false;
+	}
+}
+
+function prepareAllWeightedSkinPreviews() {
+	let prepared = 0, vertices = 0, missing = 0;
+	for (const mesh of weightedPreviewMeshes()) {
+		if (prepareWeightedSkinPreview(mesh)) {
+			prepared++;
+			vertices += Object.keys(mesh.__cs2VertexSkin || {}).length;
+			missing += mesh.__cs2WeightedSource.preview?.missingBones?.length || 0;
+		}
+	}
+	return { prepared, vertices, missing };
+}
+
+function clearWeightedSkinPreview() {
+	if (typeof Mesh === 'undefined' || !Mesh.preview_controller) return;
+	for (const mesh of weightedPreviewMeshes()) {
+		try {
+			// Rebuild from element.vertices, which always remain the bind pose.
+			Mesh.preview_controller.updateGeometry(mesh);
+		} catch (e) { /* project may be closing/rebuilding */ }
+	}
+}
+
+function updateWeightedSkinPreview() {
+	if (typeof THREE === 'undefined' || typeof Mesh === 'undefined' || !Mesh.preview_controller) return;
+	const meshes = weightedPreviewMeshes();
+	if (!meshes.length) return;
+
+	// Animator updates Group transforms before dispatching display_animation_frame.
+	// Force the world matrices current once here so scrubbing, playback and
+	// controller previews all use the exact pose visible this frame.
+	try {
+		if (typeof Canvas !== 'undefined' && Canvas.scene && Canvas.scene.updateMatrixWorld) Canvas.scene.updateMatrixWorld(true);
+	} catch (e) { /* best effort */ }
+
+	const tmpWorld = new THREE.Vector3();
+	const blendedWorld = new THREE.Vector3();
+	const local = new THREE.Vector3();
+	const base = new THREE.Vector3();
+
+	for (const mesh of meshes) {
+		const source = mesh.__cs2WeightedSource;
+		let preview = source && source.preview;
+		if (!preview && !prepareWeightedSkinPreview(mesh)) continue;
+		preview = source.preview;
+
+		const meshObject = mesh.scene_object || mesh.mesh;
+		if (!meshObject || !meshObject.matrixWorld) continue;
+		const currentMeshWorldInverse = new THREE.Matrix4().copy(meshObject.matrixWorld).invert();
+
+		// One skin matrix per influencing bone per frame.  This is the standard
+		// currentGlobal * inverse(bindGlobal) matrix, expressed in THREE world space.
+		const skinMatrices = new Map();
+		for (const node of preview.boneNodes || []) {
+			const group = source.groupByNode && source.groupByNode[node];
+			const boneObject = group && (group.scene_object || group.mesh);
+			const invBind = preview.bindBoneWorldInverse.get(node);
+			if (!boneObject || !invBind) continue;
+			skinMatrices.set(node, new THREE.Matrix4().multiplyMatrices(boneObject.matrixWorld, invBind));
+		}
+
+		const offsets = {};
+		for (const vkey in mesh.vertices) {
+			const original = mesh.vertices[vkey];
+			const bindWorld = preview.bindWorldPositions[vkey];
+			const influences = mesh.__cs2VertexSkin[vkey] || [];
+			if (!bindWorld || !influences.length) continue;
+
+			blendedWorld.set(0, 0, 0);
+			let totalWeight = 0;
+			for (const inf of influences) {
+				const weight = Number(inf.weight) || 0;
+				const skinMatrix = skinMatrices.get(inf.node);
+				if (weight <= 1e-8 || !skinMatrix) continue;
+				tmpWorld.copy(bindWorld).applyMatrix4(skinMatrix);
+				blendedWorld.addScaledVector(tmpWorld, weight);
+				totalWeight += weight;
+			}
+			if (totalWeight <= 1e-8) continue;
+			if (Math.abs(totalWeight - 1) > 1e-6) blendedWorld.multiplyScalar(1 / totalWeight);
+
+			local.copy(blendedWorld).applyMatrix4(currentMeshWorldInverse);
+			base.fromArray(original);
+			local.sub(base);
+			offsets[vkey] = [local.x, local.y, local.z];
+		}
+
+		try {
+			Mesh.preview_controller.displayDeformation(mesh, offsets);
+		} catch (e) {
+			console.warn('[geckolib-import] weighted preview update failed for', mesh.name, e);
+		}
+	}
+}
+
+function installWeightedSkinPreview() {
+	if (typeof Blockbench === 'undefined' || !Blockbench.on || weightedSkinPreviewAnimationHandler) return;
+	weightedSkinPreviewAnimationHandler = () => updateWeightedSkinPreview();
+	weightedSkinPreviewDefaultPoseHandler = event => {
+		// Animator.preview() resets the default pose with reduced_updates=true on
+		// every frame, then immediately applies the animated pose. Avoid rebuilding
+		// the full mesh in that hot path; displayDeformation overwrites all preview
+		// positions a moment later. A real return to Edit/default pose clears it.
+		if (!event || !event.reduced_updates) clearWeightedSkinPreview();
+	};
+	Blockbench.on('display_animation_frame', weightedSkinPreviewAnimationHandler);
+	Blockbench.on('display_default_pose', weightedSkinPreviewDefaultPoseHandler);
+}
+
+function uninstallWeightedSkinPreview() {
+	try {
+		if (typeof Blockbench !== 'undefined' && Blockbench.removeListener) {
+			if (weightedSkinPreviewAnimationHandler) Blockbench.removeListener('display_animation_frame', weightedSkinPreviewAnimationHandler);
+			if (weightedSkinPreviewDefaultPoseHandler) Blockbench.removeListener('display_default_pose', weightedSkinPreviewDefaultPoseHandler);
+		}
+	} catch (e) { /* best effort */ }
+	weightedSkinPreviewAnimationHandler = null;
+	weightedSkinPreviewDefaultPoseHandler = null;
+}
+
+/**
+ * Compile one glTF-skinned preview Mesh into CS2 Lootbox's weighted extension.
+ *
+ * The source triangles live in Blockbench model/pixel space (the same space as
+ * the imported bones).  The runtime renderer consumes GeckoLib model units, so
+ * positions are divided by 16 here.  UVs are stored already in the final
+ * orientation expected by VertexConsumer (0..1, top-left Blockbench V).
+ *
+ * This data deliberately lives beside bone.poly_mesh instead of replacing
+ * GeckoMesh. Rigid meshes still use GeckoMesh; only meshes tagged by the glTF
+ * importer as weighted are emitted here.
+ */
+function compileWeightedSkinMesh(mesh) {
+	const source = mesh && mesh.__cs2WeightedSource;
+	if (!source || !Array.isArray(source.faces) || !source.faces.length) return null;
+
+	const bones = [];
+	const boneIndex = new Map();
+	const boneNameForNode = node => {
+		const group = source.groupByNode && source.groupByNode[node];
+		if (group && group.name) return String(group.name);
+		const h = source.hierarchyByNode && source.hierarchyByNode.get && source.hierarchyByNode.get(node);
+		return h && h.name ? String(h.name) : `node_${node}`;
+	};
+	const indexForBone = node => {
+		const name = boneNameForNode(node);
+		let index = boneIndex.get(name);
+		if (index === undefined) {
+			index = bones.length;
+			boneIndex.set(name, index);
+			bones.push(name);
+		}
+		return index;
+	};
+
+	const positions = [], uvs = [], joints = [], weights = [], indices = [];
+	const vertexIndex = new Map();
+	const q = v => Math.round(Number(v || 0) * 1e7) / 1e7;
+
+	const addVertex = (position, uv, influences) => {
+		let inf = Array.isArray(influences) ? influences
+			.filter(x => x && x.node !== undefined && Number(x.weight) > 1e-8)
+			.map(x => ({ node: x.node, weight: Number(x.weight) }))
+			.sort((a, b) => b.weight - a.weight)
+			.slice(0, 4) : [];
+		let sum = inf.reduce((v, x) => v + x.weight, 0);
+		if (sum > 1e-8) inf = inf.map(x => ({ node: x.node, weight: x.weight / sum }));
+
+		const jointSlots = [0, 0, 0, 0];
+		const weightSlots = [0, 0, 0, 0];
+		for (let i = 0; i < inf.length; i++) {
+			jointSlots[i] = indexForBone(inf[i].node);
+			weightSlots[i] = inf[i].weight;
+		}
+
+		// No valid skin influence should not happen on a weighted primitive, but
+		// falling back to the mesh's parent bone is safer than dropping a vertex.
+		if (!inf.length) {
+			const parentName = mesh.parent && mesh.parent.name ? String(mesh.parent.name) : '';
+			let bi = boneIndex.get(parentName);
+			if (bi === undefined) { bi = bones.length; boneIndex.set(parentName, bi); bones.push(parentName); }
+			jointSlots[0] = bi;
+			weightSlots[0] = 1;
+		}
+
+		const px = q(position && position[0]) / 16;
+		const py = q(position && position[1]) / 16;
+		const pz = q(position && position[2]) / 16;
+		const tu = Project.texture_width ? q(uv && uv[0]) / Project.texture_width : 0;
+		const tv = Project.texture_height ? q(uv && uv[1]) / Project.texture_height : 0;
+		const key = [q(px), q(py), q(pz), q(tu), q(tv), ...jointSlots, ...weightSlots.map(q)].join('|');
+		let vi = vertexIndex.get(key);
+		if (vi !== undefined) return vi;
+
+		vi = positions.length / 3;
+		vertexIndex.set(key, vi);
+		positions.push(px, py, pz);
+		uvs.push(tu, tv);
+		joints.push(...jointSlots);
+		weights.push(...weightSlots.map(q));
+		return vi;
+	};
+
+	for (const face of source.faces) {
+		if (!face.positions || face.positions.length < 3) continue;
+		const corner = [];
+		for (let i = 0; i < 3; i++) {
+			corner.push(addVertex(
+				face.positions[i],
+				(face.uvs && face.uvs[i]) || [0, 0],
+				(face.skinVertices && face.skinVertices[i]) || []
+			));
+		}
+		if (new Set(corner).size < 3) continue;
+		// GeckoMesh reverses poly_mesh winding while converting coordinates. Match
+		// that final winding so weighted and rigid meshes cull identically in-game.
+		indices.push(corner[0], corner[2], corner[1]);
+	}
+
+	if (!indices.length || !bones.length) return null;
+	return {
+		name: String(mesh.name || 'weighted_mesh'),
+		bones,
+		positions,
+		uvs,
+		joints,
+		weights,
+		indices,
+	};
+}
+
 let polyMeshCompileHandler = null;
 let geckoMeshesPreviousValue;
 
 // Runtime coordinate convention for exported bone.poly_mesh.
-// CS2LootboxMod currently uses GeckoMesh 1.0 from CurseMaven, whose
-// PolyMeshConverter keeps X unchanged. GeckoMesh 1.1+ changed the converter to
-// negate X at runtime. Keep the export selectable so both versions stay valid.
-let polyMeshGeckoMeshRuntime = '1_0';
+// GeckoMesh 1.1+ is the default and negates X in PolyMeshConverter. The old
+// 1.0 CurseMaven converter keeps X unchanged, so it remains selectable for
+// legacy projects.
+let polyMeshGeckoMeshRuntime = '1_1_plus';
 
 /** Allow Mesh elements inside GeckoLib projects while this plugin is active. */
 function enableGeckoMeshEditing() {
@@ -3214,7 +3696,11 @@ function enableGeckoMeshEditing() {
 	}
 }
 
-/** Inject Mesh elements into the Bedrock geometry export as bone.poly_mesh. */
+/**
+ * Inject ordinary Mesh elements as bone.poly_mesh and weighted glTF meshes as
+ * geometry.cs2_skinning.  GeckoLib ignores the custom geometry field, while
+ * CS2 Lootbox reads it after GeckoLib has evaluated the animation pose.
+ */
 function installPolyMeshExporter() {
 	if (polyMeshCompileHandler || typeof Codecs === 'undefined' || !Codecs.bedrock || !Codecs.bedrock.on) return;
 	polyMeshCompileHandler = function geckolibImporterPolyMeshCompile(event) {
@@ -3224,17 +3710,37 @@ function installPolyMeshExporter() {
 			if (geometry && geometry['minecraft:geometry']) geometry = geometry['minecraft:geometry'][0];
 			if (!geometry || !Array.isArray(geometry.bones) || typeof Group === 'undefined' || typeof Mesh === 'undefined') return;
 
+			const weighted = [];
 			for (const group of Group.all) {
 				const meshes = (group.children || []).filter(child => child instanceof Mesh && child.export !== false);
 				if (!meshes.length) continue;
 				const bone = geometry.bones.find(b => b.name === group.name);
 				if (!bone) continue;
+
 				let poly = null;
-				for (const mesh of meshes) poly = compileBlockbenchMeshIntoPolyMesh(poly, mesh);
+				for (const mesh of meshes) {
+					if (mesh.__cs2WeightedSource) {
+						const skin = compileWeightedSkinMesh(mesh);
+						if (skin) weighted.push(skin);
+					} else {
+						poly = compileBlockbenchMeshIntoPolyMesh(poly, mesh);
+					}
+				}
 				if (poly && poly.polys.length) bone.poly_mesh = poly;
 			}
+
+			if (weighted.length) {
+				geometry.cs2_skinning = {
+					format_version: 1,
+					space: 'geckolib_model_units',
+					max_influences: 4,
+					meshes: weighted,
+				};
+			} else if (geometry.cs2_skinning) {
+				delete geometry.cs2_skinning;
+			}
 		} catch (e) {
-			console.error('[geckolib-import] poly_mesh export failed', e);
+			console.error('[geckolib-import] poly_mesh / weighted skin export failed', e);
 		}
 	};
 	Codecs.bedrock.on('compile', polyMeshCompileHandler);
@@ -4340,11 +4846,11 @@ function buildPolyMeshProject(ctx) {
 	} = ctx;
 
 	// Keep the exporter in the same coordinate convention as the runtime mod.
-	// Default to 1.0 because that is the CurseMaven version used by
-	// CS2LootboxMod. This fixes the in-game-only X mirror and the resulting
-	// mismatch between PolyMesh geometry and GeckoLib bone animations.
+	// GeckoMesh 1.1+ is the current/default coordinate convention. Keep 1.0
+	// selectable for older CurseMaven builds, but do not silently fall back to it.
+	// Using the wrong convention mirrors PolyMesh geometry relative to the bones.
 	polyMeshGeckoMeshRuntime =
-		opts && opts.geckomesh_runtime === '1_1_plus' ? '1_1_plus' : '1_0';
+		opts && opts.geckomesh_runtime === '1_0' ? '1_0' : '1_1_plus';
 
 	enableGeckoMeshEditing();
 	installPolyMeshExporter();
@@ -4374,19 +4880,198 @@ function buildPolyMeshProject(ctx) {
 	// animation conversion continues to target the same nodes.
 	const groupByNode = {};
 	for (const h of parsed.hierarchy) {
-		const g = new Group({ name: h.name, origin: snapVec(h.pivot) }).init();
+		const g = new Group({ name: h.name, origin: preciseBonePivot(h.pivot) }).init();
 		if (h.parent >= 0 && groupByNode[h.parent]) g.addTo(groupByNode[h.parent]);
 		groupByNode[h.index] = g;
 	}
 
+	const requestedSkinningMode = opts && opts.skinning_mode;
+	const skinningMode = ['native', 'auto', 'continuous', 'dominant'].includes(requestedSkinningMode)
+		? requestedSkinningMode
+		: 'native';
+	const hierarchyByNode = new Map(parsed.hierarchy.map(h => [h.index, h]));
+	const parentOfNode = node => {
+		const h = hierarchyByNode.get(node);
+		return h && h.parent >= 0 ? h.parent : undefined;
+	};
+	const commonAncestor = nodes => {
+		const unique = [...new Set(Array.from(nodes || []).filter(n => hierarchyByNode.has(n)))];
+		if (!unique.length) return undefined;
+		const otherSets = unique.slice(1).map(n => {
+			const set = new Set();
+			for (let p = n; p !== undefined; p = parentOfNode(p)) set.add(p);
+			return set;
+		});
+		for (let p = unique[0]; p !== undefined; p = parentOfNode(p)) {
+			if (otherSets.every(set => set.has(p))) return p;
+		}
+		return undefined;
+	};
+	const isAncestorOf = (ancestor, node) => {
+		for (let p = node; p !== undefined; p = parentOfNode(p)) if (p === ancestor) return true;
+		return false;
+	};
+	// A smooth ribbon driven by strip000 -> strip001 -> ... is a special case that
+	// GeckoMesh can approximate much better than a general smooth-skinned surface.
+	// If every influencing joint is comparable in one ancestor chain, assigning
+	// successive triangles to their dominant chain joint produces articulated rigid
+	// sections instead of one completely rigid "bamboo".  Sibling-driven body
+	// surfaces (root/top/bottom) are NOT a chain and therefore stay continuous.
+	const isLinearBoneChain = nodes => {
+		const unique = [...new Set(Array.from(nodes || []).filter(n => hierarchyByNode.has(n)))];
+		if (unique.length < 2) return false;
+		for (let i = 0; i < unique.length; i++) {
+			for (let j = i + 1; j < unique.length; j++) {
+				if (!isAncestorOf(unique[i], unique[j]) && !isAncestorOf(unique[j], unique[i])) return false;
+			}
+		}
+		return true;
+	};
+
 	let meshCount = 0, triangleCount = 0, dropped = 0, untextured = 0;
+	let smoothComponentsKept = 0, smoothFacesKept = 0;
+	let chainComponentsSplit = 0, chainFacesSplit = 0;
+	let weightedMeshCount = 0, weightedFaceCount = 0;
+	const smoothExamples = [], chainExamples = [], weightedExamples = [];
 	for (const obj of parsed.objects) {
-		// Rigid skinning is represented by parenting geometry to its dominant glTF
-		// joint. A single primitive may therefore become several Mesh elements, one
-		// per target bone. They are merged back into one bone.poly_mesh at export.
+		let sourceFaces = obj.faces || [];
+
+		// Native CS2 mode keeps every glTF-skinned primitive intact.  The Mesh is
+		// still created so the bind pose can be inspected/edited in Blockbench, but
+		// the Bedrock compile hook excludes it from bone.poly_mesh and instead writes
+		// exact JOINTS_0/WEIGHTS_0 into geometry.cs2_skinning.  At runtime CS2 Lootbox
+		// asks GeckoLib for the animated bone pose and performs the vertex blend.
+		if (skinningMode === 'native') {
+			const weightedFaces = sourceFaces.filter(face => Array.isArray(face.skinVertices)
+				&& face.skinVertices.some(v => Array.isArray(v) && v.length));
+			if (weightedFaces.length) {
+				const valid = weightedFaces.filter(f => !isDegenerate([f]));
+				dropped += weightedFaces.length - valid.length;
+				if (valid.length) {
+					const influences = new Set();
+					for (const face of valid) for (const node of face.skinNodes || []) influences.add(node);
+					let anchor = commonAncestor(influences);
+					if (anchor === undefined) anchor = valid.find(face => face.boneNode !== undefined)?.boneNode;
+					if (anchor === undefined) anchor = obj.node;
+
+					const mesh = meshFromTriangleFaces(`${obj.name}_weighted`, valid, atlasTexture, true);
+					mesh.__cs2WeightedSource = { faces: valid, groupByNode, hierarchyByNode };
+					mesh.__cs2WeightedPreviewEnabled = !opts || opts.weighted_skin_preview !== false;
+					const parent = groupByNode[anchor] || groupByNode[obj.node];
+					if (parent) mesh.addTo(parent); else mesh.addTo('root');
+					mesh.init();
+					meshCount++;
+					triangleCount += valid.length;
+					weightedMeshCount++;
+					weightedFaceCount += valid.length;
+					if (weightedExamples.length < 4) {
+						const names = [...influences].map(n => hierarchyByNode.get(n)?.name || n);
+						weightedExamples.push(`${obj.name}: ${valid.length} faces / ${names.length} bones`);
+					}
+					if (obj.image < 0) untextured++;
+				}
+			}
+			const weightedSet = new Set(weightedFaces);
+			sourceFaces = sourceFaces.filter(face => !weightedSet.has(face));
+		}
+		// GeckoLib/GeckoMesh transforms a complete poly_mesh with one bone; it does
+		// not retain glTF JOINTS_0/WEIGHTS_0 per vertex.  There is therefore no exact
+		// representation of Source 2 smooth skinning.  The default AUTO mode uses a
+		// hybrid approximation:
+		//   * general blended surfaces stay on one common ancestor so the body does
+		//     not explode into detached triangles;
+		//   * blended surfaces driven by a single linear bone chain are segmented by
+		//     dominant joint, allowing ribbons/tear strips/tails to articulate.
+		// CONTINUOUS keeps every blended island rigid. DOMINANT is the old behaviour
+		// that splits every blended triangle, including the main body.
+		const assignedBone = new Map();
+		if (skinningMode !== 'dominant') {
+			const components = splitComponents(sourceFaces).map(faces => {
+				const influences = new Set();
+				for (const face of faces) for (const node of face.skinNodes || []) influences.add(node);
+				return { faces, influences, blended: faces.some(face => !!face.skinBlended) };
+			});
+
+			// Rigid components always keep their exact owning bone. In AUTO, a smooth
+			// component driven by one ancestor chain is intentionally segmented by the
+			// dominant joint of each triangle. This is what restores bending of the
+			// dossier's envelope_strip000..005 while leaving the envelope body intact.
+			const continuousIds = [];
+			for (let i = 0; i < components.length; i++) {
+				const component = components[i];
+				if (!component.blended) {
+					for (const face of component.faces) assignedBone.set(face, face.boneNode === undefined ? obj.node : face.boneNode);
+					continue;
+				}
+				if (skinningMode === 'auto' && isLinearBoneChain(component.influences)) {
+					for (const face of component.faces) assignedBone.set(face, face.boneNode === undefined ? obj.node : face.boneNode);
+					chainComponentsSplit++;
+					chainFacesSplit += component.faces.length;
+					if (chainExamples.length < 4) {
+						const names = [...component.influences].map(n => hierarchyByNode.get(n)?.name || n);
+						chainExamples.push(`${component.faces.length} faces → ${names.join(' -> ')}`);
+					}
+				} else {
+					continuousIds.push(i);
+				}
+			}
+
+			// Several disconnected shells can belong to the SAME smooth-skinned part.
+			// Merge continuous candidates that share influences before choosing a common
+			// ancestor, otherwise caps/backfaces can still float independently.
+			const parent = new Map(continuousIds.map(i => [i, i]));
+			const find = i => {
+				let p = parent.get(i);
+				while (p !== parent.get(p)) { parent.set(p, parent.get(parent.get(p))); p = parent.get(p); }
+				return p;
+			};
+			const unite = (a, b) => { a = find(a); b = find(b); if (a !== b) parent.set(b, a); };
+			for (let ai = 0; ai < continuousIds.length; ai++) {
+				for (let bi = ai + 1; bi < continuousIds.length; bi++) {
+					const a = components[continuousIds[ai]], b = components[continuousIds[bi]];
+					let overlaps = false;
+					for (const node of a.influences) if (b.influences.has(node)) { overlaps = true; break; }
+					if (overlaps) unite(continuousIds[ai], continuousIds[bi]);
+				}
+			}
+
+			const islands = new Map();
+			for (const i of continuousIds) {
+				const root = find(i);
+				if (!islands.has(root)) islands.set(root, []);
+				islands.get(root).push(components[i]);
+			}
+
+			for (const island of islands.values()) {
+				const influences = [];
+				const islandFaces = [];
+				for (const component of island) {
+					islandFaces.push(...component.faces);
+					influences.push(...component.influences);
+				}
+				let anchor = commonAncestor(influences);
+				if (anchor === undefined) anchor = islandFaces.find(face => face.boneNode !== undefined)?.boneNode;
+				if (anchor === undefined) anchor = obj.node;
+				for (const face of islandFaces) assignedBone.set(face, anchor);
+				smoothComponentsKept += island.length;
+				smoothFacesKept += islandFaces.length;
+				if (smoothExamples.length < 4) {
+					const bone = hierarchyByNode.get(anchor);
+					smoothExamples.push(`${islandFaces.length} faces / ${island.length} shell(s) → ${(bone && bone.name) || anchor}`);
+				}
+			}
+		}
+
 		const buckets = new Map();
-		for (const face of obj.faces || []) {
-			const boneNode = face.boneNode === undefined ? obj.node : face.boneNode;
+		for (const face of sourceFaces) {
+			// AUTO and CONTINUOUS both pre-compute the intended bone in assignedBone:
+			// AUTO keeps general smooth islands together while still segmenting linear
+			// bone chains; CONTINUOUS keeps every blended island together. Only the
+			// explicit DOMINANT mode should bypass that assignment.
+			const fallbackBone = face.boneNode === undefined ? obj.node : face.boneNode;
+			const boneNode = skinningMode === 'dominant'
+				? fallbackBone
+				: (assignedBone.get(face) ?? fallbackBone);
 			if (!buckets.has(boneNode)) buckets.set(boneNode, []);
 			buckets.get(boneNode).push(face);
 		}
@@ -4417,14 +5102,26 @@ function buildPolyMeshProject(ctx) {
 			? '1.1+ (runtime negates X)'
 			: '1.0 / CurseMaven (runtime keeps X)'}`,
 		`Geometry/animation unit scale: x${parsed.unitScale || chosenScale}` ,
+		`Skinning: ${skinningMode === 'native'
+			? `native CS2 weighted renderer — ${weightedMeshCount} mesh(es), ${weightedFaceCount} faces${weightedExamples.length ? '; ' + weightedExamples.join(', ') : ''}`
+			: skinningMode === 'auto'
+				? `auto hybrid — ${chainComponentsSplit} chain component(s) segmented (${chainFacesSplit} faces${chainExamples.length ? '; ' + chainExamples.join(', ') : ''}); ${smoothComponentsKept} general blended component(s) kept continuous (${smoothFacesKept} faces${smoothExamples.length ? '; ' + smoothExamples.join(', ') : ''})`
+				: skinningMode === 'continuous'
+					? `keep all blended components continuous (${smoothComponentsKept} component(s), ${smoothFacesKept} faces${smoothExamples.length ? '; ' + smoothExamples.join(', ') : ''})`
+					: 'legacy dominant joint per triangle'}`,
 		`Poly Mesh elements created: ${meshCount}`,
 		`Triangles preserved: ${triangleCount}`,
 		`Bones created: ${parsed.hierarchy.length}`,
+		parsed.bindPivotStats && parsed.bindPivotStats.overrides
+			? `Bone pivots: ${parsed.bindPivotStats.overrides} skinned joint(s) reconstructed from inverse bind matrices; max correction ${parsed.bindPivotStats.maxCorrection.toFixed(3)} px${parsed.bindPivotStats.worstBone ? ` on “${parsed.bindPivotStats.worstBone}”` : ''}`
+			: 'Bone pivots: exact glTF node positions (no usable inverse bind matrices)',
 		`Texture: ${size.width}×${size.height}`,
 		`Objects without a material: ${untextured}`,
 	];
 	if (dropped) lines.push(`Degenerate triangles dropped: ${dropped}`);
-	lines.push('NOTE: the exported .geo.json uses bone.poly_mesh. Stock GeckoLib Java currently does not render poly_mesh; a runtime renderer/loader extension is required.');
+	lines.push(skinningMode === 'native'
+		? 'NOTE: skinned primitives export as geometry.cs2_skinning and are rendered from GeckoLib bone poses by the updated CS2 Lootbox renderer. Rigid primitives still use bone.poly_mesh/GeckoMesh.'
+		: 'NOTE: the exported .geo.json uses bone.poly_mesh. Stock GeckoLib Java currently does not render poly_mesh; a runtime renderer/loader extension is required.');
 
 	try {
 		applyAnimations(parsed, groupByNode, lines, opts);
@@ -4436,6 +5133,11 @@ function buildPolyMeshProject(ctx) {
 	if (parsed.warnings.length) lines.push('', 'Warnings:', ...parsed.warnings.slice(0, 8));
 
 	Canvas.updateAll();
+	let weightedPreviewStats = { prepared: 0, vertices: 0, missing: 0 };
+	if (skinningMode === 'native' && (!opts || opts.weighted_skin_preview !== false)) {
+		weightedPreviewStats = prepareAllWeightedSkinPreviews();
+		lines.push(`Blockbench weighted preview: ${weightedPreviewStats.prepared} mesh(es), ${weightedPreviewStats.vertices} skinned vertices${weightedPreviewStats.missing ? `, ${weightedPreviewStats.missing} missing bone binding(s)` : ''}`);
+	}
 	// Canvas.updateAll may recreate the material and reset texture wrapping.
 	// Re-assert the sampler after the final project rebuild as well.
 	if (previewWrap) applyPreviewTextureWrap(atlasTexture, previewWrap.modeS, previewWrap.modeT);
@@ -4454,7 +5156,9 @@ function buildPolyMeshProject(ctx) {
 			['Animations', String(parsed.animations.length)],
 			['Scale', `×${chosenScale}`],
 		],
-		warning: 'Poly Mesh preserves the source geometry, but stock GeckoLib Java currently does not render bone.poly_mesh. Use it only with a runtime renderer/loader that supports it.',
+		warning: skinningMode === 'native'
+			? 'Weighted glTF meshes export in geometry.cs2_skinning. Blockbench previews the same smooth weights while scrubbing/playing animations, and the updated CS2 Lootbox renderer performs the equivalent skinning in-game from GeckoLib bone poses.'
+			: 'Poly Mesh preserves the source geometry, but stock GeckoLib Java currently does not render bone.poly_mesh. Use it only with a runtime renderer/loader that supports it.',
 		log: lines.join('\n'),
 		name: (sourceName || 'model').replace(/\.[^.]*$/, ''),
 	});
@@ -4871,7 +5575,7 @@ function buildFromFiles(files, sourceName, opts) {
 	// bones: the hierarchy is walked in order, a parent always before its child
 	const groupByNode = {};
 	for (const h of parsed.hierarchy) {
-		const g = new Group({ name: h.name, origin: snapVec(h.pivot) }).init();
+		const g = new Group({ name: h.name, origin: preciseBonePivot(h.pivot) }).init();
 		if (h.parent >= 0 && groupByNode[h.parent]) g.addTo(groupByNode[h.parent]);
 		groupByNode[h.index] = g;
 	}
@@ -4912,6 +5616,9 @@ function buildFromFiles(files, sourceName, opts) {
 		...report,
 		`Cubes created: ${solved.length}`,
 		`Bones created: ${parsed.hierarchy.length}`,
+		parsed.bindPivotStats && parsed.bindPivotStats.overrides
+			? `Bone pivots: ${parsed.bindPivotStats.overrides} skinned joint(s) reconstructed from inverse bind matrices; max correction ${parsed.bindPivotStats.maxCorrection.toFixed(3)} px${parsed.bindPivotStats.worstBone ? ` on “${parsed.bindPivotStats.worstBone}”` : ''}`
+			: 'Bone pivots: exact glTF node positions (no usable inverse bind matrices)',
 		`Texture: ${size.width}×${size.height}`,
 		`Objects without a material: ${untextured}`,
 		`Faces hidden: ${hidden}`,
@@ -5340,18 +6047,43 @@ function askImportOptions(onReady) {
 					+ 'Note: stock GeckoLib Java currently parses poly_mesh but does not render it, so your mod renderer/loader must support it.',
 			},
 			geckomesh_runtime: {
-				label: 'GeckoMesh runtime', type: 'select', default: '1_0',
+				label: 'GeckoMesh runtime', type: 'select', default: '1_1_plus',
 				condition: form => form.geometry_mode === 'poly_mesh',
 				options: {
-					'1_0': '1.0 — CurseMaven / CS2LootboxMod (recommended)',
-					'1_1_plus': '1.1+ — newer converter that flips X at runtime',
+					'1_1_plus': '1.1+ — current/default (runtime flips X)',
+					'1_0': '1.0 — legacy CurseMaven converter',
 				},
 			},
 			geckomesh_runtime_hint: {
 				type: 'info',
 				condition: form => form.geometry_mode === 'poly_mesh',
-				text: 'Use 1.0 with CurseMaven file 8266268. Choosing the wrong runtime version mirrors '
+				text: '1.1+ is the default. Use 1.0 only with the older CurseMaven converter. Choosing the wrong runtime version mirrors '
 					+ 'the mesh in-game and makes bone animations appear incorrect even when Blockbench is right.',
+			},
+			skinning_mode: {
+				label: 'Smooth skinning', type: 'select', default: 'native',
+				condition: form => form.geometry_mode === 'poly_mesh',
+				options: {
+					native: 'CS2LootBox native weighted skinning — exact (recommended)',
+					auto: 'GeckoMesh approximation — preserve body + segment bone chains',
+					continuous: 'GeckoMesh approximation — keep every blended component rigid',
+					dominant: 'GeckoMesh approximation — split by dominant joint (legacy)',
+				},
+			},
+			skinning_mode_hint: {
+				type: 'info',
+				condition: form => form.geometry_mode === 'poly_mesh',
+				text: 'Native weighted skinning preserves the original glTF JOINTS_0/WEIGHTS_0 inside the exported .geo.json. The CS2LootBox Forge renderer then skins those vertices from GeckoLib’s live animated bones. '
+					+ 'The other modes remain as rigid GeckoMesh approximations for projects that do not use the updated renderer.',
+			},
+			weighted_skin_preview: {
+				label: 'Preview native skinning in Blockbench', type: 'checkbox', value: true,
+				condition: form => form.geometry_mode === 'poly_mesh' && form.skinning_mode === 'native',
+			},
+			weighted_skin_preview_hint: {
+				type: 'info',
+				condition: form => form.geometry_mode === 'poly_mesh' && form.skinning_mode === 'native' && form.weighted_skin_preview !== false,
+				text: 'The viewport will deform the intact weighted mesh from the animated GeckoLib bone groups while you scrub or play the timeline. This is preview-only: bind-pose vertices and exported JOINTS_0/WEIGHTS_0 are never modified.',
 			},
 			recenter: { label: 'Centre the model and place it on the ground', type: 'checkbox', value: true },
 			rot_x: {
@@ -5359,7 +6091,7 @@ function askImportOptions(onReady) {
 				options: { 0: 'none', '-90': '−90° (model lies face up)', 90: '+90°', 180: '180°' },
 			},
 			rot_y: {
-				label: 'Extra rotation around Y', type: 'select', default: '0',
+				label: 'Extra rotation around Y', type: 'select', default: '90',
 				options: { 0: 'none', 90: '90°', 180: '180° (faces backwards)', 270: '270°' },
 			},
 			animations: { label: 'Transfer animations', type: 'checkbox', value: true },
@@ -5400,7 +6132,7 @@ function askImportOptions(onReady) {
 			},
 			scale_custom: {
 				label: 'Custom scale (0 = unset)', type: 'number',
-				value: 0, min: 0, max: 64, step: 0.05, condition: adv,
+				value: 8, min: 0, max: 64, step: 0.05, condition: adv,
 			},
 			bad_objects: {
 				label: 'Objects that are not cubes', type: 'select', default: 'box', condition: adv,
@@ -5464,6 +6196,7 @@ function requireGeckolib() {
 	if (geckolibAvailable()) {
 		enableGeckoMeshEditing();
 		installPolyMeshExporter();
+		installWeightedSkinPreview();
 		return true;
 	}
 	new Dialog({
@@ -6010,9 +6743,201 @@ function showEnvironment() {
 	}).show();
 }
 
+
+// ------------------------------------------------------- Poly Mesh fuse tool
+
+/** Return Mesh elements from the current selection, including meshes below selected Groups. */
+function selectedPolyMeshes() {
+	const found = [];
+	const seenMeshes = new Set();
+	const seenNodes = new Set();
+	const addSelection = item => {
+		if (!item) return;
+		const nodeId = item.uuid || item;
+		if (seenNodes.has(nodeId)) return;
+		seenNodes.add(nodeId);
+
+		if (typeof Mesh !== 'undefined' && item instanceof Mesh) {
+			const id = item.uuid || item;
+			if (!seenMeshes.has(id)) { seenMeshes.add(id); found.push(item); }
+			return;
+		}
+
+		// Selecting envelope_strip000 in the Outliner should be enough to fuse the
+		// complete strip: recurse through child bones and gather their Mesh elements.
+		if (Array.isArray(item.children)) item.children.forEach(addSelection);
+	};
+
+	try {
+		if (typeof Mesh !== 'undefined' && Array.isArray(Mesh.selected)) Mesh.selected.forEach(addSelection);
+	} catch (e) { /* older Blockbench */ }
+	try {
+		if (typeof Outliner !== 'undefined' && Array.isArray(Outliner.selected)) Outliner.selected.forEach(addSelection);
+	} catch (e) { /* older Blockbench */ }
+	try {
+		// Some builds expose selected elements through the generic selection array.
+		if (typeof selected !== 'undefined' && Array.isArray(selected)) selected.forEach(addSelection);
+	} catch (e) { /* optional API */ }
+	return found;
+}
+
+/** Bake a Mesh element's own Euler rotation into one stored vertex. */
+function bakeMeshPoint(mesh, point) {
+	const origin = mesh.origin || [0, 0, 0];
+	let x = Number(point[0]) || 0;
+	let y = Number(point[1]) || 0;
+	let z = Number(point[2]) || 0;
+	const rot = mesh.rotation || [0, 0, 0];
+	if (!rot[0] && !rot[1] && !rot[2]) return [x, y, z];
+
+	x -= origin[0]; y -= origin[1]; z -= origin[2];
+	const rx = rot[0] * Math.PI / 180;
+	const ry = rot[1] * Math.PI / 180;
+	const rz = rot[2] * Math.PI / 180;
+	let t = y; y = y * Math.cos(rx) - z * Math.sin(rx); z = t * Math.sin(rx) + z * Math.cos(rx);
+	t = x; x = x * Math.cos(ry) + z * Math.sin(ry); z = -t * Math.sin(ry) + z * Math.cos(ry);
+	t = x; x = x * Math.cos(rz) - y * Math.sin(rz); y = t * Math.sin(rz) + y * Math.cos(rz);
+	return [x + origin[0], y + origin[1], z + origin[2]];
+}
+
+function meshParentLabel(mesh) {
+	const p = mesh && mesh.parent;
+	if (!p || p === 'root') return 'root';
+	return p.name || p.uuid || 'root';
+}
+
+/**
+ * Merge selected Mesh elements into one rigid Mesh and parent it to the chosen
+ * source mesh's bone. This is primarily for rigid props that a glTF skin split
+ * over several joints even though the object should animate as one piece.
+ *
+ * The imported Poly Mesh path stores vertices in model coordinates and its
+ * element rotations are normally zero. We still bake element rotation here so
+ * the command remains safe after manual Blockbench edits.
+ */
+function fuseSelectedPolyMeshes(options) {
+	const meshes = selectedPolyMeshes();
+	if (meshes.length < 2) {
+		Blockbench.showQuickMessage('Select at least two Mesh elements to fuse', 2200);
+		return;
+	}
+
+	const target = meshes.find(m => m.uuid === options.target_mesh) || meshes[0];
+	const targetParent = target.parent && target.parent !== 'root' ? target.parent : 'root';
+	const fusedName = String(options.name || (target.name + '_fused')).trim() || 'fused_mesh';
+	const fused = new Mesh({
+		name: fusedName,
+		origin: [0, 0, 0],
+		rotation: [0, 0, 0],
+		autouv: 0,
+		vertices: {},
+	});
+	const newFaces = [];
+	let vertexCount = 0;
+	let faceCount = 0;
+
+	for (const src of meshes) {
+		const keyMap = new Map();
+		for (const oldKey in src.vertices) {
+			const newKey = typeof guid === 'function' ? guid() : `fv_${vertexCount}_${oldKey}`;
+			keyMap.set(oldKey, newKey);
+			fused.vertices[newKey] = bakeMeshPoint(src, src.vertices[oldKey]);
+			vertexCount++;
+		}
+
+		for (const faceKey in src.faces) {
+			const face = src.faces[faceKey];
+			const oldVertices = (face.vertices || []).slice();
+			if (oldVertices.length < 3) continue;
+			const verts = oldVertices.map(k => keyMap.get(k)).filter(Boolean);
+			if (verts.length < 3) continue;
+			const uv = {};
+			for (const oldKey of oldVertices) {
+				const nk = keyMap.get(oldKey);
+				if (!nk) continue;
+				const srcUV = face.uv && face.uv[oldKey] ? face.uv[oldKey] : [0, 0];
+				uv[nk] = [Number(srcUV[0]) || 0, Number(srcUV[1]) || 0];
+			}
+			newFaces.push(new MeshFace(fused, {
+				vertices: verts,
+				uv,
+				texture: face.texture || undefined,
+			}));
+			faceCount++;
+		}
+	}
+
+	if (!faceCount) {
+		Blockbench.showQuickMessage('The selected meshes contain no polygon faces', 2400);
+		return;
+	}
+
+	try {
+		if (typeof Undo !== 'undefined' && Undo.initEdit) Undo.initEdit({ elements: meshes, outliner: true });
+	} catch (e) { /* undo is best effort */ }
+
+	if (targetParent && targetParent !== 'root' && typeof fused.addTo === 'function') fused.addTo(targetParent);
+	else fused.addTo('root');
+	fused.addFaces(...newFaces);
+	fused.init();
+
+	if (options.delete_sources !== false) {
+		for (const src of meshes) {
+			try { src.remove(); } catch (e) {
+				try { src.removeFromParent && src.removeFromParent(); } catch (e2) { /* best effort */ }
+			}
+		}
+	}
+
+	try {
+		if (typeof Undo !== 'undefined' && Undo.finishEdit) Undo.finishEdit('Fuse selected Poly Meshes');
+	} catch (e) { /* best effort */ }
+	try {
+		if (typeof Outliner !== 'undefined' && Outliner.select) Outliner.select(fused);
+		else if (fused.select) fused.select();
+	} catch (e) { /* selection is cosmetic */ }
+	Canvas.updateAll();
+	Blockbench.showQuickMessage(`Fused ${meshes.length} meshes → ${fusedName} (${faceCount} faces)`, 3000);
+}
+
+function openFusePolyMeshesDialog() {
+	const meshes = selectedPolyMeshes();
+	if (meshes.length < 2) {
+		Blockbench.showMessageBox({
+			title: 'Fuse Poly Meshes',
+			message: 'Select at least two Mesh elements, or select a bone/group containing them. Child meshes are collected recursively and will become one rigid mesh.',
+		});
+		return;
+	}
+	const targetOptions = {};
+	for (const m of meshes) targetOptions[m.uuid] = `${m.name}  →  ${meshParentLabel(m)}`;
+	const first = meshes[0];
+
+	new Dialog({
+		id: PLUGIN_ID + '_fuse_poly_meshes',
+		title: 'Fuse Selected Poly Meshes',
+		form: {
+			target_mesh: {
+				label: 'Bone / parent to keep', type: 'select', default: first.uuid,
+				options: targetOptions,
+			},
+			name: { label: 'Fused mesh name', type: 'text', value: (first.name || 'mesh') + '_fused' },
+			delete_sources: { label: 'Delete source meshes', type: 'checkbox', value: true },
+			hint: {
+				type: 'info',
+				text: 'All selected polygons are combined into one Mesh and assigned to the selected parent bone. '
+					+ 'Use this for rigid objects (case, envelope, weapon part, etc.) that were split across several glTF joints and tear apart when animated. '
+					+ 'Do not use it on parts that are supposed to deform or follow different bones.',
+			},
+		},
+		onConfirm(form) { this.hide(); fuseSelectedPolyMeshes(form); },
+	}).show();
+}
+
 // ------------------------------------------------------------- registration
 
 let action;
+let fusePolyMeshesAction;
 let envAction;
 let importAction;
 let sketchfabAction;
@@ -6023,7 +6948,7 @@ Plugin.register(PLUGIN_ID, {
 	author: 'MopicMP',
 	icon: 'view_in_ar',
 	description: 'Import glTF models — including straight from Sketchfab — into GeckoLib as cubes or preserved Poly Mesh geometry, or turn them into a Customizable Player Models skin.',
-	version: '0.1.7-polymesh',
+	version: '0.1.12-native-weighted-preview',
 	variant: 'both',
 	min_version: '4.9.0',
 	tags: ['Minecraft: Java Edition', 'Import', 'Animation'],
@@ -6066,6 +6991,15 @@ Plugin.register(PLUGIN_ID, {
 		});
 		MenuBar.addAction(action, 'filter');
 
+		fusePolyMeshesAction = new Action(PLUGIN_ID + '_fuse_poly_meshes', {
+			name: 'Fuse Selected Poly Meshes',
+			description: 'Combine selected meshes (including meshes below selected groups) into one rigid mesh on one chosen bone',
+			icon: 'merge_type',
+			condition: () => typeof Mesh !== 'undefined' && selectedPolyMeshes().length >= 2,
+			click: openFusePolyMeshesDialog,
+		});
+		MenuBar.addAction(fusePolyMeshesAction, 'filter');
+
 		envAction = new Action(PLUGIN_ID + '_env', {
 			name: 'Environment diagnostics (GeckoLib Importer)',
 			description: 'Shows what is available inside Blockbench: ZIP, formats, codecs',
@@ -6106,8 +7040,10 @@ Plugin.register(PLUGIN_ID, {
 	},
 
 	onunload() {
+		uninstallWeightedSkinPreview();
 		uninstallPolyMeshExporter();
 		if (action) action.delete();
+		if (fusePolyMeshesAction) fusePolyMeshesAction.delete();
 		if (envAction) envAction.delete();
 		if (importAction) importAction.delete();
 		if (cpmAction) cpmAction.delete();
