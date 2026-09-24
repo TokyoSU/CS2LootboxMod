@@ -4,7 +4,7 @@ CS2 Lootbox includes a **startup-time KubeJS API** for creating complete CS2-sty
 
 With KubeJS you can:
 
-- register new case + key items automatically;
+- register new case items and optional matching key items automatically;
 - use custom GeckoLib models, textures and animations;
 - configure the 3D case preview;
 - build weighted loot tables;
@@ -114,10 +114,12 @@ You do **not** need a separate `ItemEvents.registry` block for them.
 
 # Automatic item registration
 
-Every lootbox definition owns two Minecraft items:
+By default, each lootbox definition creates two Minecraft items:
 
 1. a case item;
 2. a matching key item.
+
+Free-to-open definitions create only the case item.
 
 For:
 
@@ -147,6 +149,26 @@ The mod registers the final case/key `ItemBuilder`s **after all `CS2LootboxEvent
 > Do not separately register another item with the same ID through `ItemEvents.registry`.
 
 ---
+
+## Free-to-open cases
+
+Some CS2 drops, such as dossiers and sticker containers, do not need a key. Mark them free-to-open with either form:
+
+```js
+crate.requiresKey(false)
+// or
+crate.freeToOpen()
+```
+
+For a free-to-open case:
+
+- no key item is registered;
+- the opening screen shows **No key required / Free to open**;
+- the server does not search for or consume a key;
+- the case item itself is still consumed when the reward is accepted.
+
+Keyed cases remain the default, so existing scripts do not need to change.
+
 
 # Default resource paths
 
@@ -258,7 +280,10 @@ The case must already exist before `changeCase()` is called.
 | `model(resource)` | GeckoLib `.geo.json` model |
 | `texture(resource)` | Diffuse case texture |
 | `animation(resource)` | GeckoLib `.animation.json` |
-| `keyTexture(resource)` | 2D key item texture |
+| `keyTexture(resource)` | 2D key item texture (used only when a key is required) |
+| `requiresKey(boolean)` | Enables/disables matching-key registration and consumption; default `true` |
+| `freeToOpen()` | Shortcut for `requiresKey(false)` |
+| `noKeyRequired()` | Alias of `freeToOpen()` |
 | `itemJson(resource)` | Parent Minecraft item-model JSON used for inventory/hand/fixed transforms |
 
 Example:
@@ -347,6 +372,8 @@ The default values are:
 case = 16
 key  = 64
 ```
+
+`keyStackSize()` is ignored for free-to-open cases because no key item is registered.
 
 ---
 

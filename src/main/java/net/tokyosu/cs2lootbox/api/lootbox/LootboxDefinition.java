@@ -35,6 +35,7 @@ public record LootboxDefinition(
         @NotNull AnimationSet animations,
         @NotNull PreviewTransform preview,
         @NotNull UiSkin uiSkin,
+        boolean requiresKey,
         int caseStackSize,
         int keyStackSize,
         @NotNull String caseTranslationKey,
@@ -70,6 +71,15 @@ public record LootboxDefinition(
         keyTranslationKey = Objects.requireNonNull(keyTranslationKey, "keyTranslationKey");
         loot = List.copyOf(Objects.requireNonNull(loot, "loot"));
         legendaryLoot = List.copyOf(Objects.requireNonNull(legendaryLoot, "legendaryLoot"));
+    }
+
+
+    /**
+     * Returns true when this container can be opened without consuming a key.
+     * The case item itself is still consumed when the pending reward is accepted.
+     */
+    public boolean isFreeToOpen() {
+        return !requiresKey;
     }
 
 

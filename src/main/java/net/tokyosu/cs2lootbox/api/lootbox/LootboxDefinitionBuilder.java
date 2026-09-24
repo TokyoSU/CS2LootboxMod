@@ -73,6 +73,7 @@ public final class LootboxDefinitionBuilder {
     private int blockLight = 12;
     private int skyLight = 12;
 
+    private boolean requiresKey = true;
     private int caseStackSize = 16;
     private int keyStackSize = 64;
     private @Nullable String caseTranslationKey;
@@ -145,6 +146,7 @@ public final class LootboxDefinitionBuilder {
         this.blockLight = definition.preview().blockLight();
         this.skyLight = definition.preview().skyLight();
 
+        this.requiresKey = definition.requiresKey();
         this.caseStackSize = definition.caseStackSize();
         this.keyStackSize = definition.keyStackSize();
         this.caseTranslationKey = definition.caseTranslationKey();
@@ -459,6 +461,27 @@ public final class LootboxDefinitionBuilder {
         return this;
     }
 
+    @Info("Controls whether opening this lootbox consumes its matching key. Defaults to true. Set false for dossiers, sticker capsules/cases, and other free-to-open drops.")
+    public @NotNull LootboxDefinitionBuilder requiresKey(boolean requiresKey) {
+        this.requiresKey = requiresKey;
+        return this;
+    }
+
+    /** Alias for requiresKey(boolean), useful when a script reads more naturally as keyRequired(false). */
+    public @NotNull LootboxDefinitionBuilder keyRequired(boolean required) {
+        return requiresKey(required);
+    }
+
+    @Info("Marks this lootbox as free to open: no key item is registered, required, displayed, or consumed.")
+    public @NotNull LootboxDefinitionBuilder freeToOpen() {
+        return requiresKey(false);
+    }
+
+    /** Explicit alias for freeToOpen(). */
+    public @NotNull LootboxDefinitionBuilder noKeyRequired() {
+        return requiresKey(false);
+    }
+
     @Info("Sets the max stack size for the case item.")
     public @NotNull LootboxDefinitionBuilder caseStackSize(int size) {
         caseStackSize = clampStackSize(size);
@@ -687,6 +710,7 @@ public final class LootboxDefinitionBuilder {
                         Objects.requireNonNull(markerOuterCircleTexture, "markerOuterCircleTexture"),
                         Objects.requireNonNull(markerInnerCircleTexture, "markerInnerCircleTexture")
                 ),
+                requiresKey,
                 clampStackSize(caseStackSize),
                 clampStackSize(keyStackSize),
                 caseTranslationKey != null ? caseTranslationKey : Util.makeDescriptionId("item", caseItemId),

@@ -6,7 +6,7 @@
 
 **A configurable CS2-inspired lootbox system for Minecraft Forge 1.20.1.**
 
-Create animated cases, matching keys, weighted loot tables, legendary sub-rolls, rarity effects, StatTrak-style rewards, custom sounds, and CS-style opening screens — all configurable through KubeJS.
+Create animated cases, optional matching keys, free-to-open drops, weighted loot tables, legendary sub-rolls, rarity effects, StatTrak-style rewards, custom sounds, and CS-style opening screens — all configurable through KubeJS.
 
 ![Minecraft](https://img.shields.io/badge/Minecraft-1.20.1-62B47A)
 ![Forge](https://img.shields.io/badge/Forge-47.x-E04E39)
@@ -42,7 +42,7 @@ CS2 Lootbox provides a reusable, registry-driven case system designed for modpac
   - Closing the UI after a committed roll does not destroy the pending reward
 
 - **KubeJS configuration**
-  - Add completely new cases
+  - Add completely new keyed or free-to-open cases
   - Modify built-in cases
   - Configure models, textures, animation names and transforms
   - Configure weighted loot and stack counts
@@ -176,6 +176,25 @@ CS2LootboxEvents.register(event => {
 `addCase(...)` is also available as an alias of `addCrate(...)`.
 
 ---
+
+## Free-to-open dossiers / sticker containers
+
+Keys are optional per case. Existing cases stay keyed by default. For a dossier, sticker case/capsule, or any other free drop:
+
+```js
+CS2LootboxEvents.register(event => {
+    event.addCrate('kubejs:sticker_case', crate => {
+        crate.freeToOpen()
+        crate.model('kubejs:geo/sticker_case.geo.json')
+        crate.texture('kubejs:textures/lootbox/sticker_case.png')
+        crate.animation('kubejs:animations/sticker_case.animation.json')
+        crate.loot('minecraft:paper', 100)
+    })
+})
+```
+
+`requiresKey(false)` is equivalent. Free-to-open cases do not register, display, validate, or consume a key item. The case itself is still consumed after the reward is granted.
+
 
 ## Editing an Existing Case
 
@@ -516,9 +535,9 @@ The opening sequence is intentionally server-authoritative.
 
 1. The case is displayed and animated through GeckoLib.
 2. The player requests an opening.
-3. The server validates the case, matching key and loot definition.
+3. The server validates the case and loot definition, plus the matching key only when `requiresKey(true)`.
 4. The server rolls and locks the actual reward.
-5. The matching key is consumed.
+5. For keyed cases, the matching key is consumed; free-to-open cases skip this step.
 6. The case-opening animation plays.
 7. If the primary pool has more than one valid configured result, the client displays the cosmetic roulette; otherwise it goes directly to the prize screen.
 8. When shown, the carousel snaps the winning card to the center marker.
@@ -611,7 +630,7 @@ client/widget/
     LootboxOverlayWidget
 ```
 
-The same generic case/key item and UI implementation are reused by registered lootbox definitions rather than requiring a new Java class for every case.
+The same generic case item, optional key item, and UI implementation are reused by registered lootbox definitions rather than requiring a new Java class for every case.
 
 ---
 

@@ -18,7 +18,7 @@ public class AgentDossier01 {
                 "agents_dossier_01.geo.json",
                 "agents_dossier_01.png",
                 "agents_dossier_01.animation.json",
-                "agents_dossier_01_key", true, false);
+                "agents_dossier_01_key", false, false);
 
         LootboxRegistrationService.register(builder);
     }

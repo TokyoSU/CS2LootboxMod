@@ -513,11 +513,14 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
             return;
         }
 
-        Item keyItem = ForgeRegistries.ITEMS.getValue(definition.keyItemId());
-        ItemStack keyStack = player.getAbilities().instabuild ? ItemStack.EMPTY : findItem(player, keyItem);
-        if (!player.getAbilities().instabuild && (keyItem == null || keyStack.isEmpty())) {
-            rejectOpen("cs2lootbox.message.missing_key");
-            return;
+        ItemStack keyStack = ItemStack.EMPTY;
+        if (definition.requiresKey() && !player.getAbilities().instabuild) {
+            Item keyItem = ForgeRegistries.ITEMS.getValue(definition.keyItemId());
+            keyStack = findItem(player, keyItem);
+            if (keyItem == null || keyStack.isEmpty()) {
+                rejectOpen("cs2lootbox.message.missing_key");
+                return;
+            }
         }
 
         RandomSource random = RandomSource.create();
@@ -527,7 +530,7 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
             return;
         }
 
-        if (!player.getAbilities().instabuild) {
+        if (definition.requiresKey() && !player.getAbilities().instabuild) {
             keyStack.shrink(1);
         }
 
@@ -1923,10 +1926,15 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
         Font font = Minecraft.getInstance().font;
         int centerX = position.x + size.width / 2;
 
-        drawCentered(graphics, font, Component.translatable("cs2lootbox.case_screen.unlock_container"),
+        Component header = definition().requiresKey()
+                ? Component.translatable("cs2lootbox.case_screen.unlock_container")
+                : Component.translatable("cs2lootbox.case_screen.open_container");
+        Component caseAction = definition().requiresKey()
+                ? Component.translatable("cs2lootbox.case_screen.unlock_case", caseDisplayName())
+                : Component.translatable("cs2lootbox.case_screen.open_case", caseDisplayName());
+        drawCentered(graphics, font, header,
                 centerX, position.y + 16, withAlpha(0xFFFFFF, alpha));
-        drawCentered(graphics, font,
-                Component.translatable("cs2lootbox.case_screen.unlock_case", caseDisplayName()),
+        drawCentered(graphics, font, caseAction,
                 centerX, position.y + 34, withAlpha(0xFFDCDCDC, alpha));
         drawCentered(graphics, font, Component.translatable("cs2lootbox.case_screen.single_open"),
                 centerX, position.y + 52, withAlpha(0xFFC7C7C7, alpha));

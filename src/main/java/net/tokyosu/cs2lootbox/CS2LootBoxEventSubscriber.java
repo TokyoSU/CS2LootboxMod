@@ -23,7 +23,9 @@ public final class CS2LootBoxEventSubscriber {
 
         for (LootboxDefinition definition : LootboxRegistry.values()) {
             acceptIfPresent(event, definition.caseItemId());
-            acceptIfPresent(event, definition.keyItemId());
+            if (definition.requiresKey()) {
+                acceptIfPresent(event, definition.keyItemId());
+            }
         }
     }
 

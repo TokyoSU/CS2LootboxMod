@@ -62,7 +62,9 @@ public final class LootboxRegistrationService {
                 continue;
             }
             RegistryInfo.ITEM.addBuilder(new LootboxCaseItemBuilder(definition));
-            RegistryInfo.ITEM.addBuilder(new LootboxKeyItemBuilder(definition));
+            if (definition.requiresKey()) {
+                RegistryInfo.ITEM.addBuilder(new LootboxKeyItemBuilder(definition));
+            }
         }
 
         finalized = true;

@@ -18,7 +18,7 @@ import java.util.function.Consumer;
  * before the Minecraft item registry closes.
  */
 public final class LootboxStartupRegisterEvent extends StartupEventJS {
-    @Info(value = "Registers a complete CS2 lootbox and its matching key item.", params = {
+    @Info(value = "Registers a complete CS2 lootbox. Keyed boxes create a matching key item; free-to-open boxes do not.", params = {
             @Param(name = "id", value = "Lootbox definition id, for example kubejs:revolution"),
             @Param(name = "config", value = "Builder callback used to configure model, texture, animation, sounds, loot and GUI transform")
     })
@@ -28,7 +28,7 @@ public final class LootboxStartupRegisterEvent extends StartupEventJS {
         LootboxRegistrationService.register(builder);
     }
 
-    @Info(value = "Alias of addCrate(). Registers a complete CS2 case and its matching key item.", params = {
+    @Info(value = "Alias of addCrate(). Registers a complete CS2 case; the key item is only created when requiresKey(true).", params = {
             @Param(name = "id", value = "Lootbox definition id, for example kubejs:revolution"),
             @Param(name = "config", value = "Builder callback used to configure the case")
     })

@@ -227,11 +227,16 @@ public final class LootboxOverlayWidget extends Widget {
         Font font = Minecraft.getInstance().font;
         int centerX = position.x + size.width / 2;
 
+        boolean requiresKey = model.getDefinition().requiresKey();
         drawCentered(graphics, font,
-                Component.translatable("cs2lootbox.case_screen.unlock_container"),
+                Component.translatable(requiresKey
+                        ? "cs2lootbox.case_screen.unlock_container"
+                        : "cs2lootbox.case_screen.open_container"),
                 centerX, position.y + 16, 0xFFF4F4F4);
         drawCentered(graphics, font,
-                Component.translatable("cs2lootbox.case_screen.unlock_case", caseName()),
+                requiresKey
+                        ? Component.translatable("cs2lootbox.case_screen.unlock_case", caseName())
+                        : Component.translatable("cs2lootbox.case_screen.open_case", caseName()),
                 centerX, position.y + 34, 0xFFDCDCDC);
         drawCentered(graphics, font,
                 Component.translatable("cs2lootbox.case_screen.single_open"),
@@ -821,15 +826,21 @@ public final class LootboxOverlayWidget extends Widget {
         int keyAreaRight = position.x + size.width - (OPEN_WIDTH + CLOSE_WIDTH + BUTTON_GAP + 16);
         int centerY = top + (bottom - top) / 2;
 
-        ItemStack keyStack = keyStack();
-        if (!keyStack.isEmpty()) {
-            graphics.renderItem(keyStack, keyAreaLeft, centerY - 8);
-            graphics.flush();
-            RenderSystem.disableDepthTest();
+        if (model.getDefinition().requiresKey()) {
+            ItemStack keyStack = keyStack();
+            if (!keyStack.isEmpty()) {
+                graphics.renderItem(keyStack, keyAreaLeft, centerY - 8);
+                graphics.flush();
+                RenderSystem.disableDepthTest();
+            }
+            graphics.drawString(font,
+                    Component.translatable("cs2lootbox.case_screen.use_key", keyName()),
+                    keyAreaLeft + 24, centerY - 4, 0xFFDADADA, true);
+        } else {
+            graphics.drawString(font,
+                    Component.translatable("cs2lootbox.case_screen.no_key_required"),
+                    keyAreaLeft, centerY - 4, 0xFFB9E6A5, true);
         }
-        graphics.drawString(font,
-                Component.translatable("cs2lootbox.case_screen.use_key", keyName()),
-                keyAreaLeft + 24, centerY - 4, 0xFFDADADA, true);
 
         boolean opening = model.isOpeningFromChrome();
         int oy = top + 9;
@@ -850,7 +861,9 @@ public final class LootboxOverlayWidget extends Widget {
         drawCentered(graphics, font, openTitle, ox + OPEN_WIDTH / 2, oy + 5, 0xFFFFFFFF);
         Component openSubtitle = opening
                 ? Component.literal(spinnerFrame())
-                : Component.translatable("cs2lootbox.case_screen.open_subtitle");
+                : Component.translatable(model.getDefinition().requiresKey()
+                        ? "cs2lootbox.case_screen.open_subtitle"
+                        : "cs2lootbox.case_screen.open_subtitle_free");
         drawCentered(graphics, font, openSubtitle, ox + OPEN_WIDTH / 2, oy + 18, 0xFFD2D2D2);
 
         if (model.canCloseFromChrome()) {

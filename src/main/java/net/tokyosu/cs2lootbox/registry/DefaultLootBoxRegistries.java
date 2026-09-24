@@ -10,7 +10,7 @@ public class DefaultLootBoxRegistries {
                                                      @NotNull String modelPath,
                                                      @NotNull String texturePath,
                                                      @NotNull String animationPath,
-                                                     @NotNull String keyTexture, boolean isCrateWithLock, boolean hasOpenIdleAnim) {
+                                                     @NotNull String keyTexture, boolean requiresKey, boolean hasOpenIdleAnim) {
         builder.caseItem("cs2lootbox:" + caseRegName)
                 .keyItem("cs2lootbox:" + caseKeyRegName)
                 .itemJson("cs2lootbox:item/lootbox_case")
@@ -18,6 +18,7 @@ public class DefaultLootBoxRegistries {
                 .texture("cs2lootbox:textures/lootbox/" + texturePath)
                 .animation("cs2lootbox:animations/" + animationPath)
                 .keyTexture("cs2lootbox:item/" + keyTexture)
+                .requiresKey(requiresKey)
                 .itemIdleAnimation("idle")
 
                 // -----------------------------------------------------------------
@@ -122,7 +123,7 @@ public class DefaultLootBoxRegistries {
         else
             builder.animations("fall", "idle", "open");
 
-        if (isCrateWithLock)
+        if (requiresKey)
             builder.openSound("cs2lootbox:case_unlock", 0.2F, 1.0F);
         else
             builder.openSound("cs2lootbox:case_unlock_immediate_01", 0.2F, 1.0F);
