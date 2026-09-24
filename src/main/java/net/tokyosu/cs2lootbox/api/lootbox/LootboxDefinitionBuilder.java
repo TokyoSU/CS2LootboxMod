@@ -733,7 +733,7 @@ public final class LootboxDefinitionBuilder {
 
 
     private static @NotNull ResourceLocation parse(@NotNull String value, @NotNull String defaultNamespace) {
-        if (value == null || value.isBlank()) {
+        if (value.isBlank()) {
             throw new IllegalArgumentException("Resource location cannot be empty");
         }
         String normalized = value.trim();

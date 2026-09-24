@@ -6,7 +6,7 @@ import dev.latvian.mods.kubejs.event.EventHandler;
 import dev.latvian.mods.kubejs.script.ScriptType;
 import dev.latvian.mods.kubejs.util.ClassFilter;
 import net.tokyosu.cs2lootbox.integration.kubejs.event.LootboxStartupRegisterEvent;
-import net.tokyosu.cs2lootbox.registry.BuiltInLootboxes;
+import net.tokyosu.cs2lootbox.registry.BuiltInLootBoxes;
 import net.tokyosu.cs2lootbox.registry.LootboxRegistrationService;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,7 +37,7 @@ public final class CS2LootboxKubeJSPlugin extends KubeJSPlugin {
 
     @Override
     public void initStartup() {
-        BuiltInLootboxes.register();
+        BuiltInLootBoxes.register();
         REGISTER.post(new LootboxStartupRegisterEvent());
         LootboxRegistrationService.finalizeItemRegistrations();
     }

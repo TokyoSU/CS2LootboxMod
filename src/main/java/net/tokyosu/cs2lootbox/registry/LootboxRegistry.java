@@ -53,7 +53,7 @@ public final class LootboxRegistry {
             return definition;
         }
 
-        definition = DEFINITIONS.get(BuiltInLootboxes.DEFAULT_ID);
+        definition = DEFINITIONS.get(BuiltInLootBoxes.DEFAULT_ID);
         if (definition == null) {
             throw new IllegalStateException("Default lootbox definition has not been registered");
         }

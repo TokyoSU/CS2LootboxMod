@@ -17,7 +17,6 @@ import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -54,7 +53,7 @@ import net.tokyosu.cs2lootbox.config.CS2LootboxServerConfig;
 import net.tokyosu.cs2lootbox.item.LootboxCaseItem;
 import net.tokyosu.cs2lootbox.loot.LootboxLootRoller;
 import net.tokyosu.cs2lootbox.loot.StatTrackUtil;
-import net.tokyosu.cs2lootbox.registry.BuiltInLootboxes;
+import net.tokyosu.cs2lootbox.registry.BuiltInLootBoxes;
 import net.tokyosu.cs2lootbox.registry.LootboxRegistry;
 import net.tokyosu.cs2lootbox.registry.ModSounds;
 import org.jetbrains.annotations.NotNull;
@@ -143,7 +142,7 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
     @NumberRange(range = {-360, 360}, wheel = 1)
     private float modelRoll = 0.0F;
 
-    private ResourceLocation lootboxId = BuiltInLootboxes.DEFAULT_ID;
+    private ResourceLocation lootboxId = BuiltInLootBoxes.DEFAULT_ID;
     private LootboxAnimationState animationState = LootboxAnimationState.FALL;
 
     // Common/server transaction state.
