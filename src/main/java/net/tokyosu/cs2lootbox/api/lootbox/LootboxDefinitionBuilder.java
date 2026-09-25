@@ -28,8 +28,10 @@ public final class LootboxDefinitionBuilder {
     private ResourceLocation animation;
     private ResourceLocation keyTexture;
     private ResourceLocation itemJson = ResourceLocation.fromNamespaceAndPath(
-            CS2LootBoxMod.MOD_ID, "item/lootbox_case");
+            CS2LootBoxMod.MOD_ID, "item/lootbox_renderer");
+    private ResourceLocation dropSound = ModSounds.CASE_DROP.getId();
     private ResourceLocation openSound = ModSounds.CASE_UNLOCK.getId();
+    private @Nullable ResourceLocation openLoopSound;
     private ResourceLocation carouselTickSound = ModSounds.CRATE_ITEM_SCROLL.getId();
     private ResourceLocation rewardSound = ModSounds.CASE_AWARDED_COMMON.getId();
     private ResourceLocation uncommonSound = ModSounds.CASE_AWARDED_UNCOMMON.getId();
@@ -48,7 +50,9 @@ public final class LootboxDefinitionBuilder {
     private float defaultSoundVolume = 0.60F;
     private float defaultSoundPitch = 1.0F;
 
+    private @Nullable LootboxDefinition.SoundTuning dropSoundTuning;
     private @Nullable LootboxDefinition.SoundTuning openSoundTuning;
+    private @Nullable LootboxDefinition.SoundTuning openLoopSoundTuning;
     private @Nullable LootboxDefinition.SoundTuning carouselTickSoundTuning;
     private @Nullable LootboxDefinition.SoundTuning rewardSoundTuning;
     private @Nullable LootboxDefinition.SoundTuning uncommonSoundTuning;
@@ -72,6 +76,21 @@ public final class LootboxDefinitionBuilder {
     private float roll = -3.0F;
     private int blockLight = 12;
     private int skyLight = 12;
+
+    private LootboxDefinition.ItemTransform firstPersonRight = transform(
+            0.0F, 1.0F, 0.0F, 0.0F, 135.0F, 0.0F, 1.3F, 1.3F, 1.3F);
+    private LootboxDefinition.ItemTransform firstPersonLeft = transform(
+            0.0F, 1.0F, 0.0F, 0.0F, 225.0F, 0.0F, 1.3F, 1.3F, 1.3F);
+    private LootboxDefinition.ItemTransform thirdPersonRight = transform(
+            0.0F, 2.5F, 0.0F, 75.0F, 45.0F, 0.0F, 1.3F, 1.3F, 1.3F);
+    private LootboxDefinition.ItemTransform thirdPersonLeft = transform(
+            0.0F, 2.5F, 0.0F, 75.0F, 45.0F, 0.0F, 1.3F, 1.3F, 1.3F);
+    private LootboxDefinition.ItemTransform groundTransform = transform(
+            0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.5F, 1.5F, 1.5F);
+    private LootboxDefinition.ItemTransform guiTransform = transform(
+            0.0F, -3.0F, 0.0F, 30.0F, 135.0F, 0.0F, 1.5F, 1.5F, 1.5F);
+    private LootboxDefinition.ItemTransform fixedTransform = transform(
+            0.0F, -1.5F, 0.0F, 0.0F, 0.0F, 0.0F, 1.5F, 1.5F, 1.5F);
 
     private boolean requiresKey = true;
     private int caseStackSize = 16;
@@ -103,7 +122,9 @@ public final class LootboxDefinitionBuilder {
         this.animation = definition.animation();
         this.keyTexture = definition.keyTexture();
         this.itemJson = definition.itemJson();
+        this.dropSound = definition.dropSound();
         this.openSound = definition.openSound();
+        this.openLoopSound = definition.openLoopSound();
         this.carouselTickSound = definition.carouselTickSound();
         this.rewardSound = definition.rewardSound();
         this.uncommonSound = definition.uncommonSound();
@@ -121,7 +142,9 @@ public final class LootboxDefinitionBuilder {
         LootboxDefinition.SoundProfile soundProfile = definition.soundProfile();
         this.defaultSoundVolume = soundProfile.defaults().volume();
         this.defaultSoundPitch = soundProfile.defaults().pitch();
+        this.dropSoundTuning = soundProfile.drop();
         this.openSoundTuning = soundProfile.open();
+        this.openLoopSoundTuning = soundProfile.openLoop();
         this.carouselTickSoundTuning = soundProfile.carouselTick();
         this.rewardSoundTuning = soundProfile.reward();
         this.uncommonSoundTuning = soundProfile.uncommon();
@@ -145,6 +168,14 @@ public final class LootboxDefinitionBuilder {
         this.roll = definition.preview().roll();
         this.blockLight = definition.preview().blockLight();
         this.skyLight = definition.preview().skyLight();
+
+        this.firstPersonRight = definition.itemTransforms().firstPersonRight();
+        this.firstPersonLeft = definition.itemTransforms().firstPersonLeft();
+        this.thirdPersonRight = definition.itemTransforms().thirdPersonRight();
+        this.thirdPersonLeft = definition.itemTransforms().thirdPersonLeft();
+        this.groundTransform = definition.itemTransforms().ground();
+        this.guiTransform = definition.itemTransforms().gui();
+        this.fixedTransform = definition.itemTransforms().fixed();
 
         this.requiresKey = definition.requiresKey();
         this.caseStackSize = definition.caseStackSize();
@@ -210,10 +241,92 @@ public final class LootboxDefinitionBuilder {
         return this;
     }
 
-    @Info("Sets the Minecraft item-model JSON used for first/third person, ground, GUI and fixed transforms. "
-            + "The case geometry itself is still rendered by GeckoLib. Example: kubejs:item/lootbox_case.")
+    @Info("Sets the base Minecraft item-model JSON. Item positioning is now renderer-owned and configurable through firstPersonRight/Left, thirdPersonRight/Left, ground, gui and fixed. "
+            + "The default is the neutral cs2lootbox:item/lootbox_renderer model. A custom parent with display transforms will be additive, so normally leave this unset.")
     public @NotNull LootboxDefinitionBuilder itemJson(@NotNull String resource) {
         itemJson = parse(resource, id.getNamespace());
+        return this;
+    }
+
+    @Info("Sets the first-person right-hand transform. Translation uses item-model units (16 = one block), rotation is degrees, and scale is a multiplier.")
+    public @NotNull LootboxDefinitionBuilder firstPersonRight(float tx, float ty, float tz, float rx, float ry, float rz, float scale) {
+        return firstPersonRight(tx, ty, tz, rx, ry, rz, scale, scale, scale);
+    }
+
+    public @NotNull LootboxDefinitionBuilder firstPersonRight(float tx, float ty, float tz, float rx, float ry, float rz, float sx, float sy, float sz) {
+        firstPersonRight = transform(tx, ty, tz, rx, ry, rz, sx, sy, sz);
+        return this;
+    }
+
+    @Info("Sets the first-person left-hand transform. Values are applied exactly; the renderer does not mirror the right-hand transform automatically.")
+    public @NotNull LootboxDefinitionBuilder firstPersonLeft(float tx, float ty, float tz, float rx, float ry, float rz, float scale) {
+        return firstPersonLeft(tx, ty, tz, rx, ry, rz, scale, scale, scale);
+    }
+
+    public @NotNull LootboxDefinitionBuilder firstPersonLeft(float tx, float ty, float tz, float rx, float ry, float rz, float sx, float sy, float sz) {
+        firstPersonLeft = transform(tx, ty, tz, rx, ry, rz, sx, sy, sz);
+        return this;
+    }
+
+    @Info("Sets the third-person right-hand transform.")
+    public @NotNull LootboxDefinitionBuilder thirdPersonRight(float tx, float ty, float tz, float rx, float ry, float rz, float scale) {
+        return thirdPersonRight(tx, ty, tz, rx, ry, rz, scale, scale, scale);
+    }
+
+    public @NotNull LootboxDefinitionBuilder thirdPersonRight(float tx, float ty, float tz, float rx, float ry, float rz, float sx, float sy, float sz) {
+        thirdPersonRight = transform(tx, ty, tz, rx, ry, rz, sx, sy, sz);
+        return this;
+    }
+
+    @Info("Sets the third-person left-hand transform. Values are independent from the right hand.")
+    public @NotNull LootboxDefinitionBuilder thirdPersonLeft(float tx, float ty, float tz, float rx, float ry, float rz, float scale) {
+        return thirdPersonLeft(tx, ty, tz, rx, ry, rz, scale, scale, scale);
+    }
+
+    public @NotNull LootboxDefinitionBuilder thirdPersonLeft(float tx, float ty, float tz, float rx, float ry, float rz, float sx, float sy, float sz) {
+        thirdPersonLeft = transform(tx, ty, tz, rx, ry, rz, sx, sy, sz);
+        return this;
+    }
+
+    @Info("Sets the dropped-item/ground transform.")
+    public @NotNull LootboxDefinitionBuilder ground(float tx, float ty, float tz, float rx, float ry, float rz, float scale) {
+        return ground(tx, ty, tz, rx, ry, rz, scale, scale, scale);
+    }
+
+    public @NotNull LootboxDefinitionBuilder ground(float tx, float ty, float tz, float rx, float ry, float rz, float sx, float sy, float sz) {
+        groundTransform = transform(tx, ty, tz, rx, ry, rz, sx, sy, sz);
+        return this;
+    }
+
+    @Info("Sets the inventory/GUI item transform.")
+    public @NotNull LootboxDefinitionBuilder gui(float tx, float ty, float tz, float rx, float ry, float rz, float scale) {
+        return gui(tx, ty, tz, rx, ry, rz, scale, scale, scale);
+    }
+
+    public @NotNull LootboxDefinitionBuilder gui(float tx, float ty, float tz, float rx, float ry, float rz, float sx, float sy, float sz) {
+        guiTransform = transform(tx, ty, tz, rx, ry, rz, sx, sy, sz);
+        return this;
+    }
+
+    @Info("Sets the item-frame/fixed transform.")
+    public @NotNull LootboxDefinitionBuilder fixed(float tx, float ty, float tz, float rx, float ry, float rz, float scale) {
+        return fixed(tx, ty, tz, rx, ry, rz, scale, scale, scale);
+    }
+
+    public @NotNull LootboxDefinitionBuilder fixed(float tx, float ty, float tz, float rx, float ry, float rz, float sx, float sy, float sz) {
+        fixedTransform = transform(tx, ty, tz, rx, ry, rz, sx, sy, sz);
+        return this;
+    }
+
+    @Info("Sets all seven renderer-owned item transforms to identity. Call this before defining a completely custom transform set.")
+    public @NotNull LootboxDefinitionBuilder identityItemTransforms() {
+        firstPersonRight = LootboxDefinition.ItemTransform.IDENTITY;
+        firstPersonLeft = LootboxDefinition.ItemTransform.IDENTITY;
+        thirdPersonRight = LootboxDefinition.ItemTransform.IDENTITY;
+        thirdPersonLeft = LootboxDefinition.ItemTransform.IDENTITY;
+        groundTransform = LootboxDefinition.ItemTransform.IDENTITY;
+        guiTransform = LootboxDefinition.ItemTransform.IDENTITY;
+        fixedTransform = LootboxDefinition.ItemTransform.IDENTITY;
         return this;
     }
 
@@ -240,6 +353,20 @@ public final class LootboxDefinitionBuilder {
         return this;
     }
 
+    @Info("Sets the one-shot sound played when the case first falls/appears. It inherits defaultSound(...) tuning.")
+    public @NotNull LootboxDefinitionBuilder dropSound(@NotNull String sound) {
+        dropSound = parse(sound, "minecraft");
+        dropSoundTuning = null;
+        return this;
+    }
+
+    @Info("Sets the fall/appearance sound id with an explicit volume and pitch override.")
+    public @NotNull LootboxDefinitionBuilder dropSound(@NotNull String sound, float volume, float pitch) {
+        dropSound = parse(sound, "minecraft");
+        dropSoundTuning = soundTuning(volume, pitch);
+        return this;
+    }
+
     @Info(value = "Sets the sound played when the opening animation starts. It inherits defaultSound(...) tuning.", params = {
             @Param(name = "sound", value = "Registered sound event id, e.g. minecraft:block.chest.open")
     })
@@ -253,6 +380,27 @@ public final class LootboxDefinitionBuilder {
     public @NotNull LootboxDefinitionBuilder openSound(@NotNull String sound, float volume, float pitch) {
         openSound = parse(sound, "minecraft");
         openSoundTuning = soundTuning(volume, pitch);
+        return this;
+    }
+
+    @Info("Sets a sound that loops for the entire GeckoLib OPEN animation. Useful for repeated pin/zipper/tear sounds. It inherits defaultSound(...) tuning.")
+    public @NotNull LootboxDefinitionBuilder openLoopSound(@NotNull String sound) {
+        openLoopSound = parse(sound, "minecraft");
+        openLoopSoundTuning = null;
+        return this;
+    }
+
+    @Info("Sets the OPEN-animation loop sound with an explicit volume and pitch override.")
+    public @NotNull LootboxDefinitionBuilder openLoopSound(@NotNull String sound, float volume, float pitch) {
+        openLoopSound = parse(sound, "minecraft");
+        openLoopSoundTuning = soundTuning(volume, pitch);
+        return this;
+    }
+
+    @Info("Disables the optional OPEN-animation loop sound for this case.")
+    public @NotNull LootboxDefinitionBuilder noOpenLoopSound() {
+        openLoopSound = null;
+        openLoopSoundTuning = null;
         return this;
     }
 
@@ -666,7 +814,9 @@ public final class LootboxDefinitionBuilder {
                 Objects.requireNonNull(animation, "animation"),
                 Objects.requireNonNull(keyTexture, "keyTexture"),
                 Objects.requireNonNull(itemJson, "itemJson"),
+                Objects.requireNonNull(dropSound, "dropSound"),
                 Objects.requireNonNull(openSound, "openSound"),
+                openLoopSound,
                 Objects.requireNonNull(carouselTickSound, "carouselTickSound"),
                 Objects.requireNonNull(rewardSound, "rewardSound"),
                 Objects.requireNonNull(uncommonSound, "uncommonSound"),
@@ -677,7 +827,9 @@ public final class LootboxDefinitionBuilder {
                 Objects.requireNonNull(specialSound, "specialSound"),
                 new LootboxDefinition.SoundProfile(
                         soundTuning(defaultSoundVolume, defaultSoundPitch),
+                        dropSoundTuning,
                         openSoundTuning,
+                        openLoopSoundTuning,
                         carouselTickSoundTuning,
                         rewardSoundTuning,
                         uncommonSoundTuning,
@@ -704,6 +856,15 @@ public final class LootboxDefinitionBuilder {
                         clampLight(blockLight),
                         clampLight(skyLight)
                 ),
+                new LootboxDefinition.ItemDisplayTransforms(
+                        firstPersonRight,
+                        firstPersonLeft,
+                        thirdPersonRight,
+                        thirdPersonLeft,
+                        groundTransform,
+                        guiTransform,
+                        fixedTransform
+                ),
                 new LootboxDefinition.UiSkin(
                         Objects.requireNonNull(slotBorderTexture, "slotBorderTexture"),
                         Objects.requireNonNull(markerBarTexture, "markerBarTexture"),
@@ -725,6 +886,13 @@ public final class LootboxDefinitionBuilder {
 
     private static @NotNull LootboxDefinition.SoundTuning soundTuning(float volume, float pitch) {
         return new LootboxDefinition.SoundTuning(volume, pitch);
+    }
+
+    private static @NotNull LootboxDefinition.ItemTransform transform(
+            float tx, float ty, float tz,
+            float rx, float ry, float rz,
+            float sx, float sy, float sz) {
+        return new LootboxDefinition.ItemTransform(tx, ty, tz, rx, ry, rz, sx, sy, sz);
     }
 
 

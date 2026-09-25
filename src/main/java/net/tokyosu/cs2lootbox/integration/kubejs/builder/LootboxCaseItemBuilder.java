@@ -20,10 +20,10 @@ public final class LootboxCaseItemBuilder extends ItemBuilder {
 
         maxStackSize(definition.caseStackSize());
 
-        // Let KubeJS generate this case's model as a child of the selected
-        // shared item JSON. The shared JSON only controls vanilla item display
-        // transforms; LootboxCaseItem's custom GeckoLib renderer still draws
-        // the actual .geo.json model.
+        // Let KubeJS generate this case's item model as a child of the selected
+        // base JSON. The default parent is deliberately transform-free because
+        // LootboxCaseItemRenderer now applies all seven display transforms from
+        // the LootboxDefinition/KubeJS configuration itself.
         parentModel(definition.itemJson().toString());
 
         translationKey(definition.caseTranslationKey());

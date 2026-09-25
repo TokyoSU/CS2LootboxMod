@@ -13,13 +13,23 @@ public class DefaultLootBoxRegistries {
                                                      @NotNull String keyTexture, boolean requiresKey, boolean hasOpenIdleAnim) {
         builder.caseItem("cs2lootbox:" + caseRegName)
                 .keyItem("cs2lootbox:" + caseKeyRegName)
-                .itemJson("cs2lootbox:item/lootbox_case")
+                .itemJson("cs2lootbox:item/lootbox_renderer")
                 .model("cs2lootbox:geo/" + modelPath)
                 .texture("cs2lootbox:textures/lootbox/" + texturePath)
                 .animation("cs2lootbox:animations/" + animationPath)
                 .keyTexture("cs2lootbox:item/" + keyTexture)
                 .requiresKey(requiresKey)
                 .itemIdleAnimation("idle")
+                // Item display is renderer-owned so left/right hands are truly
+                // independent. These values are the former lootbox_patch.json
+                // display settings, now expressed directly through the builder.
+                .thirdPersonRight(0.0F, 0.0F, 0.0F, 35.0F, 135.0F, 0.0F, 1.3F)
+                .thirdPersonLeft(0.0F, 0.0F, 0.0F, 35.0F, 135.0F, 0.0F, 1.3F)
+                .firstPersonRight(0.0F, 0.0F, 0.0F, 35.0F, 135.0F, 0.0F, 1.3F)
+                .firstPersonLeft(0.0F, 0.0F, 0.0F, 35.0F, 135.0F, 0.0F, 1.3F)
+                .ground(0.0F, 0.0F, 0.0F, 35.0F, 135.0F, 0.0F, 1.5F)
+                .gui(0.0F, -3.0F, 0.0F, 35.0F, 135.0F, 0.0F, 1.5F)
+                .fixed(0.0F, -1.5F, 0.0F, 35.0F, 135.0F, 0.0F, 1.5F)
 
                 // -----------------------------------------------------------------
                 // Mil-Spec / blue — 7 slots
@@ -126,7 +136,7 @@ public class DefaultLootBoxRegistries {
         if (requiresKey)
             builder.openSound("cs2lootbox:case_unlock", 0.2F, 1.0F);
         else
-            builder.openSound("cs2lootbox:case_unlock_immediate_01", 0.2F, 1.0F);
+            builder.openSound("cs2lootbox:case_unlock_immediate", 0.2F, 1.0F);
 
         // ---------------------------------------------------------------------
         // Legendary / gold — absolute 0.26%

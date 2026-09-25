@@ -123,9 +123,16 @@ CS2LootboxEvents.register(event => {
         crate.animation('kubejs:animations/revolution.animation.json')
         crate.keyTexture('kubejs:item/revolution_key')
 
-        // Minecraft item model used for inventory/hand transforms.
-        // The opening-screen case itself is rendered through GeckoLib.
-        crate.itemJson('kubejs:item/lootbox_case')
+        // Item display transforms are applied by the GeckoLib item renderer.
+        // Values follow vanilla model-JSON semantics, but every context has its
+        // own independent KubeJS definition.
+        crate.firstPersonRight(0, 1, 0, 0, 135, 0, 1.3)
+        crate.firstPersonLeft(0, 1, 0, 0, 225, 0, 1.3)
+        crate.thirdPersonRight(0, 2.5, 0, 75, 45, 0, 1.3)
+        crate.thirdPersonLeft(0, 2.5, 0, 75, 45, 0, 1.3)
+        crate.ground(0, 1, 0, 0, 0, 0, 1.5)
+        crate.gui(0, -3, 0, 30, 135, 0, 1.5)
+        crate.fixed(0, -1.5, 0, 0, 0, 0, 1.5)
 
         crate.position(22, 30)
         crate.scale(78)
@@ -135,7 +142,10 @@ CS2LootboxEvents.register(event => {
         crate.itemIdleAnimation('idle')
 
         crate.defaultSound(0.60, 1.0)
+        crate.dropSound('cs2lootbox:case_drop')
         crate.openSound('minecraft:block.chest.open')
+        // Optional: repeated for the full OPEN animation.
+        // crate.openLoopSound('cs2lootbox:case_pins_fall')
 
         crate.caseName('item.kubejs.revolution_case')
         crate.keyName('item.kubejs.revolution_key')
@@ -412,7 +422,9 @@ crate.defaultSoundPitch(1.0)
 Individual cues can then be overridden:
 
 ```js
-crate.openSound('namespace:sound')
+crate.dropSound('namespace:fall_sound')
+crate.openSound('namespace:open_sound')
+crate.openLoopSound('namespace:open_loop_sound') // optional, repeats only during OPEN
 crate.carouselTickSound('namespace:sound')
 crate.rewardSound('namespace:sound')
 
@@ -427,9 +439,13 @@ crate.specialSound('namespace:sound')
 Each sound setter also supports explicit volume and pitch:
 
 ```js
-crate.openSound('namespace:sound', 0.50, 1.0)
+crate.dropSound('namespace:fall_sound', 0.60, 1.0)
+crate.openSound('namespace:open_sound', 0.50, 1.0)
+crate.openLoopSound('namespace:open_loop_sound', 0.45, 1.0)
 crate.carouselTickSound('namespace:sound', 0.30, 1.0)
 ```
+
+`openLoopSound(...)` is stopped automatically as soon as GeckoLib's OPEN animation ends, or if the UI closes. Use `noOpenLoopSound()` to clear it when modifying an existing case.
 
 The mod includes its own CS-style case UI sound set, including carousel ticks, reveal sounds and rarity-specific awarded sounds.
 
@@ -647,3 +663,9 @@ See [`LICENSE`](LICENSE) for details.
 This is an independent Minecraft mod inspired by the presentation of Counter-Strike case openings.
 
 It is **not affiliated with, endorsed by, or sponsored by Valve Corporation**. Counter-Strike, CS:GO and CS2 are trademarks of their respective owners.
+
+
+## Per-case opening sounds
+
+Lootbox definitions can customize the one-shot fall/appearance sound with `dropSound(...)` and an optional sample that repeats for the full GeckoLib OPEN animation with `openLoopSound(...)`. The loop stops automatically when OPEN ends or the UI closes. The built-in agent dossier uses `case_patch_fall` and `case_pins_fall`.
+

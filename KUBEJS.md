@@ -284,7 +284,7 @@ The case must already exist before `changeCase()` is called.
 | `requiresKey(boolean)` | Enables/disables matching-key registration and consumption; default `true` |
 | `freeToOpen()` | Shortcut for `requiresKey(false)` |
 | `noKeyRequired()` | Alias of `freeToOpen()` |
-| `itemJson(resource)` | Parent Minecraft item-model JSON used for inventory/hand/fixed transforms |
+| `itemJson(resource)` | Optional base Minecraft item-model JSON. Leave unset for the neutral renderer model; display transforms are configured below in KubeJS. |
 
 Example:
 
@@ -297,10 +297,46 @@ crate.texture('kubejs:textures/lootbox/revolution.png')
 crate.animation('kubejs:animations/revolution.animation.json')
 crate.keyTexture('kubejs:item/revolution_key')
 
-crate.itemJson('cs2lootbox:item/lootbox_case')
+// Optional custom parent only. Normally leave itemJson() unset.
+// crate.itemJson('kubejs:item/my_neutral_parent')
 ```
 
-`itemJson()` controls the vanilla item display transforms. The actual animated case geometry is still rendered with GeckoLib.
+The default item parent is `cs2lootbox:item/lootbox_renderer`, which is intentionally neutral (`builtin/entity`). The GeckoLib renderer applies hand/GUI/ground/fixed transforms itself, so left and right hands are independent. If a custom `itemJson()` contains its own `display` section, those transforms are applied **in addition to** the KubeJS transforms below.
+
+## Item display transforms
+
+These methods use the same value convention as Minecraft item-model JSON: translation is in item units (`16 = 1 block`), rotation is in degrees, and scale is a multiplier. Left-hand contexts also use Minecraft's normal handedness rule (X translation and Y/Z rotation are mirrored), so existing `display` values can be copied 1:1.
+
+```js
+crate.firstPersonRight(0, 0, 0, 0, 135, 0, 1.5)
+crate.firstPersonLeft (0, 1, 0, 0, 225, 0, 1.3)
+
+crate.thirdPersonRight(0, 1.5, 0, 75, 45, 0, 1.7)
+crate.thirdPersonLeft (0, 2.5, 0, 75, 45, 0, 1.3)
+
+crate.ground(0, 0, 0, 90, 135, 0, 1.5)
+crate.gui   (0, -3, 0, 30, 135, 0, 1.5)
+crate.fixed (0, -1.5, 0, 0, 0, 0, 1.5)
+```
+
+Each method also has a 9-number form if non-uniform scale is needed:
+
+```js
+// tx, ty, tz, rx, ry, rz, sx, sy, sz
+crate.firstPersonRight(0, 0, 0, 0, 135, 0, 1.5, 1.2, 1.5)
+```
+
+| Method | Context |
+| --- | --- |
+| `firstPersonRight(...)` | Main/right hand in first person |
+| `firstPersonLeft(...)` | Off/left hand in first person |
+| `thirdPersonRight(...)` | Main/right hand in third person |
+| `thirdPersonLeft(...)` | Off/left hand in third person |
+| `ground(...)` | Dropped item |
+| `gui(...)` | Inventory/GUI item |
+| `fixed(...)` | Item frame / fixed context |
+| `identityItemTransforms()` | Resets all seven contexts to identity |
+
 
 ---
 
@@ -1135,19 +1171,32 @@ Volume is clamped to the supported `0.0 .. 1.0` range and pitch to the supported
 
 ---
 
-## Opening and carousel
+## Drop, opening loop, and carousel
 
 ```js
+// One-shot when the case/dossier first falls or appears.
+crate.dropSound('cs2lootbox:case_patch_fall')
+
+// One-shot when OPEN begins.
 crate.openSound('minecraft:block.chest.open')
+
+// Optional sound repeated automatically for the full OPEN animation.
+// It stops exactly when GeckoLib reports OPEN has ended.
+crate.openLoopSound('cs2lootbox:case_pins_fall')
+
 crate.carouselTickSound('cs2lootbox:csgo_ui_crate_item_scroll')
 ```
 
 With explicit volume/pitch:
 
 ```js
+crate.dropSound('cs2lootbox:case_patch_fall', 0.6, 1.0)
 crate.openSound('minecraft:block.chest.open', 0.5, 1.0)
+crate.openLoopSound('cs2lootbox:case_pins_fall', 0.45, 1.0)
 crate.carouselTickSound('cs2lootbox:csgo_ui_crate_item_scroll', 0.3, 1.0)
 ```
+
+`openLoopSound(...)` is optional. Use `crate.noOpenLoopSound()` to remove it again when editing an existing definition.
 
 ---
 
@@ -1627,8 +1676,14 @@ CS2LootboxEvents.register(event => {
         crate.animation('kubejs:animations/revolution.animation.json')
         crate.keyTexture('kubejs:item/revolution_key')
 
-        // Shared vanilla item-display transform JSON.
-        crate.itemJson('cs2lootbox:item/lootbox_case')
+        // Item display transforms are renderer-owned and configured directly.
+        crate.firstPersonRight(0, 1, 0, 0, 135, 0, 1.3)
+        crate.firstPersonLeft(0, 1, 0, 0, 225, 0, 1.3)
+        crate.thirdPersonRight(0, 2.5, 0, 75, 45, 0, 1.3)
+        crate.thirdPersonLeft(0, 2.5, 0, 75, 45, 0, 1.3)
+        crate.ground(0, 1, 0, 0, 0, 0, 1.5)
+        crate.gui(0, -3, 0, 30, 135, 0, 1.5)
+        crate.fixed(0, -1.5, 0, 0, 0, 0, 1.5)
 
         // -------------------------------------------------------------
         // 3D CASE PRESENTATION
@@ -1661,7 +1716,9 @@ CS2LootboxEvents.register(event => {
         crate.defaultSound(0.60, 1.0)
 
         // Bundled sounds are already used by default, so these are optional:
+        // crate.dropSound('cs2lootbox:case_drop')
         // crate.openSound('cs2lootbox:case_unlock', 0.2, 1.0)
+        // crate.openLoopSound('cs2lootbox:case_pins_fall')
         // crate.carouselTickSound('cs2lootbox:csgo_ui_crate_item_scroll')
 
         // -------------------------------------------------------------

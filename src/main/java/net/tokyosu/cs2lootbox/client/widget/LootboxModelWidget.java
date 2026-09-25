@@ -24,6 +24,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -32,6 +33,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
@@ -175,6 +177,7 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
     private transient PrizeAction pendingPrizeAction = PrizeAction.CLOSE;
     private transient boolean inventoryOpenQueued;
     private transient boolean caseDropSoundPlayed;
+    private transient @Nullable SoundInstance openLoopSoundInstance;
     private transient boolean carouselStartPending;
     private transient long carouselReadyAtMs;
 
@@ -328,6 +331,10 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
             return;
         }
 
+        // Never let a case-specific opening loop escape the UI if the player
+        // closes the screen or the server closes the container unexpectedly.
+        stopOpenLoopSound();
+
         // The CS2 awarded sting belongs to the moment the reward UI closes,
         // not the moment the roulette stops. The actual roll is already fixed
         // by the server, so this is presentation only.
@@ -370,7 +377,8 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
         ensureRenderer();
         if (!caseDropSoundPlayed) {
             caseDropSoundPlayed = true;
-            playDefaultUiSound(ModSounds.CASE_DROP.getId());
+            LootboxDefinition definition = definition();
+            playUiSound(definition.dropSound(), definition.soundProfile().dropResolved());
         }
 
         if ((clientPhase == ClientPhase.CASE || clientPhase == ClientPhase.CASE_LOADING) && animatable != null) {
@@ -386,6 +394,7 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
                 // OPEN is also length-independent now. If open_idle exists the
                 // next render starts it; otherwise the final OPEN frame stays
                 // held while the carousel startup delay runs.
+                stopOpenLoopSound();
                 setAnimationState(LootboxAnimationState.OPEN_IDLE);
                 scheduleCarouselAfterOpen();
             }
@@ -569,8 +578,9 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
             carouselStartPending = false;
             carouselReadyAtMs = 0L;
             clientStatus = null;
-            playOpenSound();
             setAnimationState(LootboxAnimationState.OPEN);
+            playOpenSound();
+            startOpenLoopSound();
             return;
         }
 
@@ -1446,6 +1456,52 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
     private void playOpenSound() {
         LootboxDefinition definition = definition();
         playUiSound(definition.openSound(), definition.soundProfile().openResolved());
+    }
+
+    /**
+     * Starts the optional per-case sound that repeats continuously while the
+     * GeckoLib OPEN animation is active. Minecraft's sound engine performs the
+     * actual sample looping; we stop the instance as soon as OPEN ends.
+     */
+    @OnlyIn(Dist.CLIENT)
+    private void startOpenLoopSound() {
+        stopOpenLoopSound();
+
+        if (!CS2LootboxClientConfig.ENABLE_UI_SOUNDS.get()) {
+            return;
+        }
+
+        LootboxDefinition definition = definition();
+        ResourceLocation soundId = definition.openLoopSound();
+        if (soundId == null || ForgeRegistries.SOUND_EVENTS.getValue(soundId) == null) {
+            return;
+        }
+
+        LootboxDefinition.SoundTuning tuning = definition.soundProfile().openLoopResolved();
+        openLoopSoundInstance = new SimpleSoundInstance(
+                soundId,
+                SoundSource.MASTER,
+                tuning.volume(),
+                tuning.pitch(),
+                RandomSource.create(),
+                true,
+                0,
+                SoundInstance.Attenuation.NONE,
+                0.0D,
+                0.0D,
+                0.0D,
+                true
+        );
+        Minecraft.getInstance().getSoundManager().play(openLoopSoundInstance);
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    private void stopOpenLoopSound() {
+        if (openLoopSoundInstance == null) {
+            return;
+        }
+        Minecraft.getInstance().getSoundManager().stop(openLoopSoundInstance);
+        openLoopSoundInstance = null;
     }
 
     @OnlyIn(Dist.CLIENT)

@@ -22,7 +22,9 @@ public record LootboxDefinition(
         @NotNull ResourceLocation animation,
         @NotNull ResourceLocation keyTexture,
         @NotNull ResourceLocation itemJson,
+        @NotNull ResourceLocation dropSound,
         @NotNull ResourceLocation openSound,
+        @Nullable ResourceLocation openLoopSound,
         @NotNull ResourceLocation carouselTickSound,
         @NotNull ResourceLocation rewardSound,
         @NotNull ResourceLocation uncommonSound,
@@ -34,6 +36,7 @@ public record LootboxDefinition(
         @NotNull SoundProfile soundProfile,
         @NotNull AnimationSet animations,
         @NotNull PreviewTransform preview,
+        @NotNull ItemDisplayTransforms itemTransforms,
         @NotNull UiSkin uiSkin,
         boolean requiresKey,
         int caseStackSize,
@@ -54,6 +57,7 @@ public record LootboxDefinition(
         animation = Objects.requireNonNull(animation, "animation");
         keyTexture = Objects.requireNonNull(keyTexture, "keyTexture");
         itemJson = Objects.requireNonNull(itemJson, "itemJson");
+        dropSound = Objects.requireNonNull(dropSound, "dropSound");
         openSound = Objects.requireNonNull(openSound, "openSound");
         carouselTickSound = Objects.requireNonNull(carouselTickSound, "carouselTickSound");
         rewardSound = Objects.requireNonNull(rewardSound, "rewardSound");
@@ -66,6 +70,7 @@ public record LootboxDefinition(
         soundProfile = Objects.requireNonNull(soundProfile, "soundProfile");
         animations = Objects.requireNonNull(animations, "animations");
         preview = Objects.requireNonNull(preview, "preview");
+        itemTransforms = Objects.requireNonNull(itemTransforms, "itemTransforms");
         uiSkin = Objects.requireNonNull(uiSkin, "uiSkin");
         caseTranslationKey = Objects.requireNonNull(caseTranslationKey, "caseTranslationKey");
         keyTranslationKey = Objects.requireNonNull(keyTranslationKey, "keyTranslationKey");
@@ -108,7 +113,9 @@ public record LootboxDefinition(
      */
     public record SoundProfile(
             @NotNull SoundTuning defaults,
+            @Nullable SoundTuning drop,
             @Nullable SoundTuning open,
+            @Nullable SoundTuning openLoop,
             @Nullable SoundTuning carouselTick,
             @Nullable SoundTuning reward,
             @Nullable SoundTuning uncommon,
@@ -125,7 +132,9 @@ public record LootboxDefinition(
             return override != null ? override : defaults;
         }
 
+        public @NotNull SoundTuning dropResolved() { return resolve(drop); }
         public @NotNull SoundTuning openResolved() { return resolve(open); }
+        public @NotNull SoundTuning openLoopResolved() { return resolve(openLoop); }
         public @NotNull SoundTuning carouselTickResolved() { return resolve(carouselTick); }
         public @NotNull SoundTuning rewardResolved() { return resolve(reward); }
         public @NotNull SoundTuning uncommonResolved() { return resolve(uncommon); }
@@ -167,6 +176,68 @@ public record LootboxDefinition(
             float roll,
             int blockLight,
             int skyLight) {
+    }
+
+    /**
+     * One Minecraft item-display transform, using the same units/conventions as
+     * an item model JSON: translation is in 1/16-block units, rotation is in
+     * degrees, and scale is a direct multiplier.
+     */
+    public record ItemTransform(
+            float translationX,
+            float translationY,
+            float translationZ,
+            float rotationX,
+            float rotationY,
+            float rotationZ,
+            float scaleX,
+            float scaleY,
+            float scaleZ) {
+        public static final ItemTransform IDENTITY = new ItemTransform(
+                0.0F, 0.0F, 0.0F,
+                0.0F, 0.0F, 0.0F,
+                1.0F, 1.0F, 1.0F
+        );
+
+        public ItemTransform {
+            translationX = finiteOr(translationX, 0.0F);
+            translationY = finiteOr(translationY, 0.0F);
+            translationZ = finiteOr(translationZ, 0.0F);
+            rotationX = finiteOr(rotationX, 0.0F);
+            rotationY = finiteOr(rotationY, 0.0F);
+            rotationZ = finiteOr(rotationZ, 0.0F);
+            scaleX = finiteOr(scaleX, 1.0F);
+            scaleY = finiteOr(scaleY, 1.0F);
+            scaleZ = finiteOr(scaleZ, 1.0F);
+        }
+
+        private static float finiteOr(float value, float fallback) {
+            return Float.isFinite(value) ? value : fallback;
+        }
+    }
+
+    /**
+     * Renderer-owned item transforms. Keeping these in the definition makes
+     * left/right hand positioning deterministic for GeckoLib custom items and
+     * lets KubeJS configure every useful vanilla display context directly.
+     */
+    public record ItemDisplayTransforms(
+            @NotNull ItemTransform firstPersonRight,
+            @NotNull ItemTransform firstPersonLeft,
+            @NotNull ItemTransform thirdPersonRight,
+            @NotNull ItemTransform thirdPersonLeft,
+            @NotNull ItemTransform ground,
+            @NotNull ItemTransform gui,
+            @NotNull ItemTransform fixed) {
+        public ItemDisplayTransforms {
+            firstPersonRight = Objects.requireNonNull(firstPersonRight, "firstPersonRight");
+            firstPersonLeft = Objects.requireNonNull(firstPersonLeft, "firstPersonLeft");
+            thirdPersonRight = Objects.requireNonNull(thirdPersonRight, "thirdPersonRight");
+            thirdPersonLeft = Objects.requireNonNull(thirdPersonLeft, "thirdPersonLeft");
+            ground = Objects.requireNonNull(ground, "ground");
+            gui = Objects.requireNonNull(gui, "gui");
+            fixed = Objects.requireNonNull(fixed, "fixed");
+        }
     }
 
     /** Optional customizable UI skin resources for the CS2-style screen. */

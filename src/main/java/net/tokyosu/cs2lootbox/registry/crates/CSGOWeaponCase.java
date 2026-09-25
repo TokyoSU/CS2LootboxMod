@@ -21,6 +21,17 @@ public final class CSGOWeaponCase {
                 "csgo_drop_crate_armsdeal1.animation.json",
                 "weapon_case_key", true, false);
 
+        // Item display is renderer-owned so left/right hands are truly
+        // independent. These values are the former lootbox_patch.json
+        // display settings, now expressed directly through the builder.
+        builder.thirdPersonRight(0.0F, 0.0F, 0.0F, 0.0F, 135.0F, 0.0F, 1.3F)
+                .thirdPersonLeft(0.0F, 0.0F, 0.0F, 0.0F, 135.0F, 0.0F, 1.3F)
+                .firstPersonRight(0.0F, 0.0F, 0.0F, 0.0F, 135.0F, 0.0F, 1.3F)
+                .firstPersonLeft(0.0F, 0.0F, 0.0F, 0.0F, 135.0F, 0.0F, 1.3F)
+                .ground(0.0F, 0.0F, 0.0F, 0.0F, 135.0F, 0.0F, 1.5F)
+                .gui(0.0F, -3.0F, 0.0F, 30.0F, 135.0F, 0.0F, 1.5F)
+                .fixed(0.0F, -1.5F, 0.0F, 0.0F, 135.0F, 0.0F, 1.5F);
+
         LootboxRegistrationService.register(builder);
     }
 }
