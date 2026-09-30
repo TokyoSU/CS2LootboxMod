@@ -30,6 +30,7 @@ public final class CS2LootBoxForgeEvents {
      * held. Main hand is preferred; offhand is used when the main-hand item is
      * not StatTrack-enabled. The NBT mutation occurs only on the logical server.
      */
+    @SuppressWarnings("resource")
     @SubscribeEvent
     public static void onLivingDeath(@NotNull LivingDeathEvent event) {
         if (!CS2LootboxServerConfig.ENABLE_STATTRACK_KILL_COUNTING.get()) {
