@@ -1,9 +1,9 @@
 package net.tokyosu.cs2lootbox.api.lootbox;
 
+import net.tokyosu.apocalypselib.utils.ResourceUtils;
 import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.kubejs.typings.Param;
 import net.minecraft.resources.ResourceLocation;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -11,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 
 /** KubeJS builder for the rewards behind one legendary panel. */
-@SuppressWarnings("unused")
 public final class LegendarySubLootBuilder {
     private final ResourceLocation ownerId;
     private final List<LootEntry> entries = new ArrayList<>();
@@ -99,18 +98,8 @@ public final class LegendarySubLootBuilder {
     }
 
     private @NotNull ResourceLocation parse(@NotNull String value) {
-        if (value == null || value.isBlank()) {
-            throw new IllegalArgumentException("Legendary sub-loot item id cannot be empty");
-        }
-        String normalized = value.trim();
-        int separator = normalized.indexOf(':');
-        if (separator >= 0) {
-            return ResourceLocation.fromNamespaceAndPath(
-                    normalized.substring(0, separator),
-                    normalized.substring(separator + 1)
-            );
-        }
-        return ResourceLocation.fromNamespaceAndPath(ownerId.getNamespace(), normalized);
+        if (value == null || value.isBlank()) throw new IllegalArgumentException("Legendary sub-loot item id cannot be empty");
+        return ResourceUtils.parseRequired(value, ownerId.getNamespace());
     }
 
     private static @NotNull LootEntry asLegendary(@NotNull LootEntry entry) {

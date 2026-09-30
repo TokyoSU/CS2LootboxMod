@@ -6,7 +6,6 @@ import net.tokyosu.cs2lootbox.api.lootbox.LootboxDefinitionBuilder;
 import net.tokyosu.cs2lootbox.registry.DefaultLootBoxRegistries;
 import net.tokyosu.cs2lootbox.registry.LootboxRegistrationService;
 
-@SuppressWarnings("SpellCheckingInspection")
 public final class CSGOWeaponCase {
     public static final ResourceLocation CASE_ID = ResourceLocation.fromNamespaceAndPath(CS2LootBoxMod.MOD_ID, "csgo_case_weapon");
 

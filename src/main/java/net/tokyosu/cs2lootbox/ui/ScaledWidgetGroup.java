@@ -1,16 +1,15 @@
 package net.tokyosu.cs2lootbox.ui;
 
+import net.tokyosu.apocalypselib.menu.layout.CanvasTransform;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.utils.Position;
-import com.lowdragmc.lowdraglib.utils.Size;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.NotNull;
-
 
 /**
  * Unity-style "Scale With Screen Size" container for LDLib.
@@ -44,30 +43,19 @@ public final class ScaledWidgetGroup extends WidgetGroup {
             screenHeight = minecraft.getWindow().getGuiScaledHeight();
         }
 
-        float availableWidth = Math.max(1.0F, screenWidth - SAFE_MARGIN * 2.0F);
-        float availableHeight = Math.max(1.0F, screenHeight - SAFE_MARGIN * 2.0F);
-        float scale = Math.min(availableWidth / referenceWidth, availableHeight / referenceHeight);
-        scale = Math.max(0.05F, scale);
-
-        float scaledWidth = referenceWidth * scale;
-        float scaledHeight = referenceHeight * scale;
-        float left = (screenWidth - scaledWidth) * 0.5F;
-        float top = (screenHeight - scaledHeight) * 0.5F;
-
         Position position = getPosition();
-        float translateX = left - position.x * scale;
-        float translateY = top - position.y * scale;
-        return new CanvasTransform(scale, left, top, translateX, translateY, screenWidth, screenHeight);
+        return CanvasTransform.fit(screenWidth, screenHeight, referenceWidth, referenceHeight,
+                position.x, position.y, SAFE_MARGIN, 0.05F);
     }
 
     @OnlyIn(Dist.CLIENT)
     private double referenceMouseX(double mouseX, @NotNull CanvasTransform transform) {
-        return getPosition().x + (mouseX - transform.left()) / transform.scale();
+        return transform.referenceX(mouseX);
     }
 
     @OnlyIn(Dist.CLIENT)
     private double referenceMouseY(double mouseY, @NotNull CanvasTransform transform) {
-        return getPosition().y + (mouseY - transform.top()) / transform.scale();
+        return transform.referenceY(mouseY);
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -208,13 +196,4 @@ public final class ScaledWidgetGroup extends WidgetGroup {
         );
     }
 
-    private record CanvasTransform(
-            float scale,
-            float left,
-            float top,
-            float translateX,
-            float translateY,
-            int screenWidth,
-            int screenHeight) {
-    }
 }

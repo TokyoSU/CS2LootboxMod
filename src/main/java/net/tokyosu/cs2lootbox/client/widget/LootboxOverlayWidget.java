@@ -1,5 +1,12 @@
 package net.tokyosu.cs2lootbox.client.widget;
 
+import net.tokyosu.apocalypselib.utils.ResourceUtils;
+
+import net.tokyosu.apocalypselib.utils.HudUtils;
+import net.tokyosu.apocalypselib.utils.ModUtils;
+import net.tokyosu.apocalypselib.utils.ColorUtils;
+import net.tokyosu.apocalypselib.menu.layout.CanvasTransform;
+import net.tokyosu.apocalypselib.client.GuiDrawUtils;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.utils.Position;
 import com.lowdragmc.lowdraglib.utils.Size;
@@ -22,14 +29,12 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.registries.ForgeRegistries;
 import net.tokyosu.cs2lootbox.CS2LootBoxMod;
 import net.tokyosu.cs2lootbox.api.lootbox.LegendaryLoot;
 import net.tokyosu.cs2lootbox.api.lootbox.LootEntry;
 import net.tokyosu.cs2lootbox.api.lootbox.LootboxDefinition;
 import net.tokyosu.cs2lootbox.config.CS2LootboxClientConfig;
 import net.tokyosu.cs2lootbox.loot.LootboxLootRoller;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import java.util.List;
@@ -42,25 +47,18 @@ import java.util.Objects;
  * render pass cannot overwrite the shader/depth state used by the controls.
  */
 public final class LootboxOverlayWidget extends Widget {
+    private static final ResourceLocation LEGENDARY_GLOW_TEXTURE = ResourceLocation.fromNamespaceAndPath(CS2LootBoxMod.MOD_ID, "textures/gui/glow_radial.png");
     private static final int FOOTER_HEIGHT = 62;
     private static final int BUTTON_HEIGHT = 32;
     private static final int OPEN_WIDTH = 146;
     private static final int CLOSE_WIDTH = 78;
     private static final int BUTTON_GAP = 10;
-
     private static final int LIST_HEIGHT = 184;
     private static final int SLOT_WIDTH = 72;
     private static final int SLOT_HEIGHT = 66;
-    private static final int SLOT_MIN_GAP = 5;
     private static final int SLOT_ROW_GAP = 11;
     private static final int MAX_COLUMNS = 11;
-    private static final ResourceLocation LEGENDARY_GLOW_TEXTURE = ResourceLocation.fromNamespaceAndPath(
-            CS2LootBoxMod.MOD_ID, "textures/gui/glow_radial.png");
     private static final int LEGENDARY_GOLD = 0xFFD85A;
-    private static final int LEGENDARY_TOP = 0x4A3A0D;
-    private static final int LEGENDARY_CENTER = 0xA77D17;
-    private static final int LEGENDARY_BOTTOM = 0x57400C;
-
     private final LootboxModelWidget model;
 
     // Only regular crate.loot(...) entries can be inspected. Legendary panels
@@ -75,7 +73,6 @@ public final class LootboxOverlayWidget extends Widget {
     private float inspectYaw = -28.0F;
     private float inspectPitch = 12.0F;
     private float inspectZoom = 1.0F;
-
 
     public LootboxOverlayWidget(int x, int y, int width, int height, @NotNull LootboxModelWidget model) {
         super(x, y, width, height);
@@ -224,21 +221,21 @@ public final class LootboxOverlayWidget extends Widget {
     private void drawHeader(@NotNull GuiGraphics graphics) {
         Position position = getPosition();
         Size size = getSize();
-        Font font = Minecraft.getInstance().font;
+        Font font = ModUtils.getFont();
         int centerX = position.x + size.width / 2;
 
         boolean requiresKey = model.getDefinition().requiresKey();
-        drawCentered(graphics, font,
+        graphics.drawCenteredString(font,
                 Component.translatable(requiresKey
                         ? "cs2lootbox.case_screen.unlock_container"
                         : "cs2lootbox.case_screen.open_container"),
                 centerX, position.y + 16, 0xFFF4F4F4);
-        drawCentered(graphics, font,
+        graphics.drawCenteredString(font,
                 requiresKey
                         ? Component.translatable("cs2lootbox.case_screen.unlock_case", caseName())
                         : Component.translatable("cs2lootbox.case_screen.open_case", caseName()),
                 centerX, position.y + 34, 0xFFDCDCDC);
-        drawCentered(graphics, font,
+        graphics.drawCenteredString(font,
                 Component.translatable("cs2lootbox.case_screen.single_open"),
                 centerX, position.y + 52, 0xFFC7C7C7);
     }
@@ -247,7 +244,7 @@ public final class LootboxOverlayWidget extends Widget {
     private void drawLootPanel(@NotNull GuiGraphics graphics, int mouseX, int mouseY) {
         Position position = getPosition();
         Size size = getSize();
-        Font font = Minecraft.getInstance().font;
+        Font font = ModUtils.getFont();
         LootboxDefinition definition = model.getDefinition();
         List<LootEntry> loot = definition.loot();
         List<LegendaryLoot> legendaryLoot = definition.legendaryLoot();
@@ -268,7 +265,7 @@ public final class LootboxOverlayWidget extends Widget {
         graphics.fill(left, bottom - 1, right, bottom, 0x22000000);
 
         Component title = Component.translatable("cs2lootbox.case_screen.receive_one_following");
-        drawCentered(graphics, font, title, position.x + size.width / 2, titleY, 0xFFE6E6E6);
+        graphics.drawCenteredString(font, title, position.x + size.width / 2, titleY, 0xFFE6E6E6);
 
         if (CS2LootboxClientConfig.ENABLE_3D_ITEM_INSPECTION.get()) {
             Component inspect = Component.translatable("cs2lootbox.case_screen.inspect_items");
@@ -298,7 +295,7 @@ public final class LootboxOverlayWidget extends Widget {
             if (i < loot.size()) {
                 boolean hovered = CS2LootboxClientConfig.ENABLE_3D_ITEM_INSPECTION.get()
                         && model.canStartOpeningFromChrome()
-                        && inside(mouseX, mouseY, x, y, SLOT_WIDTH, SLOT_HEIGHT);
+                        && HudUtils.contains(mouseX, mouseY, x, y, SLOT_WIDTH, SLOT_HEIGHT);
                 drawLootEntry(graphics, font, loot.get(i), x, y, SLOT_WIDTH, SLOT_HEIGHT, hovered);
             } else {
                 // Legendary panels intentionally have no hover/click inspect
@@ -312,12 +309,12 @@ public final class LootboxOverlayWidget extends Widget {
     @OnlyIn(Dist.CLIENT)
     private void drawLootEntry(@NotNull GuiGraphics graphics, @NotNull Font font, @NotNull LootEntry entry, int x, int y, int width, int height, boolean hovered) {
         ItemStack stack = LootboxLootRoller.createPreviewStack(entry);
-        int rarity = rarityColor(entry, stack);
+        int rarity = rarityColor(entry);
 
         graphics.fill(x, y, x + width, y + height, hovered ? 0x665F6469 : 0x465B5957);
         graphics.fill(x + 1, y + 1, x + width - 1, y + height - 1, hovered ? 0x48484B4F : 0x303B3A39);
         graphics.fill(x + 1, y + 1, x + width - 1, y + 18, hovered ? 0x28FFFFFF : 0x18FFFFFF);
-        drawBorder(graphics, x, y, width, height, hovered ? 0xA8FFFFFF : 0x26FFFFFF);
+        GuiDrawUtils.drawBorder(graphics, x, y, width, height, hovered ? 0xA8FFFFFF : 0x26FFFFFF);
         graphics.fill(x + 1, y + height - 4, x + width - 1, y + height - 1, (0xB8000000 | rarity));
         blitTinted(graphics, model.getDefinition().uiSkin().slotBorderTexture(), x, y, width, height, rarity, 0.28F);
 
@@ -374,7 +371,7 @@ public final class LootboxOverlayWidget extends Widget {
                 0xFFFFFF,
                 1.0F);
 
-        drawBorder(graphics, x, y, width, height, 0x66FFE789);
+        GuiDrawUtils.drawBorder(graphics, x, y, width, height, 0x66FFE789);
         graphics.fill(x + 1, y + height - 4, x + width - 1, y + height - 1, 0xE0FFD700);
         blitTinted(graphics, model.getDefinition().uiSkin().slotBorderTexture(),
                 x, y, width, height, LEGENDARY_GOLD, 0.34F);
@@ -473,7 +470,7 @@ public final class LootboxOverlayWidget extends Widget {
                 break;
             }
 
-            if (inside(mouseX, mouseY, x, y, SLOT_WIDTH, SLOT_HEIGHT)) {
+            if (HudUtils.contains(mouseX, mouseY, x, y, SLOT_WIDTH, SLOT_HEIGHT)) {
                 return loot.get(i);
             }
         }
@@ -490,7 +487,7 @@ public final class LootboxOverlayWidget extends Widget {
 
         Position position = getPosition();
         Size size = getSize();
-        Font font = Minecraft.getInstance().font;
+        Font font = ModUtils.getFont();
 
         int panelWidth = Math.min(720, Math.max(430, size.width - 38));
         int panelHeight = Math.min(360, Math.max(260, size.height - 64));
@@ -498,7 +495,7 @@ public final class LootboxOverlayWidget extends Widget {
         int panelY = position.y + Math.max(18, (size.height - panelHeight) / 2 - 4);
         int panelRight = panelX + panelWidth;
         int panelBottom = panelY + panelHeight;
-        int rarity = rarityColor(entry, inspectedStack);
+        int rarity = rarityColor(entry);
 
         graphics.fill(fullscreenReferenceLeft(), position.y,
                 fullscreenReferenceRight(), position.y + size.height,
@@ -516,11 +513,11 @@ public final class LootboxOverlayWidget extends Widget {
         int backHeight = 22;
         int backX = panelRight - backWidth - 12;
         int backY = panelY + 9;
-        boolean backHover = inside(mouseX, mouseY, backX, backY, backWidth, backHeight);
+        boolean backHover = HudUtils.contains(mouseX, mouseY, backX, backY, backWidth, backHeight);
         graphics.fill(backX, backY, backX + backWidth, backY + backHeight,
                 backHover ? 0xFF464646 : 0xFF2A2A2A);
-        drawBorder(graphics, backX, backY, backWidth, backHeight, 0x62FFFFFF);
-        drawCentered(graphics, font,
+        GuiDrawUtils.drawBorder(graphics, backX, backY, backWidth, backHeight, 0x62FFFFFF);
+        graphics.drawCenteredString(font,
                 Component.translatable("cs2lootbox.case_screen.inspect_back"),
                 backX + backWidth / 2, backY + 7, 0xFFFFFFFF);
 
@@ -555,7 +552,7 @@ public final class LootboxOverlayWidget extends Widget {
         }
 
         Component hint = Component.translatable("cs2lootbox.case_screen.inspect_controls");
-        drawCentered(graphics, font, hint,
+        graphics.drawCenteredString(font, hint,
                 previewCenterX, previewBottom - 15, 0xFFAEB4C0);
 
         // Right side = item metadata. The 3D viewport remains the primary focus.
@@ -800,19 +797,14 @@ public final class LootboxOverlayWidget extends Widget {
         int backHeight = 22;
         int backX = panelX + panelWidth - backWidth - 12;
         int backY = panelY + 9;
-        return inside(mouseX, mouseY, backX, backY, backWidth, backHeight);
-    }
-
-    private static boolean inside(double mouseX, double mouseY, int x, int y, int width, int height) {
-        return mouseX >= x && mouseX < x + width
-                && mouseY >= y && mouseY < y + height;
+        return HudUtils.contains(mouseX, mouseY, backX, backY, backWidth, backHeight);
     }
 
     @OnlyIn(Dist.CLIENT)
     private void drawFooter(@NotNull GuiGraphics graphics, int mouseX, int mouseY) {
         Position position = getPosition();
         Size size = getSize();
-        Font font = Minecraft.getInstance().font;
+        Font font = ModUtils.getFont();
 
         int left = fullscreenReferenceLeft();
         int right = fullscreenReferenceRight();
@@ -823,7 +815,6 @@ public final class LootboxOverlayWidget extends Widget {
         graphics.fill(left, top, right, top + 1, 0x42FFFFFF);
 
         int keyAreaLeft = position.x + 12;
-        int keyAreaRight = position.x + size.width - (OPEN_WIDTH + CLOSE_WIDTH + BUTTON_GAP + 16);
         int centerY = top + (bottom - top) / 2;
 
         if (model.getDefinition().requiresKey()) {
@@ -853,18 +844,18 @@ public final class LootboxOverlayWidget extends Widget {
         int openFill = opening ? 0xFF5B5B5B : (openHover ? 0xFF717171 : 0xFF636363);
         graphics.fill(ox, oy, ox + OPEN_WIDTH, oy + BUTTON_HEIGHT, openFill);
         graphics.fill(ox + 1, oy + 1, ox + OPEN_WIDTH - 1, oy + BUTTON_HEIGHT / 2, 0x18FFFFFF);
-        drawBorder(graphics, ox, oy, OPEN_WIDTH, BUTTON_HEIGHT, 0x8AFFFFFF);
+        GuiDrawUtils.drawBorder(graphics, ox, oy, OPEN_WIDTH, BUTTON_HEIGHT, 0x8AFFFFFF);
 
         Component openTitle = opening
                 ? Component.translatable("cs2lootbox.case_screen.opening")
                 : Component.translatable("cs2lootbox.case_screen.open_button");
-        drawCentered(graphics, font, openTitle, ox + OPEN_WIDTH / 2, oy + 5, 0xFFFFFFFF);
+        graphics.drawCenteredString(font, openTitle, ox + OPEN_WIDTH / 2, oy + 5, 0xFFFFFFFF);
         Component openSubtitle = opening
                 ? Component.literal(spinnerFrame())
                 : Component.translatable(model.getDefinition().requiresKey()
                         ? "cs2lootbox.case_screen.open_subtitle"
                         : "cs2lootbox.case_screen.open_subtitle_free");
-        drawCentered(graphics, font, openSubtitle, ox + OPEN_WIDTH / 2, oy + 18, 0xFFD2D2D2);
+        graphics.drawCenteredString(font, openSubtitle, ox + OPEN_WIDTH / 2, oy + 18, 0xFFD2D2D2);
 
         if (model.canCloseFromChrome()) {
             boolean closeHover = mouseX >= cx && mouseX < cx + CLOSE_WIDTH
@@ -872,8 +863,8 @@ public final class LootboxOverlayWidget extends Widget {
             graphics.fill(cx, oy, cx + CLOSE_WIDTH, oy + BUTTON_HEIGHT,
                     closeHover ? 0xFF323232 : 0xFF232323);
             graphics.fill(cx + 1, oy + 1, cx + CLOSE_WIDTH - 1, oy + BUTTON_HEIGHT / 2, 0x10FFFFFF);
-            drawBorder(graphics, cx, oy, CLOSE_WIDTH, BUTTON_HEIGHT, 0x52FFFFFF);
-            drawCentered(graphics, font,
+            GuiDrawUtils.drawBorder(graphics, cx, oy, CLOSE_WIDTH, BUTTON_HEIGHT, 0x52FFFFFF);
+            graphics.drawCenteredString(font,
                     Component.translatable("cs2lootbox.case_screen.close_button"),
                     cx + CLOSE_WIDTH / 2, oy + 11, 0xFFFFFFFF);
         }
@@ -888,8 +879,7 @@ public final class LootboxOverlayWidget extends Widget {
         Position position = getPosition();
         Size size = getSize();
         int color = model.hasChromeError() ? 0xFFFF6666 : 0xFFDCDCDC;
-        drawCentered(graphics, Minecraft.getInstance().font, status,
-                position.x + size.width / 2, footerTop() - 20, color);
+        graphics.drawCenteredString(ModUtils.getFont(), status, position.x + size.width / 2, footerTop() - 20, color);
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -898,9 +888,9 @@ public final class LootboxOverlayWidget extends Widget {
         if (definition.caseTranslationKey() != null && !definition.caseTranslationKey().isBlank() && I18n.exists(definition.caseTranslationKey())) {
             return Component.translatable(definition.caseTranslationKey());
         }
-        Item item = ForgeRegistries.ITEMS.getValue(definition.caseItemId());
+        Item item = ResourceUtils.getItemByLocation(definition.caseItemId());
         if (item != null) {
-            String hover = new ItemStack(item).getHoverName().getString();
+            String hover = item.getDefaultInstance().getHoverName().getString();
             if (hover != null && !hover.isBlank() && !hover.contains(".")) {
                 return Component.literal(hover);
             }
@@ -914,9 +904,9 @@ public final class LootboxOverlayWidget extends Widget {
         if (definition.keyTranslationKey() != null && !definition.keyTranslationKey().isBlank() && I18n.exists(definition.keyTranslationKey())) {
             return Component.translatable(definition.keyTranslationKey());
         }
-        Item item = ForgeRegistries.ITEMS.getValue(definition.keyItemId());
+        Item item = ResourceUtils.getItemByLocation(definition.keyItemId());
         if (item != null) {
-            String hover = new ItemStack(item).getHoverName().getString();
+            String hover = item.getDefaultInstance().getHoverName().getString();
             if (hover != null && !hover.isBlank() && !hover.contains(".")) {
                 return Component.literal(hover);
             }
@@ -926,8 +916,8 @@ public final class LootboxOverlayWidget extends Widget {
 
     @OnlyIn(Dist.CLIENT)
     private @NotNull ItemStack keyStack() {
-        Item item = ForgeRegistries.ITEMS.getValue(model.getDefinition().keyItemId());
-        return item == null ? ItemStack.EMPTY : new ItemStack(item);
+        Item item = ResourceUtils.getItemByLocation(model.getDefinition().keyItemId());
+        return item == null ? ItemStack.EMPTY : item.getDefaultInstance();
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -944,13 +934,7 @@ public final class LootboxOverlayWidget extends Widget {
             return 0;
         }
 
-        float scale = Math.min(screenWidth / (float) size.width, screenHeight / (float) size.height);
-        if (scale <= 0.0F) {
-            return 0;
-        }
-
-        float sideGutterPixels = Math.max(0.0F, (screenWidth - size.width * scale) * 0.5F);
-        return (int) Math.ceil(sideGutterPixels / scale);
+        return CanvasTransform.horizontalOverscan(screenWidth, screenHeight, size.width, size.height);
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -987,26 +971,13 @@ public final class LootboxOverlayWidget extends Widget {
     }
 
     @OnlyIn(Dist.CLIENT)
-    private static void drawBorder(@NotNull GuiGraphics graphics, int x, int y, int width, int height, int color) {
-        graphics.fill(x, y, x + width, y + 1, color);
-        graphics.fill(x, y + height - 1, x + width, y + height, color);
-        graphics.fill(x, y, x + 1, y + height, color);
-        graphics.fill(x + width - 1, y, x + width, y + height, color);
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    private static void drawCentered(@NotNull GuiGraphics graphics, @NotNull Font font, @NotNull Component text, int x, int y, int color) {
-        graphics.drawString(font, text, x - font.width(text) / 2, y, color, true);
-    }
-
-    @OnlyIn(Dist.CLIENT)
     private static @NotNull String spinnerFrame() {
         String[] frames = {"|", "/", "-", "\\"};
         return frames[(int) ((Util.getMillis() / 120L) % frames.length)];
     }
 
     @OnlyIn(Dist.CLIENT)
-    private static int rarityColor(@NotNull LootEntry entry, @NotNull ItemStack stack) {
+    private static int rarityColor(@NotNull LootEntry entry) {
         if (entry.rarityColor() != -1) {
             return entry.rarityColor() & 0xFFFFFF;
         }
@@ -1105,9 +1076,9 @@ public final class LootboxOverlayWidget extends Widget {
         if (texture == null) {
             return;
         }
-        float r = ((rgb >> 16) & 0xFF) / 255.0F;
-        float g = ((rgb >> 8) & 0xFF) / 255.0F;
-        float b = (rgb & 0xFF) / 255.0F;
+        float r = ColorUtils.getRedFloat(rgb);
+        float g = ColorUtils.getGreenFloat(rgb);
+        float b = ColorUtils.getBlueFloat(rgb);
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.setShaderColor(r, g, b, alpha);

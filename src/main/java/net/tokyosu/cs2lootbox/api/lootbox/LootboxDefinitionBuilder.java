@@ -1,12 +1,12 @@
 package net.tokyosu.cs2lootbox.api.lootbox;
 
+import net.tokyosu.apocalypselib.utils.ResourceUtils;
 import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.kubejs.typings.Param;
 import net.minecraft.Util;
 import net.tokyosu.cs2lootbox.CS2LootBoxMod;
 import net.tokyosu.cs2lootbox.registry.ModSounds;
 import net.minecraft.resources.ResourceLocation;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -17,7 +17,6 @@ import org.jetbrains.annotations.Nullable;
 /**
  * KubeJS-friendly builder for one lootbox definition.
  */
-@SuppressWarnings("unused")
 public final class LootboxDefinitionBuilder {
     private final ResourceLocation id;
 
@@ -105,7 +104,6 @@ public final class LootboxDefinitionBuilder {
     public LootboxDefinitionBuilder(@NotNull String id) {
         this(parse(id, "kubejs"));
     }
-
 
     /**
      * Creates an editable copy of an existing immutable definition. Used by
@@ -707,7 +705,6 @@ public final class LootboxDefinitionBuilder {
         return collectionImage(resource);
     }
 
-
     @Info(value = "Adds one weighted reward to this crate. Weight must be between 0 and 100 and is normalized against the crate total.", params = {
             @Param(name = "item", value = "Registered item id or #item_tag, for example minecraft:diamond or #forge:ingots/iron"),
             @Param(name = "weight", value = "Drop weight from 0 to 100")
@@ -883,7 +880,6 @@ public final class LootboxDefinitionBuilder {
         );
     }
 
-
     private static @NotNull LootboxDefinition.SoundTuning soundTuning(float volume, float pitch) {
         return new LootboxDefinition.SoundTuning(volume, pitch);
     }
@@ -894,7 +890,6 @@ public final class LootboxDefinitionBuilder {
             float sx, float sy, float sz) {
         return new LootboxDefinition.ItemTransform(tx, ty, tz, rx, ry, rz, sx, sy, sz);
     }
-
 
     private @NotNull LootEntryBuilder createLootEntryBuilder(@NotNull String source, double weight) {
         boolean tagSource = isItemTagSource(source);
@@ -923,21 +918,9 @@ public final class LootboxDefinitionBuilder {
         return parse(normalized, defaultNamespace);
     }
 
-
     private static @NotNull ResourceLocation parse(@NotNull String value, @NotNull String defaultNamespace) {
-        if (value.isBlank()) {
-            throw new IllegalArgumentException("Resource location cannot be empty");
-        }
-        String normalized = value.trim();
-        int separator = normalized.indexOf(':');
-
-        if (separator >= 0) {
-            String namespace = normalized.substring(0, separator);
-            String path = normalized.substring(separator + 1);
-            return ResourceLocation.fromNamespaceAndPath(namespace, path);
-        }
-
-        return ResourceLocation.fromNamespaceAndPath(defaultNamespace, normalized);
+        if (value.isBlank()) throw new IllegalArgumentException("Resource location cannot be empty");
+        return ResourceUtils.parseRequired(value, defaultNamespace);
     }
 
     private static int clampLight(int value) {

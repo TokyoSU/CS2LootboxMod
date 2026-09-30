@@ -1,5 +1,7 @@
 package net.tokyosu.cs2lootbox.client.renderer;
 
+import net.tokyosu.cs2lootbox.client.renderer.skinning.WeightedSkinPass;
+
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -10,9 +12,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.ForgeRenderTypes;
 import net.tokyosu.cs2lootbox.api.lootbox.LootboxDefinition;
 import net.tokyosu.cs2lootbox.client.model.LootboxCaseItemModel;
-import net.tokyosu.cs2lootbox.client.renderer.skinning.GeckoLibWeightedSkinRenderer;
-import net.tokyosu.cs2lootbox.client.renderer.skinning.SkinnedGeoModelData;
-import net.tokyosu.cs2lootbox.client.renderer.skinning.SkinnedGeoModelLoader;
 import net.tokyosu.cs2lootbox.item.LootboxCaseItem;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -112,9 +111,8 @@ public final class LootboxCaseItemRenderer extends GeoItemRenderer<LootboxCaseIt
 
         if (!isReRender) {
             ResourceLocation modelResource = getGeoModel().getModelResource(animatable, this);
-            SkinnedGeoModelData skinning = SkinnedGeoModelLoader.get(modelResource);
-            GeckoLibWeightedSkinRenderer.render(
-                    poseStack, model, skinning, buffer,
+            WeightedSkinPass.render(
+                    modelResource, poseStack, model, buffer,
                     packedLight, packedOverlay, red, green, blue, alpha);
         }
     }

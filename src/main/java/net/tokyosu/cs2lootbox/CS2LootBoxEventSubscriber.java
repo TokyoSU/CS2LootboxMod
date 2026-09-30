@@ -1,11 +1,12 @@
 package net.tokyosu.cs2lootbox;
 
+import net.tokyosu.apocalypselib.utils.ResourceUtils;
+
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.ForgeRegistries;
 import net.tokyosu.cs2lootbox.api.lootbox.LootboxDefinition;
 import net.tokyosu.cs2lootbox.registry.LootboxRegistry;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +31,7 @@ public final class CS2LootBoxEventSubscriber {
     }
 
     private static void acceptIfPresent(@NotNull BuildCreativeModeTabContentsEvent event, @NotNull net.minecraft.resources.ResourceLocation id) {
-        Item item = ForgeRegistries.ITEMS.getValue(id);
+        Item item = ResourceUtils.getItemByLocation(id);
         if (item != null) {
             event.accept(item);
         }

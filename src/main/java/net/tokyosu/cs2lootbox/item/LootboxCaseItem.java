@@ -1,5 +1,7 @@
 package net.tokyosu.cs2lootbox.item;
 
+import net.tokyosu.apocalypselib.utils.ColorUtils;
+
 import com.lowdragmc.lowdraglib.gui.factory.HeldItemUIFactory;
 import com.lowdragmc.lowdraglib.gui.modular.IUIHolder;
 import com.lowdragmc.lowdraglib.gui.modular.ModularUI;
@@ -176,12 +178,7 @@ public final class LootboxCaseItem extends Item implements GeoItem, IUIHolder.It
         }
 
         if (!stack.isEmpty()) {
-            return switch (stack.getRarity()) {
-                case UNCOMMON -> 0xFFFF55;
-                case RARE -> 0x55FFFF;
-                case EPIC -> 0xFF55FF;
-                default -> 0xFFFFFF;
-            };
+            return ColorUtils.getRGBFromRarity(stack.getRarity(), 0xFFFFFF);
         }
 
         return 0xFFFFFF;

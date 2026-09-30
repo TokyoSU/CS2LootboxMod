@@ -8,7 +8,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Locale;
 
 /** KubeJS-facing modifier collection for one loot entry. */
-@SuppressWarnings("unused")
 public final class LootModifiersBuilder {
     private StatTrackModifier statTrack;
 

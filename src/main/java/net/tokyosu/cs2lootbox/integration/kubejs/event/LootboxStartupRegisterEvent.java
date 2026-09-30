@@ -1,5 +1,6 @@
 package net.tokyosu.cs2lootbox.integration.kubejs.event;
 
+import net.tokyosu.apocalypselib.utils.ResourceUtils;
 import dev.latvian.mods.kubejs.event.StartupEventJS;
 import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.kubejs.typings.Param;
@@ -9,7 +10,6 @@ import net.tokyosu.cs2lootbox.api.lootbox.LootboxDefinitionBuilder;
 import net.tokyosu.cs2lootbox.registry.LootboxRegistrationService;
 import net.tokyosu.cs2lootbox.registry.LootboxRegistry;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -58,15 +58,6 @@ public final class LootboxStartupRegisterEvent extends StartupEventJS {
             throw new IllegalArgumentException("Lootbox id cannot be empty");
         }
 
-        String normalized = value.trim();
-        int separator = normalized.indexOf(':');
-        if (separator >= 0) {
-            return ResourceLocation.fromNamespaceAndPath(
-                    normalized.substring(0, separator),
-                    normalized.substring(separator + 1)
-            );
-        }
-
-        return ResourceLocation.fromNamespaceAndPath("kubejs", normalized);
+        return ResourceUtils.parseRequired(value, "kubejs");
     }
 }

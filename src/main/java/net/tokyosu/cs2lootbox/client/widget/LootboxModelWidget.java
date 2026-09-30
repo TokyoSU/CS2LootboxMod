@@ -1,5 +1,11 @@
 package net.tokyosu.cs2lootbox.client.widget;
 
+import net.tokyosu.apocalypselib.utils.ResourceUtils;
+
+import net.tokyosu.apocalypselib.utils.ColorUtils;
+import net.tokyosu.apocalypselib.utils.ModUtils;
+import net.tokyosu.apocalypselib.menu.layout.CanvasTransform;
+import net.tokyosu.apocalypselib.client.GuiDrawUtils;
 import com.lowdragmc.lowdraglib.gui.editor.annotation.Configurable;
 import com.lowdragmc.lowdraglib.gui.editor.annotation.LDLRegister;
 import com.lowdragmc.lowdraglib.gui.editor.annotation.NumberRange;
@@ -62,7 +68,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 import org.joml.Matrix4f;
-
 import java.util.Objects;
 import java.util.ArrayList;
 import java.util.List;
@@ -524,7 +529,7 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
 
         ItemStack keyStack = ItemStack.EMPTY;
         if (definition.requiresKey() && !player.getAbilities().instabuild) {
-            Item keyItem = ForgeRegistries.ITEMS.getValue(definition.keyItemId());
+            Item keyItem = ResourceUtils.getItemByLocation(definition.keyItemId());
             keyStack = findItem(player, keyItem);
             if (keyItem == null || keyStack.isEmpty()) {
                 rejectOpen("cs2lootbox.message.missing_key");
@@ -893,10 +898,10 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
 
             int focusRadius = Math.min(180, Math.max(120, (int) (size.height * 0.34F)));
             drawFilledCircle(graphics, markerX, markerY + 8, focusRadius,
-                    withAlpha(0x000000, rouletteBackgroundAlpha * 0.34F));
+                    ColorUtils.withAlpha(0x000000, rouletteBackgroundAlpha * 0.34F));
 
             graphics.fill(viewportX, slotY - 10, viewportX + viewportW, slotY + CAROUSEL_SLOT_HEIGHT + 10,
-                    withAlpha(0x080808, rouletteBackgroundAlpha * 0.34F));
+                    ColorUtils.withAlpha(0x080808, rouletteBackgroundAlpha * 0.34F));
 
             double offset = currentCarouselOffset();
 
@@ -971,9 +976,9 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
         if (special) {
             int middleY = y + CAROUSEL_SLOT_HEIGHT / 2;
             graphics.fillGradient(x, y, x + CAROUSEL_SLOT_WIDTH, middleY,
-                    withAlpha(LEGENDARY_TOP, alpha), withAlpha(LEGENDARY_CENTER, alpha));
+                    ColorUtils.withAlpha(LEGENDARY_TOP, alpha), ColorUtils.withAlpha(LEGENDARY_CENTER, alpha));
             graphics.fillGradient(x, middleY, x + CAROUSEL_SLOT_WIDTH, y + CAROUSEL_SLOT_HEIGHT,
-                    withAlpha(LEGENDARY_CENTER, alpha), withAlpha(LEGENDARY_BOTTOM, alpha));
+                    ColorUtils.withAlpha(LEGENDARY_CENTER, alpha), ColorUtils.withAlpha(LEGENDARY_BOTTOM, alpha));
             if (CS2LootboxClientConfig.ENABLE_RARITY_GLOWS.get()) {
                 blitTinted(graphics, RESULT_GLOW_TEXTURE,
                         x + 19, y + 2, CAROUSEL_SLOT_WIDTH - 38, CAROUSEL_SLOT_HEIGHT - 12,
@@ -981,14 +986,14 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
             }
         } else {
             graphics.fill(x, y, x + CAROUSEL_SLOT_WIDTH, y + CAROUSEL_SLOT_HEIGHT,
-                    withAlpha(0x202020, alpha));
+                    ColorUtils.withAlpha(0x202020, alpha));
             graphics.fill(x + 1, y + 1, x + CAROUSEL_SLOT_WIDTH - 1, y + CAROUSEL_SLOT_HEIGHT - 1,
-                    withAlpha(0x343434, alpha));
+                    ColorUtils.withAlpha(0x343434, alpha));
         }
         drawTexturedSlotBorder(graphics, x, y, CAROUSEL_SLOT_WIDTH, CAROUSEL_SLOT_HEIGHT, rarity, alpha);
         graphics.fill(x + 1, y + CAROUSEL_SLOT_HEIGHT - 5,
                 x + CAROUSEL_SLOT_WIDTH - 1, y + CAROUSEL_SLOT_HEIGHT - 1,
-                withAlpha(rarity, alpha));
+                ColorUtils.withAlpha(rarity, alpha));
 
         if (!slot.stack().isEmpty()) {
             renderCarouselItem(graphics, slot.stack(),
@@ -996,11 +1001,11 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
                     3.0F, alpha, focusBlur);
             if (slot.stack().getCount() > 1) {
                 String count = Integer.toString(slot.stack().getCount());
-                Font font = Minecraft.getInstance().font;
+                Font font = ModUtils.getFont();
                 graphics.drawString(font, count,
                         x + CAROUSEL_SLOT_WIDTH - 5 - font.width(count),
                         y + CAROUSEL_SLOT_HEIGHT - 16,
-                        withAlpha(0xFFFFFF, alpha), true);
+                        ColorUtils.withAlpha(0xFFFFFF, alpha), true);
             }
         }
     }
@@ -1014,9 +1019,9 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
         LegendaryLoot legendary = definition().legendaryLoot().get(legendaryIndex);
         int middleY = y + CAROUSEL_SLOT_HEIGHT / 2;
         graphics.fillGradient(x, y, x + CAROUSEL_SLOT_WIDTH, middleY,
-                withAlpha(LEGENDARY_TOP, alpha), withAlpha(LEGENDARY_CENTER, alpha));
+                ColorUtils.withAlpha(LEGENDARY_TOP, alpha), ColorUtils.withAlpha(LEGENDARY_CENTER, alpha));
         graphics.fillGradient(x, middleY, x + CAROUSEL_SLOT_WIDTH, y + CAROUSEL_SLOT_HEIGHT,
-                withAlpha(LEGENDARY_CENTER, alpha), withAlpha(LEGENDARY_BOTTOM, alpha));
+                ColorUtils.withAlpha(LEGENDARY_CENTER, alpha), ColorUtils.withAlpha(LEGENDARY_BOTTOM, alpha));
 
         if (CS2LootboxClientConfig.ENABLE_RARITY_GLOWS.get()) {
             blitTinted(graphics, RESULT_GLOW_TEXTURE,
@@ -1035,7 +1040,7 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
         drawTexturedSlotBorder(graphics, x, y, CAROUSEL_SLOT_WIDTH, CAROUSEL_SLOT_HEIGHT, LEGENDARY_GOLD, alpha);
         graphics.fill(x + 1, y + CAROUSEL_SLOT_HEIGHT - 5,
                 x + CAROUSEL_SLOT_WIDTH - 1, y + CAROUSEL_SLOT_HEIGHT - 1,
-                withAlpha(LEGENDARY_GOLD, alpha));
+                ColorUtils.withAlpha(LEGENDARY_GOLD, alpha));
     }
 
     private static float carouselFocusBlur(int contentCenterX, int markerX) {
@@ -1071,7 +1076,7 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
             int x1 = Math.max(x0 + 1, Math.round(fadeWidth * t1));
             float veil = (1.0F - t0);
             veil = veil * veil * 0.58F * alpha;
-            int color = withAlpha(0x050505, veil);
+            int color = ColorUtils.withAlpha(0x050505, veil);
             graphics.fill(viewportX + x0, y, viewportX + x1, y + height, color);
             graphics.fill(viewportX + viewportW - x1, y, viewportX + viewportW - x0, y + height, color);
         }
@@ -1081,7 +1086,7 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
     private void drawPrize(@NotNull GuiGraphics graphics, int mouseX, int mouseY) {
         Position position = getPosition();
         Size size = getSize();
-        Font font = Minecraft.getInstance().font;
+        Font font = ModUtils.getFont();
 
         float alpha = clientPhase == ClientPhase.CLOSING
                 ? 1.0F - phaseProgress(CLOSE_FADE_MS)
@@ -1106,14 +1111,14 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
         int textLeft = bgLeft + 34;
         int nameY = bgTop + 170;
         int bottomLineY = bgBottom - 29;
-        int stripColor = withAlpha(rarity, alpha * 0.96F);
+        int stripColor = ColorUtils.withAlpha(rarity, alpha * 0.96F);
 
         graphics.fill(fullscreenReferenceLeft(), position.y, fullscreenReferenceRight(), position.y + size.height,
-                withAlpha(0x070911, alpha * 0.36F));
-        graphics.fill(bgLeft, bgTop, bgRight, bgBottom, withAlpha(0x1D2550, alpha));
+                ColorUtils.withAlpha(0x070911, alpha * 0.36F));
+        graphics.fill(bgLeft, bgTop, bgRight, bgBottom, ColorUtils.withAlpha(0x1D2550, alpha));
         graphics.fill(bgLeft, bgTop, bgLeft + 6, bgBottom, stripColor);
-        drawBorder(graphics, bgLeft, bgTop, panelWidth, panelHeight, withAlpha(0xD8E0FF, alpha * 0.12F));
-        graphics.fill(bgLeft + 18, bottomLineY, bgRight - 18, bottomLineY + 1, withAlpha(0xA7B3DF, alpha * 0.24F));
+        GuiDrawUtils.drawBorder(graphics, bgLeft, bgTop, panelWidth, panelHeight, ColorUtils.withAlpha(0xD8E0FF, alpha * 0.12F));
+        graphics.fill(bgLeft + 18, bottomLineY, bgRight - 18, bottomLineY + 1, ColorUtils.withAlpha(0xA7B3DF, alpha * 0.24F));
 
         // CS2-style reward glow: two copies of the supplied radial texture.
         // Drive the glow directly from the OUTER panel bounds so it fills the
@@ -1126,13 +1131,13 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
         }
 
         graphics.drawString(font, Component.translatable("cs2lootbox.prize.new_item"),
-                bgLeft + 34, bgTop + 16, withAlpha(0x4C62D9, alpha), true);
+                bgLeft + 34, bgTop + 16, ColorUtils.withAlpha(0x4C62D9, alpha), true);
 
         float itemScale = 4.35F * (0.93F + 0.07F * alpha);
         renderItemScaled(graphics, clientWinningStack, itemCenterX, itemCenterY, itemScale, alpha);
 
         Component name = prizeName(entry, clientWinningStack);
-        graphics.drawString(font, name, textLeft, nameY, withAlpha(0xFFFFFF, alpha), true);
+        graphics.drawString(font, name, textLeft, nameY, ColorUtils.withAlpha(0xFFFFFF, alpha), true);
 
         ResourceLocation collectionIcon = definition().resultCollectionIconTexture();
         Component collectionLabel = prizeCollectionLabel();
@@ -1154,7 +1159,7 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
 
         graphics.drawString(font, collectionLabel,
                 collectionTextX, collectionTextY,
-                withAlpha(0xDADADA, alpha), false);
+                ColorUtils.withAlpha(0xDADADA, alpha), false);
 
         if (clientPhase == ClientPhase.PRIZE) {
             int invX = inventoryButtonX();
@@ -1163,25 +1168,25 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
             int invH = prizeButtonHeight();
             boolean invHover = mouseX >= invX && mouseX < invX + invW && mouseY >= invY && mouseY < invY + invH;
             graphics.fill(invX, invY, invX + invW, invY + invH,
-                    withAlpha(invHover ? 0x1F2749 : 0x18203C, alpha));
-            drawBorder(graphics, invX, invY, invW, invH, withAlpha(0xCCD6FF, alpha * 0.75F));
-            drawCentered(graphics, font, Component.translatable("cs2lootbox.prize.view_inventory"),
-                    invX + invW / 2, invY + 7, withAlpha(0xFFFFFF, alpha));
+                    ColorUtils.withAlpha(invHover ? 0x1F2749 : 0x18203C, alpha));
+            GuiDrawUtils.drawBorder(graphics, invX, invY, invW, invH, ColorUtils.withAlpha(0xCCD6FF, alpha * 0.75F));
+            graphics.drawCenteredString(font, Component.translatable("cs2lootbox.prize.view_inventory"),
+                    invX + invW / 2, invY + 7, ColorUtils.withAlpha(0xFFFFFF, alpha));
 
             int closeX = closePrizeButtonX();
             int closeW = closePrizeButtonWidth();
             boolean closeHover = mouseX >= closeX && mouseX < closeX + closeW && mouseY >= invY && mouseY < invY + invH;
             graphics.fill(closeX, invY, closeX + closeW, invY + invH,
-                    withAlpha(closeHover ? 0x2A2A2A : 0x202020, alpha));
-            drawBorder(graphics, closeX, invY, closeW, invH, withAlpha(0xB7B7B7, alpha * 0.75F));
-            drawCentered(graphics, font, Component.translatable("cs2lootbox.prize.close"),
-                    closeX + closeW / 2, invY + 7, withAlpha(0xFFFFFF, alpha));
+                    ColorUtils.withAlpha(closeHover ? 0x2A2A2A : 0x202020, alpha));
+            GuiDrawUtils.drawBorder(graphics, closeX, invY, closeW, invH, ColorUtils.withAlpha(0xB7B7B7, alpha * 0.75F));
+            graphics.drawCenteredString(font, Component.translatable("cs2lootbox.prize.close"),
+                    closeX + closeW / 2, invY + 7, ColorUtils.withAlpha(0xFFFFFF, alpha));
         }
 
         if (clientPhase == ClientPhase.CLOSING) {
             float cover = 1.0F - alpha;
             graphics.fill(fullscreenReferenceLeft(), position.y, fullscreenReferenceRight(), position.y + size.height,
-                    withAlpha(0x000000, cover));
+                    ColorUtils.withAlpha(0x000000, cover));
         }
     }
 
@@ -1246,8 +1251,6 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
 
         if (clientPhase == ClientPhase.CLOSING && elapsed >= CLOSE_FADE_MS && !acceptActionSent) {
             acceptActionSent = true;
-            PrizeAction action = pendingPrizeAction;
-
             // Tell the server to commit the pending reward and close the
             // lootbox container first. The server-side reward path is still
             // authoritative; opening the inventory here is only UI navigation.
@@ -1303,7 +1306,7 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
             return;
         }
 
-        Item caseItem = ForgeRegistries.ITEMS.getValue(definition().caseItemId());
+        Item caseItem = ResourceUtils.getItemByLocation(definition().caseItemId());
         ItemStack elsewhere = findItem(player, caseItem);
         if (!elsewhere.isEmpty()) {
             elsewhere.shrink(1);
@@ -1647,7 +1650,6 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
         }
     }
 
-
     @OnlyIn(Dist.CLIENT)
     private void updateCarouselTickSound() {
         if (carouselSlots.isEmpty()) {
@@ -1815,9 +1817,9 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
         if (texture == null || width <= 0 || height <= 0) {
             return;
         }
-        float r = ((rgb >> 16) & 0xFF) / 255.0F;
-        float g = ((rgb >> 8) & 0xFF) / 255.0F;
-        float b = (rgb & 0xFF) / 255.0F;
+        float r = ColorUtils.getRedFloat(rgb);
+        float g = ColorUtils.getGreenFloat(rgb);
+        float b = ColorUtils.getBlueFloat(rgb);
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.setShaderColor(r, g, b, Math.max(0.0F, Math.min(1.0F, alpha)));
@@ -1910,9 +1912,9 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderTexture(0, texture);
 
-        float r = ((tint >> 16) & 0xFF) / 255.0F;
-        float g = ((tint >> 8) & 0xFF) / 255.0F;
-        float b = (tint & 0xFF) / 255.0F;
+        float r = ColorUtils.getRedFloat(tint);
+        float g = ColorUtils.getGreenFloat(tint);
+        float b = ColorUtils.getBlueFloat(tint);
         RenderSystem.setShaderColor(r, g, b, alpha);
 
         Matrix4f matrix = graphics.pose().last().pose();
@@ -1979,7 +1981,7 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
     private void drawHeader(@NotNull GuiGraphics graphics, float alpha) {
         Position position = getPosition();
         Size size = getSize();
-        Font font = Minecraft.getInstance().font;
+        Font font = ModUtils.getFont();
         int centerX = position.x + size.width / 2;
 
         Component header = definition().requiresKey()
@@ -1988,19 +1990,19 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
         Component caseAction = definition().requiresKey()
                 ? Component.translatable("cs2lootbox.case_screen.unlock_case", caseDisplayName())
                 : Component.translatable("cs2lootbox.case_screen.open_case", caseDisplayName());
-        drawCentered(graphics, font, header,
-                centerX, position.y + 16, withAlpha(0xFFFFFF, alpha));
-        drawCentered(graphics, font, caseAction,
-                centerX, position.y + 34, withAlpha(0xFFDCDCDC, alpha));
-        drawCentered(graphics, font, Component.translatable("cs2lootbox.case_screen.single_open"),
-                centerX, position.y + 52, withAlpha(0xFFC7C7C7, alpha));
+        graphics.drawCenteredString(font, header,
+                centerX, position.y + 16, ColorUtils.withAlpha(0xFFFFFF, alpha));
+        graphics.drawCenteredString(font, caseAction,
+                centerX, position.y + 34, ColorUtils.withAlpha(0xFFDCDCDC, alpha));
+        graphics.drawCenteredString(font, Component.translatable("cs2lootbox.case_screen.single_open"),
+                centerX, position.y + 52, ColorUtils.withAlpha(0xFFC7C7C7, alpha));
     }
 
     @OnlyIn(Dist.CLIENT)
     private void drawFooterControls(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float alpha, boolean opening, boolean showClose) {
         Position position = getPosition();
         Size size = getSize();
-        Font font = Minecraft.getInstance().font;
+        Font font = ModUtils.getFont();
         int footerTop = footerTop();
         int footerBottom = position.y + size.height;
         int left = fullscreenReferenceLeft();
@@ -2009,10 +2011,10 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
         int separator1 = left + fullWidth / 3;
         int separator2 = left + (fullWidth * 2) / 3;
 
-        graphics.fill(left, footerTop, right, footerBottom, withAlpha(0x090909, alpha * 0.56F));
-        graphics.fill(left, footerTop, right, footerTop + 1, withAlpha(0x525252, alpha * 0.65F));
-        graphics.fill(separator1, footerTop + 5, separator1 + 1, footerBottom - 5, withAlpha(0x4C4C4C, alpha * 0.65F));
-        graphics.fill(separator2, footerTop + 5, separator2 + 1, footerBottom - 5, withAlpha(0x4C4C4C, alpha * 0.65F));
+        graphics.fill(left, footerTop, right, footerBottom, ColorUtils.withAlpha(0x090909, alpha * 0.56F));
+        graphics.fill(left, footerTop, right, footerTop + 1, ColorUtils.withAlpha(0x525252, alpha * 0.65F));
+        graphics.fill(separator1, footerTop + 5, separator1 + 1, footerBottom - 5, ColorUtils.withAlpha(0x4C4C4C, alpha * 0.65F));
+        graphics.fill(separator2, footerTop + 5, separator2 + 1, footerBottom - 5, ColorUtils.withAlpha(0x4C4C4C, alpha * 0.65F));
 
         // The key has already been consumed/validated by the time the roulette
         // is visible. Keep the carousel footer uncluttered instead of still
@@ -2024,14 +2026,14 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
         int openH = openButtonHeight();
         boolean openHover = !opening && mouseX >= openX && mouseX < openX + openW && mouseY >= openY && mouseY < openY + openH;
         int openFill = opening ? 0x2C2C2C : (openHover ? 0x424242 : 0x303030);
-        graphics.fill(openX, openY, openX + openW, openY + openH, withAlpha(openFill, alpha * 0.95F));
-        drawBorder(graphics, openX, openY, openW, openH, withAlpha(opening ? 0x787878 : 0xB4B4B4, alpha));
+        graphics.fill(openX, openY, openX + openW, openY + openH, ColorUtils.withAlpha(openFill, alpha * 0.95F));
+        GuiDrawUtils.drawBorder(graphics, openX, openY, openW, openH, ColorUtils.withAlpha(opening ? 0x787878 : 0xB4B4B4, alpha));
         Component openText = opening
                 ? Component.translatable("cs2lootbox.case_screen.opening")
                 : Component.translatable("cs2lootbox.case_screen.open_button");
-        drawCentered(graphics, font, openText, openX + openW / 2, openY + 8, withAlpha(0xFFFFFF, alpha));
+        graphics.drawCenteredString(font, openText, openX + openW / 2, openY + 8, ColorUtils.withAlpha(0xFFFFFF, alpha));
         if (opening) {
-            drawCentered(graphics, font, Component.literal(spinnerFrame()), openX + 18, openY + 8, withAlpha(0xFFFFFF, alpha));
+            graphics.drawCenteredString(font, Component.literal(spinnerFrame()), openX + 18, openY + 8, ColorUtils.withAlpha(0xFFFFFF, alpha));
         }
 
         if (showClose) {
@@ -2041,10 +2043,10 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
             int closeH = closeButtonHeight();
             boolean closeHover = mouseX >= closeX && mouseX < closeX + closeW && mouseY >= closeY && mouseY < closeY + closeH;
             int closeFill = closeHover ? 0x262626 : 0x181818;
-            graphics.fill(closeX, closeY, closeX + closeW, closeY + closeH, withAlpha(closeFill, alpha * 0.95F));
-            drawBorder(graphics, closeX, closeY, closeW, closeH, withAlpha(0x7A7A7A, alpha));
-            drawCentered(graphics, font, Component.translatable("cs2lootbox.case_screen.close_button"),
-                    closeX + closeW / 2, closeY + 8, withAlpha(0xFFFFFF, alpha));
+            graphics.fill(closeX, closeY, closeX + closeW, closeY + closeH, ColorUtils.withAlpha(closeFill, alpha * 0.95F));
+            GuiDrawUtils.drawBorder(graphics, closeX, closeY, closeW, closeH, ColorUtils.withAlpha(0x7A7A7A, alpha));
+            graphics.drawCenteredString(font, Component.translatable("cs2lootbox.case_screen.close_button"),
+                    closeX + closeW / 2, closeY + 8, ColorUtils.withAlpha(0xFFFFFF, alpha));
         }
     }
 
@@ -2053,9 +2055,9 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
         if (definition().caseTranslationKey() != null && !definition().caseTranslationKey().isBlank() && I18n.exists(definition().caseTranslationKey())) {
             return Component.translatable(definition().caseTranslationKey());
         }
-        Item item = ForgeRegistries.ITEMS.getValue(definition().caseItemId());
+        Item item = ResourceUtils.getItemByLocation(definition().caseItemId());
         if (item != null) {
-            String hover = new ItemStack(item).getHoverName().getString();
+            String hover = item.getDefaultInstance().getHoverName().getString();
             if (hover != null && !hover.isBlank() && !hover.contains(".")) {
                 return Component.literal(hover);
             }
@@ -2068,9 +2070,9 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
         if (definition().keyTranslationKey() != null && !definition().keyTranslationKey().isBlank() && I18n.exists(definition().keyTranslationKey())) {
             return Component.translatable(definition().keyTranslationKey());
         }
-        Item item = ForgeRegistries.ITEMS.getValue(definition().keyItemId());
+        Item item = ResourceUtils.getItemByLocation(definition().keyItemId());
         if (item != null) {
-            String hover = new ItemStack(item).getHoverName().getString();
+            String hover = item.getDefaultInstance().getHoverName().getString();
             if (hover != null && !hover.isBlank() && !hover.contains(".")) {
                 return Component.literal(hover);
             }
@@ -2080,8 +2082,8 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
 
     @OnlyIn(Dist.CLIENT)
     private @NotNull ItemStack keyDisplayStack() {
-        Item item = ForgeRegistries.ITEMS.getValue(definition().keyItemId());
-        return item == null ? ItemStack.EMPTY : new ItemStack(item);
+        Item item = ResourceUtils.getItemByLocation(definition().keyItemId());
+        return item == null ? ItemStack.EMPTY : item.getDefaultInstance();
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -2097,14 +2099,6 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
         if (minecraft.player != null) {
             minecraft.player.closeContainer();
         }
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    private static void drawBorder(@NotNull GuiGraphics graphics, int x, int y, int width, int height, int color) {
-        graphics.fill(x, y, x + width, y + 1, color);
-        graphics.fill(x, y + height - 1, x + width, y + height, color);
-        graphics.fill(x, y, x + 1, y + height, color);
-        graphics.fill(x + width - 1, y, x + width, y + height, color);
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -2156,18 +2150,8 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
         pose.popPose();
     }
 
-    @OnlyIn(Dist.CLIENT)
-    private static void drawCentered(@NotNull GuiGraphics graphics, @NotNull Font font, @NotNull Component component, int x, int y, int color) {
-        graphics.drawString(font, component, x - font.width(component) / 2, y, color, true);
-    }
-
     private static int packLight(int blockLight, int skyLight) {
         return (blockLight << 4) | (skyLight << 20);
-    }
-
-    private static int withAlpha(int rgb, float alpha) {
-        int a = Math.max(0, Math.min(255, Math.round(alpha * 255.0F)));
-        return (a << 24) | (rgb & 0xFFFFFF);
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -2262,13 +2246,7 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
             return 0;
         }
 
-        float scale = Math.min(screenWidth / (float) size.width, screenHeight / (float) size.height);
-        if (scale <= 0.0F) {
-            return 0;
-        }
-
-        float sideGutterPixels = Math.max(0.0F, (screenWidth - size.width * scale) * 0.5F);
-        return (int) Math.ceil(sideGutterPixels / scale);
+        return CanvasTransform.horizontalOverscan(screenWidth, screenHeight, size.width, size.height);
     }
 
     @OnlyIn(Dist.CLIENT)

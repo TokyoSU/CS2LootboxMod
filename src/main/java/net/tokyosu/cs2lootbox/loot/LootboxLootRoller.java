@@ -1,8 +1,10 @@
 package net.tokyosu.cs2lootbox.loot;
 
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.tokyosu.apocalypselib.utils.ResourceUtils;
+
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Item;
@@ -129,29 +131,8 @@ public final class LootboxLootRoller {
      * relative legendary chances.
      */
     public static int pickLegendaryPanelIndex(@NotNull List<LegendaryLoot> legendaryLoot, @NotNull RandomSource random) {
-        double totalChance = totalLegendaryChance(legendaryLoot);
-        if (totalChance <= 0.0D) {
-            return -1;
-        }
-
-        double value = random.nextDouble() * totalChance;
-        double cursor = 0.0D;
-        int lastValid = -1;
-
-        for (int i = 0; i < legendaryLoot.size(); i++) {
-            double chance = validLegendaryWeight(legendaryLoot.get(i));
-            if (chance <= 0.0D) {
-                continue;
-            }
-
-            lastValid = i;
-            cursor += chance;
-            if (value < cursor) {
-                return i;
-            }
-        }
-
-        return lastValid;
+        return WeightedSelection.pick(legendaryLoot, random, LootboxLootRoller::validLegendaryWeight,
+                totalLegendaryChance(legendaryLoot));
     }
 
     /** Returns the combined absolute first-stage legendary chance, capped at 100%. */
@@ -164,37 +145,8 @@ public final class LootboxLootRoller {
     }
 
     public static int pickEntryIndex(@NotNull List<LootEntry> entries, @NotNull RandomSource random) {
-        double total = 0.0D;
-        int lastValid = -1;
-
-        for (int i = 0; i < entries.size(); i++) {
-            LootEntry entry = entries.get(i);
-            if (isValid(entry)) {
-                total += entry.weight();
-                lastValid = i;
-            }
-        }
-
-        if (total <= 0.0D || lastValid < 0) {
-            return -1;
-        }
-
-        double value = random.nextDouble() * total;
-        double cursor = 0.0D;
-
-        for (int i = 0; i < entries.size(); i++) {
-            LootEntry entry = entries.get(i);
-            if (!isValid(entry)) {
-                continue;
-            }
-
-            cursor += entry.weight();
-            if (value < cursor) {
-                return i;
-            }
-        }
-
-        return lastValid;
+        return WeightedSelection.pick(entries, random, entry -> isValid(entry) ? entry.weight() : 0.0D,
+                validWeight(entries));
     }
 
     public static @NotNull ItemStack createStack(@NotNull LootEntry entry, @NotNull RandomSource random) {
@@ -226,7 +178,7 @@ public final class LootboxLootRoller {
             @NotNull LootEntry entry,
             @NotNull Item item,
             int requestedCount) {
-        ItemStack stack = new ItemStack(item);
+        ItemStack stack = item.getDefaultInstance();
 
         CompoundTag configuredNbt = entry.itemNbt();
         if (configuredNbt != null) {
@@ -240,18 +192,16 @@ public final class LootboxLootRoller {
 
     public static @Nullable Item resolvePreviewItem(@NotNull LootEntry entry) {
         if (!entry.itemTagSource()) {
-            return ForgeRegistries.ITEMS.getValue(entry.itemId());
+            return ResourceUtils.getItemByLocation(entry.itemId());
         }
 
         List<Item> items = resolveTagItems(entry);
         return items.isEmpty() ? null : items.get(0);
     }
 
-    private static @Nullable Item resolveRollItem(
-            @NotNull LootEntry entry,
-            @NotNull RandomSource random) {
+    private static @Nullable Item resolveRollItem(@NotNull LootEntry entry, @NotNull RandomSource random) {
         if (!entry.itemTagSource()) {
-            return ForgeRegistries.ITEMS.getValue(entry.itemId());
+            return ResourceUtils.getItemByLocation(entry.itemId());
         }
 
         List<Item> items = resolveTagItems(entry);
@@ -260,28 +210,29 @@ public final class LootboxLootRoller {
 
     private static @NotNull List<Item> resolveTagItems(@NotNull LootEntry entry) {
         TagKey<Item> key = TagKey.create(Registries.ITEM, entry.itemId());
-        List<Item> items = new ArrayList<>();
 
-        BuiltInRegistries.ITEM.getTag(key).ifPresent(tag ->
-                tag.forEach(holder -> items.add(holder.value())));
+        var tagManager = ForgeRegistries.ITEMS.tags();
+        if (tagManager == null) {
+            return List.of();
+        }
+
+        List<Item> items = new ArrayList<>();
+        tagManager.getTag(key).forEach(items::add);
 
         items.sort(Comparator.comparing(item -> {
-            var id = ForgeRegistries.ITEMS.getKey(item);
+            ResourceLocation id = ResourceUtils.getResourcebyItem(item);
             return id == null ? "" : id.toString();
         }));
+
         return items;
     }
-
 
     /**
      * Applies reward mutations only to the authoritative selected reward.
      * Carousel filler stacks call createStack() directly and never perform
      * modifier rolls.
      */
-    private static void applyRolledModifiers(
-            @NotNull ItemStack stack,
-            @NotNull LootEntry entry,
-            @NotNull RandomSource random) {
+    private static void applyRolledModifiers(@NotNull ItemStack stack, @NotNull LootEntry entry, @NotNull RandomSource random) {
         if (!CS2LootboxServerConfig.ENABLE_STATTRACK_ROLLS.get()) {
             return;
         }
@@ -346,7 +297,6 @@ public final class LootboxLootRoller {
         }
         return count;
     }
-
 
     private static double validLegendaryWeight(@Nullable LegendaryLoot legendary) {
         if (legendary == null

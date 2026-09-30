@@ -3,9 +3,8 @@ package net.tokyosu.cs2lootbox.api.lootbox;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.latvian.mods.kubejs.typings.Info;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.TagParser;
+import net.tokyosu.apocalypselib.utils.TagUtils;
 import net.minecraft.resources.ResourceLocation;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -14,7 +13,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /** KubeJS-friendly builder for a single weighted loot entry. */
-@SuppressWarnings("unused")
 public final class LootEntryBuilder {
     private final ResourceLocation itemId;
     private final boolean itemTagSource;
@@ -143,7 +141,7 @@ public final class LootEntryBuilder {
         }
 
         try {
-            itemNbt = TagParser.parseTag(snbt.trim());
+            itemNbt = TagUtils.parseNBT(snbt.trim());
         } catch (CommandSyntaxException exception) {
             throw new IllegalArgumentException("Invalid loot ItemStack SNBT: " + snbt, exception);
         }

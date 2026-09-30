@@ -1,5 +1,7 @@
 package net.tokyosu.cs2lootbox.client.renderer;
 
+import net.tokyosu.cs2lootbox.client.renderer.skinning.WeightedSkinPass;
+
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -8,9 +10,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.ForgeRenderTypes;
 import net.tokyosu.cs2lootbox.client.animation.LootboxAnimatable;
 import net.tokyosu.cs2lootbox.client.model.LootboxModel;
-import net.tokyosu.cs2lootbox.client.renderer.skinning.GeckoLibWeightedSkinRenderer;
-import net.tokyosu.cs2lootbox.client.renderer.skinning.SkinnedGeoModelData;
-import net.tokyosu.cs2lootbox.client.renderer.skinning.SkinnedGeoModelLoader;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.cache.object.BakedGeoModel;
@@ -71,9 +70,8 @@ public final class LootboxGuiRenderer extends GeoObjectRenderer<LootboxAnimatabl
         // the primary model pass.
         if (!isReRender) {
             ResourceLocation modelResource = getGeoModel().getModelResource(animatable, this);
-            SkinnedGeoModelData skinning = SkinnedGeoModelLoader.get(modelResource);
-            GeckoLibWeightedSkinRenderer.render(
-                    poseStack, model, skinning, buffer,
+            WeightedSkinPass.render(
+                    modelResource, poseStack, model, buffer,
                     packedLight, packedOverlay, red, green, blue, alpha);
         }
     }
