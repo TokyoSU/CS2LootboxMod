@@ -1989,3 +1989,8 @@ created, using the exact CS2 grade color. Rarity IDs are `cs2lootbox:consumer`,
 `cs2lootbox:classified`, `cs2lootbox:covert`, `cs2lootbox:special`,
 `cs2lootbox:knives`, and `cs2lootbox:contraband`. Items sharing a grade share the
 same Minecraft rarity; no separate RarityJS registration is required.
+
+The global `CS2LootboxRarity` class owns the shared RGB color constants and
+Minecraft rarity instances. Java code can use `CS2LootboxRarity.MIL_SPEC`
+(or another grade) directly with `Item.Properties.rarity(...)`.
+`LootRarityGrade.color()` and `.minecraftRarity()` reference those same globals.

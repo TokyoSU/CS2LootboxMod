@@ -6,15 +6,15 @@ import java.util.Locale;
 
 /** CS/CS2 grades with matching Forge Minecraft rarities and exact RGB colors. */
 public enum LootRarityGrade {
-    CONSUMER_GRADE("consumer", "cs2lootbox.rarity.consumer", 0xB0C3D9, "common", Rarity.COMMON),
-    INDUSTRIAL_GRADE("industrial", "cs2lootbox.rarity.industrial", 0x5E98D9, "uncommon", Rarity.UNCOMMON),
-    MIL_SPEC("milspec", "cs2lootbox.rarity.milspec", 0x4B69FF, "rare", Rarity.RARE),
-    RESTRICTED("restricted", "cs2lootbox.rarity.restricted", 0x8847FF, "mythical", Rarity.EPIC),
-    CLASSIFIED("classified", "cs2lootbox.rarity.classified", 0xD32EE6, "legendary", Rarity.EPIC),
-    COVERT("covert", "cs2lootbox.rarity.covert", 0xEB4B4B, "ancient", Rarity.EPIC),
-    SPECIAL("special", "cs2lootbox.rarity.special", 0xFFAE39, "ancient", Rarity.EPIC),
-    KNIVES("knives", "cs2lootbox.rarity.knives", 0xEB4B4B, "ancient", Rarity.EPIC),
-    CONTRABAND("contraband", "cs2lootbox.rarity.contraband", 0xFFAE39, "ancient", Rarity.EPIC);
+    CONSUMER_GRADE("consumer", "cs2lootbox.rarity.consumer", CS2LootboxRarity.CONSUMER_COLOR, "common", Rarity.COMMON, CS2LootboxRarity.CONSUMER_GRADE),
+    INDUSTRIAL_GRADE("industrial", "cs2lootbox.rarity.industrial", CS2LootboxRarity.INDUSTRIAL_COLOR, "uncommon", Rarity.UNCOMMON, CS2LootboxRarity.INDUSTRIAL_GRADE),
+    MIL_SPEC("milspec", "cs2lootbox.rarity.milspec", CS2LootboxRarity.MIL_SPEC_COLOR, "rare", Rarity.RARE, CS2LootboxRarity.MIL_SPEC),
+    RESTRICTED("restricted", "cs2lootbox.rarity.restricted", CS2LootboxRarity.RESTRICTED_COLOR, "mythical", Rarity.EPIC, CS2LootboxRarity.RESTRICTED),
+    CLASSIFIED("classified", "cs2lootbox.rarity.classified", CS2LootboxRarity.CLASSIFIED_COLOR, "legendary", Rarity.EPIC, CS2LootboxRarity.CLASSIFIED),
+    COVERT("covert", "cs2lootbox.rarity.covert", CS2LootboxRarity.COVERT_COLOR, "ancient", Rarity.EPIC, CS2LootboxRarity.COVERT),
+    SPECIAL("special", "cs2lootbox.rarity.special", CS2LootboxRarity.SPECIAL_COLOR, "ancient", Rarity.EPIC, CS2LootboxRarity.SPECIAL),
+    KNIVES("knives", "cs2lootbox.rarity.knives", CS2LootboxRarity.KNIVES_COLOR, "ancient", Rarity.EPIC, CS2LootboxRarity.KNIVES),
+    CONTRABAND("contraband", "cs2lootbox.rarity.contraband", CS2LootboxRarity.CONTRABAND_COLOR, "ancient", Rarity.EPIC, CS2LootboxRarity.CONTRABAND);
 
     private final String id;
     private final String translationKey;
@@ -23,13 +23,13 @@ public enum LootRarityGrade {
     private final Rarity vanillaFallback;
     private final Rarity minecraftRarity;
 
-    LootRarityGrade(String id, String translationKey, int color, String soundBucket, Rarity vanillaFallback) {
+    LootRarityGrade(String id, String translationKey, int color, String soundBucket, Rarity vanillaFallback, Rarity minecraftRarity) {
         this.id = id;
         this.translationKey = translationKey;
         this.color = color;
         this.soundBucket = soundBucket;
         this.vanillaFallback = vanillaFallback;
-        this.minecraftRarity = Rarity.create("cs2lootbox:" + id, style -> style.withColor(color));
+        this.minecraftRarity = minecraftRarity;
     }
 
     public String id() {
