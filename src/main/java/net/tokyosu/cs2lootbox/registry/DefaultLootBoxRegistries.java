@@ -1,161 +1,91 @@
 package net.tokyosu.cs2lootbox.registry;
 
+import net.tokyosu.cs2lootbox.CS2LootBoxMod;
 import net.tokyosu.cs2lootbox.api.lootbox.LootboxDefinitionBuilder;
 import org.jetbrains.annotations.NotNull;
 
 public class DefaultLootBoxRegistries {
-    public static synchronized void registerNewCrate(@NotNull LootboxDefinitionBuilder builder,
-                                                     @NotNull String caseRegName,
-                                                     @NotNull String caseKeyRegName,
-                                                     @NotNull String modelPath,
-                                                     @NotNull String texturePath,
-                                                     @NotNull String animationPath,
-                                                     @NotNull String keyTexture, boolean requiresKey, boolean hasOpenIdleAnim) {
-        builder.caseItem("cs2lootbox:" + caseRegName)
-                .keyItem("cs2lootbox:" + caseKeyRegName)
-                .itemJson("cs2lootbox:item/lootbox_renderer")
-                .model("cs2lootbox:geo/" + modelPath)
-                .texture("cs2lootbox:textures/lootbox/" + texturePath)
-                .animation("cs2lootbox:animations/" + animationPath)
-                .keyTexture("cs2lootbox:item/" + keyTexture)
+    public static synchronized void registerNewCrate(@NotNull LootboxDefinitionBuilder builder, @NotNull String caseRegName, @NotNull String caseKeyRegName, @NotNull String modelPath, @NotNull String texturePath, @NotNull String animationPath, @NotNull String keyTexture, boolean requiresKey, boolean hasOpenIdleAnim) {
+        builder.caseItem(CS2LootBoxMod.MOD_ID + ":" + caseRegName)
+                .keyItem(CS2LootBoxMod.MOD_ID + ":" + caseKeyRegName)
+                .itemJson(CS2LootBoxMod.MOD_ID + ":item/lootbox_renderer")
+                .model(CS2LootBoxMod.MOD_ID + ":geo/" + modelPath)
+                .texture(CS2LootBoxMod.MOD_ID + ":textures/lootbox/" + texturePath)
+                .animation(CS2LootBoxMod.MOD_ID + ":animations/" + animationPath)
+                .keyTexture(CS2LootBoxMod.MOD_ID + ":item/" + keyTexture)
                 .requiresKey(requiresKey)
                 .itemIdleAnimation("idle")
-                // Item display is renderer-owned so left/right hands are truly
-                // independent. These values are the former lootbox_patch.json
-                // display settings, now expressed directly through the builder.
-                .thirdPersonRight(0.0F, 0.0F, 0.0F, 35.0F, 135.0F, 0.0F, 1.3F)
-                .thirdPersonLeft(0.0F, 0.0F, 0.0F, 35.0F, 135.0F, 0.0F, 1.3F)
-                .firstPersonRight(0.0F, 0.0F, 0.0F, 35.0F, 135.0F, 0.0F, 1.3F)
-                .firstPersonLeft(0.0F, 0.0F, 0.0F, 35.0F, 135.0F, 0.0F, 1.3F)
-                .ground(0.0F, 0.0F, 0.0F, 35.0F, 135.0F, 0.0F, 1.5F)
-                .gui(0.0F, -3.0F, 0.0F, 35.0F, 135.0F, 0.0F, 1.5F)
-                .fixed(0.0F, -1.5F, 0.0F, 35.0F, 135.0F, 0.0F, 1.5F)
-
-                // -----------------------------------------------------------------
-                // Mil-Spec / blue — 7 slots
-                // -----------------------------------------------------------------
-                .loot("minecraft:crossbow", BuiltInLootBoxes.milSpecWeight, loot -> loot
-                        .count(1)
-                        .name("loot.cs2lootbox.famas_meow_36")
-                        .rarity("cs2lootbox.rarity.milspec", 0x4B69FF))
-
-                .loot("minecraft:bow", BuiltInLootBoxes.milSpecWeight, loot -> loot
-                        .count(1)
-                        .name("loot.cs2lootbox.galil_destroyer")
-                        .rarity("cs2lootbox.rarity.milspec", 0x4B69FF))
-
-                .loot("minecraft:trident", BuiltInLootBoxes.milSpecWeight, loot -> loot
-                        .count(1)
-                        .name("loot.cs2lootbox.m4a4_poly_mag")
-                        .rarity("cs2lootbox.rarity.milspec", 0x4B69FF))
-
-                .loot("minecraft:iron_sword", BuiltInLootBoxes.milSpecWeight, loot -> loot
-                        .count(1)
-                        .name("loot.cs2lootbox.mac10_monkeyflage")
-                        .rarity("cs2lootbox.rarity.milspec", 0x4B69FF))
-
-                .loot("minecraft:netherite_axe", BuiltInLootBoxes.milSpecWeight, loot -> loot
-                        .count(1)
-                        .name("loot.cs2lootbox.negev_drop_me")
-                        .rarity("cs2lootbox.rarity.milspec", 0x4B69FF))
-
-                .loot("minecraft:stone_sword", BuiltInLootBoxes.milSpecWeight, loot -> loot
-                        .count(1)
-                        .name("loot.cs2lootbox.ump45_roadblock")
-                        .rarity("cs2lootbox.rarity.milspec", 0x4B69FF))
-
-                .loot("minecraft:golden_sword", BuiltInLootBoxes.milSpecWeight, loot -> loot
-                        .count(1)
-                        .name("loot.cs2lootbox.glock18_winterized")
-                        .rarity("cs2lootbox.rarity.milspec", 0x4B69FF))
-
-                // -----------------------------------------------------------------
-                // Restricted / purple — 5 slots
-                // -----------------------------------------------------------------
-                .loot("minecraft:flint_and_steel", BuiltInLootBoxes.restrictedWeight, loot -> loot
-                        .count(1)
-                        .name("loot.cs2lootbox.r8_crazy_8")
-                        .rarity("cs2lootbox.rarity.restricted", 0x8847FF))
-
-                .loot("minecraft:diamond_axe", BuiltInLootBoxes.restrictedWeight, loot -> loot
-                        .count(1)
-                        .name("loot.cs2lootbox.m249_downtown")
-                        .rarity("cs2lootbox.rarity.restricted", 0x8847FF))
-
-                .loot("minecraft:iron_axe", BuiltInLootBoxes.restrictedWeight, loot -> loot
-                        .count(1)
-                        .name("loot.cs2lootbox.sg553_dragon_tech")
-                        .rarity("cs2lootbox.rarity.restricted", 0x8847FF))
-
-                .loot("minecraft:stone_axe", BuiltInLootBoxes.restrictedWeight, loot -> loot
-                        .count(1)
-                        .name("loot.cs2lootbox.p90_vent_rush")
-                        .rarity("cs2lootbox.rarity.restricted", 0x8847FF))
-
-                .loot("minecraft:shears", BuiltInLootBoxes.restrictedWeight, loot -> loot
-                        .count(1)
-                        .name("loot.cs2lootbox.dual_berettas_flora_carnivora")
-                        .rarity("cs2lootbox.rarity.restricted", 0x8847FF))
-
-                // -----------------------------------------------------------------
-                // Classified / pink — 3 slots
-                // -----------------------------------------------------------------
-                .loot("minecraft:diamond_sword", BuiltInLootBoxes.classifiedWeight, loot -> loot
-                        .count(1)
-                        .name("loot.cs2lootbox.ak47_ice_coaled")
-                        .rarity("cs2lootbox.rarity.classified", 0xD32EE6))
-
-                .loot("minecraft:spyglass", BuiltInLootBoxes.classifiedWeight, loot -> loot
-                        .count(1)
-                        .name("loot.cs2lootbox.p250_visions")
-                        .rarity("cs2lootbox.rarity.classified", 0xD32EE6))
-
-                .loot("minecraft:wooden_axe", BuiltInLootBoxes.classifiedWeight, loot -> loot
-                        .count(1)
-                        .name("loot.cs2lootbox.sawedoff_kiss_love")
-                        .rarity("cs2lootbox.rarity.classified", 0xD32EE6))
-
-                // -----------------------------------------------------------------
-                // Covert / red — 2 slots
-                // -----------------------------------------------------------------
-                .loot("minecraft:netherite_sword", BuiltInLootBoxes.covertWeight, loot -> loot
-                        .count(1)
-                        .name("loot.cs2lootbox.usps_printstream")
-                        .rarity("cs2lootbox.rarity.covert", 0xEB4B4B))
-
-                .loot("minecraft:enchanted_book", BuiltInLootBoxes.covertWeight, loot -> loot
-                        .count(1)
-                        .name("loot.cs2lootbox.awp_chromatic_aberration")
-                        .rarity("cs2lootbox.rarity.covert", 0xEB4B4B).nbt("{StoredEnchantments:[{id:\"minecraft:sharpness\",lvl:5s}]}"));
-
+                .position(70.0F, 150.0F).rotation(-3.0F, 160.0F, -3.0F).scale(300.0F)
+                .noOpenLoopSound()
+                .singleOpenText("cs2lootbox.case_screen.single_open")
+                .thirdPersonRight(0.0F, 0.0F, 0.0F, 0.0F, 135.0F, 0.0F, 1.3F)
+                .thirdPersonLeft(0.0F, 0.0F, 0.0F, 0.0F, 135.0F, 0.0F, 1.3F)
+                .firstPersonRight(0.0F, 0.0F, 0.0F, 0.0F, 135.0F, 0.0F, 1.3F)
+                .firstPersonLeft(0.0F, 0.0F, 0.0F, 0.0F, 135.0F, 0.0F, 1.3F)
+                .ground(0.0F, 0.0F, 0.0F, 0.0F, 135.0F, 0.0F, 1.5F)
+                .gui(0.0F, -3.0F, 0.0F, 30.0F, 135.0F, 0.0F, 1.5F)
+                .fixed(0.0F, -1.5F, 0.0F, 0.0F, 135.0F, 0.0F, 1.5F);
+        
         if (hasOpenIdleAnim)
             builder.animations("fall", "idle", "open", "open_idle");
         else
             builder.animations("fall", "idle", "open");
 
         if (requiresKey)
-            builder.openSound("cs2lootbox:case_unlock", 0.2F, 1.0F);
+            builder.openSound(CS2LootBoxMod.MOD_ID + ":case_unlock", 0.2F, 1.0F);
         else
-            builder.openSound("cs2lootbox:case_unlock_immediate", 0.2F, 1.0F);
-
-        // ---------------------------------------------------------------------
-        // Legendary / gold — absolute 0.26%
-        // ---------------------------------------------------------------------
-        builder.legendary(20.0D)
-                .name("legendary.kubejs.rare_gloves")
-                .tooltip("tooltip.kubejs.rare_gloves")
-                .subCarousel(false)
-                .subLoot()
-                // Temporary glove placeholder. Replace this with the real
-                // glove/knife item ids when those registries are available.
-                .add("minecraft:leather_boots", 60.0D, loot -> loot
-                        .count(1)
-                        .name("loot.cs2lootbox.gloves")
-                        .rarity("cs2lootbox.rarity.special", 0xFFAE39))
-                .add("minecraft:apple", 40.0D, loot -> loot
-                        .count(1)
-                        .name("loot.cs2lootbox.apple")
-                        .rarity("cs2lootbox.rarity.special", 0xFFAE39));
+            builder.openSound(CS2LootBoxMod.MOD_ID + ":case_unlock_immediate", 0.2F, 1.0F);
+    }
+    
+    public static synchronized void registerNewPatch(@NotNull LootboxDefinitionBuilder builder, @NotNull String caseRegName, @NotNull String modelPath, @NotNull String texturePath, @NotNull String animationPath) {
+        builder.caseItem(CS2LootBoxMod.MOD_ID + ":" + caseRegName)
+                .itemJson(CS2LootBoxMod.MOD_ID + ":item/lootbox_renderer")
+                .model(CS2LootBoxMod.MOD_ID + ":geo/" + modelPath)
+                .texture(CS2LootBoxMod.MOD_ID + ":textures/lootbox/" + texturePath)
+                .animation(CS2LootBoxMod.MOD_ID + ":animations/" + animationPath)
+                .requiresKey(false)
+                .itemIdleAnimation("idle")
+                .animations("fall", "idle", "open")
+                .dropSound(CS2LootBoxMod.MOD_ID + ":case_patch_fall", 0.2F, 1.0F)
+                .openSound(CS2LootBoxMod.MOD_ID + ":case_pins_fall", 0.2F, 1.0F)
+                .noOpenLoopSound()
+                .singleOpenText("cs2lootbox.patch_screen.single_open")
+                .position(240.0F, 440.0F).rotation(-60.0F, 170.0F, 0.0F).scale(600.0F)
+                .thirdPersonRight(0.0F, 0.0F, 0.0F, 0.0F, 135.0F, 0.0F, 1.3F)
+                .thirdPersonLeft(0.0F, 0.0F, 0.0F, 0.0F, 135.0F, 0.0F, 1.3F)
+                .firstPersonRight(0.0F, 0.0F, 0.0F, 0.0F, 135.0F, 0.0F, 1.3F)
+                .firstPersonLeft(0.5F, 0.0F, 0.0F, 0.0F, 135.0F, 0.0F, 1.3F)
+                .ground(0.0F, 0.0F, 0.0F, 0.0F, 135.0F, 0.0F, 1.3F)
+                .gui(0.0F, -7.0F, 0.0F, 0.0F, 135.0F, 0.0F, 1.8F)
+                .fixed(0.0F, -1.5F, 0.0F, 0.0F, 135.0F, 0.0F, 1.3F);
+    }
+    
+    /**
+     * ESport case use image instead of a model.
+     * @param builder
+     * @param caseRegName
+     * @param modelPath
+     * @param texturePath
+     * @param animationPath
+     */
+    public static synchronized void registerNewESportCase(@NotNull LootboxDefinitionBuilder builder, @NotNull String caseRegName, @NotNull String caseKeyRegName, @NotNull String imageName, @NotNull String keyTexture, int imageWidth, int imageHeight) {
+        builder.caseItem(CS2LootBoxMod.MOD_ID + ":" + caseRegName)
+                .keyItem(CS2LootBoxMod.MOD_ID + ":" + caseKeyRegName)
+                .image(CS2LootBoxMod.MOD_ID + ":textures/gui/cases/" + imageName, imageWidth, imageHeight)
+                .keyTexture(CS2LootBoxMod.MOD_ID + ":item/" + keyTexture)
+                .itemIdleAnimation("idle")
+                .noDropSound()
+                .openSound(CS2LootBoxMod.MOD_ID + ":case_unlock_immediate", 0.2F, 1.0F)
+                .noOpenLoopSound()
+                .singleOpenText("cs2lootbox.case_screen.single_open")
+                .position(0.0F, -50.0F).rotation(0.0F, 0.0F, 0.0F).scale(300.0F)
+                .thirdPersonRight(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.1F)
+                .thirdPersonLeft(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.1F)
+                .firstPersonRight(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.1F)
+                .firstPersonLeft(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.1F)
+                .ground(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.1F)
+                .gui(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.1F)
+                .fixed(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.1F);
 
     }
 }

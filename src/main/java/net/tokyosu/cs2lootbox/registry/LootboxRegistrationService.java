@@ -22,7 +22,16 @@ import java.util.Set;
  */
 public final class LootboxRegistrationService {
     private static final Set<ResourceLocation> FINALIZED_ITEM_BUILDERS = new HashSet<>();
+    private static final java.util.Map<ResourceLocation, net.tokyosu.cs2lootbox.api.lootbox.ModelItemDefinitionBuilder.Definition> MODEL_ITEMS = new java.util.LinkedHashMap<>();
     private static boolean finalized;
+
+    public static synchronized void registerItem(net.tokyosu.cs2lootbox.api.lootbox.ModelItemDefinitionBuilder builder) {
+        if (finalized) throw new IllegalStateException("Model items must be added during startup registration");
+        var definition = builder.build();
+        var id = definition.display().caseItemId();
+        if (MODEL_ITEMS.putIfAbsent(id, definition) != null)
+            throw new IllegalArgumentException("Duplicate model item: " + id);
+    }
 
     private LootboxRegistrationService() {
     }
@@ -57,6 +66,13 @@ public final class LootboxRegistrationService {
             return;
         }
 
+        Set<ResourceLocation> itemIds = new HashSet<>(MODEL_ITEMS.keySet());
+        for (LootboxDefinition definition : LootboxRegistry.values()) {
+            if (!itemIds.add(definition.caseItemId())
+                    || (definition.requiresKey() && !itemIds.add(definition.keyItemId())))
+                throw new IllegalArgumentException("Duplicate case, key or model item id in " + definition.id());
+        }
+
         for (LootboxDefinition definition : LootboxRegistry.values()) {
             if (!FINALIZED_ITEM_BUILDERS.add(definition.id())) {
                 continue;
@@ -67,6 +83,12 @@ public final class LootboxRegistrationService {
             }
         }
 
+        for (var definition : MODEL_ITEMS.values()) {
+            var id = definition.display().caseItemId();
+            if (!FINALIZED_ITEM_BUILDERS.add(id))
+                throw new IllegalArgumentException("Duplicate item id: " + id);
+            RegistryInfo.ITEM.addBuilder(new net.tokyosu.cs2lootbox.integration.kubejs.builder.ModelItemBuilder(definition));
+        }
         finalized = true;
     }
 }

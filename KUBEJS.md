@@ -7,6 +7,7 @@ With KubeJS you can:
 - register new case items and optional matching key items automatically;
 - use custom GeckoLib models, textures and animations;
 - configure the 3D case preview;
+- replace the case model with a static image and configure its position, rotation and scale;
 - build weighted loot tables;
 - use Minecraft/Forge item tags as rewards;
 - add custom NBT to rewards;
@@ -369,6 +370,39 @@ You will usually want to tune the transform for your own model.
 
 ---
 
+## Static image cases
+
+Use `image()` for a case such as the eSports 2013 Case that has an image instead of a 3D model:
+
+```js
+CS2LootboxEvents.register(event => {
+    event.addCrate('kubejs:esports_2013', crate => {
+        crate.image('kubejs:textures/lootbox/esports_2013.png', 512, 256)
+        crate.position(0, 0)
+        crate.rotation(0, 0, 0)
+        crate.scale(240)
+        crate.keyTexture('kubejs:item/esports_2013_key')
+        crate.loot('minecraft:diamond', 100)
+    })
+})
+```
+
+Place the PNG at `kubejs/assets/kubejs/textures/lootbox/esports_2013.png`. The dimensions above are an example: supply your image's actual width and height to preserve its aspect ratio. `image(resource)` uses a square aspect ratio.
+
+| Method | Effect for image cases |
+| --- | --- |
+| `image(resource, width, height)` | Uses the full PNG as a static image; dimensions must be positive |
+| `position(x, y)` | Offsets the image center in the same preview viewport as a model |
+| `scale(value)` | Sets the image width in reference GUI pixels; height follows the supplied aspect ratio |
+| `rotation(pitch, yaw, roll)` | Rotates the image plane on X/Y/Z; `(0, 0, 0)` faces the screen and roll rotates it in the screen plane |
+| `useModel()` | Removes the image override and restores the configured model and animations |
+
+The existing transform defaults still apply, so set rotation explicitly to face the screen. The image keeps the same placement while the carousel runs. Case fall, idle and opening animations are skipped, and opening proceeds to the carousel after server confirmation and the normal short transition delay. Model and animation files are not required for image cases; the carousel and reward UI retain their usual animations and sounds. The image does not play an opening loop sound.
+
+The case item also renders this image in inventory, in hand, and in the world, using the existing `firstPersonRight()`, `firstPersonLeft()`, `thirdPersonRight()`, `thirdPersonLeft()`, `ground()`, `gui()` and `fixed()` item transforms. Images are unlit, so `light()` does not change their brightness. `event.changeCase()` preserves the image setting unless replaced or cleared with `useModel()`.
+
+---
+
 ## Animations
 
 ```js
@@ -428,6 +462,48 @@ crate.keyTranslationKey('item.kubejs.revolution_key')
 ```
 
 If omitted, normal Minecraft item translation keys are used automatically.
+
+---
+
+## Opening-screen message
+
+Use `singleOpenText()` to customize the message below the case name on the opening screen:
+
+```js
+crate.singleOpenText('This container grants one reward')
+```
+
+The value accepts literal text or a translation key:
+
+```js
+crate.singleOpenText('container.kubejs.revolution.single_open')
+```
+
+If omitted, the default is `cs2lootbox.case_screen.single_open` ("This Container can only be opened once"). The setting changes the displayed message only; opening still consumes the case. It is preserved when using `event.changeCase()` unless explicitly replaced.
+
+---
+
+## Tooltip description
+
+Use `tooltipDescription()` to add a gray description to the case item's hover tooltip, above its collection and contents:
+
+```js
+crate.tooltipDescription('Contains rewards from the Revolution Collection.')
+```
+
+It accepts literal text or a translation key. Use `\n` for multiple lines, either in literal text or in the translated value:
+
+```js
+crate.tooltipDescription('Open to receive one reward.\nRequires a Revolution Key.')
+// Or use a translation key:
+crate.tooltipDescription('tooltip.kubejs.revolution_case.description')
+```
+
+No description is shown by default. The description remains visible when the case contents tooltip is disabled. `event.changeCase()` preserves it unless replaced; pass `null` or an empty string to clear it:
+
+```js
+crate.tooltipDescription('')
+```
 
 ---
 
@@ -1198,6 +1274,14 @@ crate.carouselTickSound('cs2lootbox:csgo_ui_crate_item_scroll', 0.3, 1.0)
 
 `openLoopSound(...)` is optional. Use `crate.noOpenLoopSound()` to remove it again when editing an existing definition.
 
+Use `noDropSound()` to disable the drop sound when the case opening screen appears:
+
+```js
+crate.noDropSound()
+```
+
+This setting is preserved by `event.changeCase()`. Calling `dropSound(...)` again restores the sound, with optional volume and pitch settings.
+
 ---
 
 ## Reward sounds by rarity
@@ -1705,6 +1789,10 @@ CS2LootboxEvents.register(event => {
         crate.caseName('item.kubejs.revolution_case')
         crate.keyName('item.kubejs.revolution_key')
 
+        // Optional opening-screen message: literal text or a translation key.
+        crate.singleOpenText('This container grants one reward')
+        crate.tooltipDescription('Contains rewards from the Revolution Collection.')
+
         crate.collection(
             'collection.kubejs.revolution',
             'kubejs:textures/gui/collections/revolution.png'
@@ -1854,3 +1942,50 @@ examples/kubejs/assets/kubejs/lang/fr_fr.json
 ```
 
 These are useful as copy/paste starting points for modpack development.
+
+### Standalone model items
+
+Use event.addItem(id, callback) in CS2LootboxEvents.register to register static
+GeckoLib items. These collectibles have no opening UI or animation and support
+both standard geometry and imported weighted meshes.
+
+```js
+CS2LootboxEvents.register(event => {
+    event.addItem('kubejs:custom_patch', item => {
+        item.model('cs2lootbox:geo/patch_inspect.geo.json')
+            .texture('kubejs:textures/patches/custom_patch.png')
+            .name('item.kubejs.custom_patch')
+            .rarityGrade('milspec')
+            .stackSize(64)
+            .gui(0, -6.4, 0, 0, 90, 0, 8)
+            .fixed(0, -6.4, 0, 0, 90, 0, 8)
+            .ground(0, 0, 0, 0, 90, 0, 4)
+            .firstPersonRight(0, -3.2, 0, 0, 90, 0, 4)
+            .firstPersonLeft(0, -3.2, 0, 0, 90, 0, 4)
+            .thirdPersonRight(0, 0, 0, 0, 90, 0, 4)
+            .thirdPersonLeft(0, 0, 0, 0, 90, 0, 4)
+    })
+    event.changeCase('cs2lootbox:csgo_patch_pack', box => {
+        box.loot('kubejs:custom_patch', 1, loot => {
+            loot.count(1).rarityGrade('milspec')
+        })
+    })
+})
+```
+
+Display methods use `(tx, ty, tz, rx, ry, rz, scale)`: translation in model
+pixels, rotation in degrees, uniform scale. Unspecified contexts use identity.
+The example rotates and enlarges the small Y/Z plane in patch_inspect. Add the
+name translation and texture to KubeJS assets. Restart Minecraft after registering
+new items. Adding loot appends to the existing list; use clearLoot() to replace it.
+
+The built-in Patch Pack drops 21 real items, including `cs2lootbox:patch_howl`,
+`cs2lootbox:patch_shattered_web`, and `cs2lootbox:patch_welcome_to_the_clutch`.
+They share patch_inspect.geo.json and individual textures in textures/patches/.
+
+Model items receive a custom Minecraft rarity from their `rarityGrade()` when
+created, using the exact CS2 grade color. Rarity IDs are `cs2lootbox:consumer`,
+`cs2lootbox:industrial`, `cs2lootbox:milspec`, `cs2lootbox:restricted`,
+`cs2lootbox:classified`, `cs2lootbox:covert`, `cs2lootbox:special`,
+`cs2lootbox:knives`, and `cs2lootbox:contraband`. Items sharing a grade share the
+same Minecraft rarity; no separate RarityJS registration is required.

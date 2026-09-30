@@ -1,8 +1,9 @@
 package net.tokyosu.cs2lootbox.registry;
 
 import net.minecraft.resources.ResourceLocation;
-import net.tokyosu.cs2lootbox.registry.crates.AgentDossier01;
-import net.tokyosu.cs2lootbox.registry.crates.CSGOWeaponCase;
+import net.tokyosu.cs2lootbox.registry.cases.CSGOWeaponCase;
+import net.tokyosu.cs2lootbox.registry.esports.ESport2013Case;
+import net.tokyosu.cs2lootbox.registry.patch.CSGOPatchPack;
 
 /**
  * Built-in CS:GO Weapon Case content.
@@ -38,8 +39,25 @@ public final class BuiltInLootBoxes {
     public static synchronized void register() {
         if (registered) return;
         registered = true;
-
-        AgentDossier01.register();
+        
+        registerCases();
+        registerPatch();
+        registerESports();
+        
+    }
+    
+    private static synchronized void registerCases() {
         CSGOWeaponCase.register();
+        
+    }
+    
+    private static synchronized void registerPatch() {
+        CSGOPatchPack.register();
+        
+    }
+    
+    private static synchronized void registerESports() {
+        ESport2013Case.register();
+        
     }
 }

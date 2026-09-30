@@ -88,6 +88,13 @@ public final class LootboxCaseItem extends Item implements GeoItem, IUIHolder.It
             @NotNull TooltipFlag flag) {
         super.appendHoverText(stack, level, tooltip, flag);
 
+        String description = definition.tooltipDescription();
+        if (description != null && !description.isBlank()) {
+            for (String line : configuredText(description).getString().split("\\R", -1)) {
+                tooltip.add(Component.literal(line).withStyle(ChatFormatting.GRAY));
+            }
+        }
+
         if (!CS2LootboxClientConfig.SHOW_CASE_LOOT_TOOLTIP.get()) {
             return;
         }
@@ -149,7 +156,7 @@ public final class LootboxCaseItem extends Item implements GeoItem, IUIHolder.It
     private static @NotNull Component configuredText(@NotNull String value) {
         String trimmed = value.trim();
 
-        // collectionText(...) accepts both a literal and a translation key.
+        // Configured tooltip text accepts both a literal and a translation key.
         // Translation keys conventionally contain no spaces; if the key is
         // missing Minecraft simply displays the key itself, which is still a
         // useful fallback.
@@ -201,6 +208,9 @@ public final class LootboxCaseItem extends Item implements GeoItem, IUIHolder.It
 
     @Override
     public void registerControllers(@NotNull AnimatableManager.ControllerRegistrar controllers) {
+        if (definition.image() != null) {
+            return;
+        }
         controllers.add(new AnimationController<>(
                 this,
                 "item",

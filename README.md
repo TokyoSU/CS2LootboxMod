@@ -150,6 +150,9 @@ CS2LootboxEvents.register(event => {
         crate.caseName('item.kubejs.revolution_case')
         crate.keyName('item.kubejs.revolution_key')
 
+        // Optional opening-screen message: literal text or a translation key.
+        crate.singleOpenText('This container grants one reward')
+
         crate.collection(
             'The Revolution Collection',
             'kubejs:textures/gui/collections/revolution.png'

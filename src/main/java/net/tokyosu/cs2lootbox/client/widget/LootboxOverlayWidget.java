@@ -236,7 +236,7 @@ public final class LootboxOverlayWidget extends Widget {
                         : Component.translatable("cs2lootbox.case_screen.open_case", caseName()),
                 centerX, position.y + 34, 0xFFDCDCDC);
         graphics.drawCenteredString(font,
-                Component.translatable("cs2lootbox.case_screen.single_open"),
+                Component.translatable(model.getDefinition().singleOpenText()),
                 centerX, position.y + 52, 0xFFC7C7C7);
     }
 

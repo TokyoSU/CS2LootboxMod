@@ -25,10 +25,11 @@ public final class LootboxDefinitionBuilder {
     private ResourceLocation model;
     private ResourceLocation texture;
     private ResourceLocation animation;
+    private @Nullable LootboxDefinition.PreviewImage image;
     private ResourceLocation keyTexture;
     private ResourceLocation itemJson = ResourceLocation.fromNamespaceAndPath(
             CS2LootBoxMod.MOD_ID, "item/lootbox_renderer");
-    private ResourceLocation dropSound = ModSounds.CASE_DROP.getId();
+    private @Nullable ResourceLocation dropSound = ModSounds.CASE_DROP.getId();
     private ResourceLocation openSound = ModSounds.CASE_UNLOCK.getId();
     private @Nullable ResourceLocation openLoopSound;
     private ResourceLocation carouselTickSound = ModSounds.CRATE_ITEM_SCROLL.getId();
@@ -96,6 +97,8 @@ public final class LootboxDefinitionBuilder {
     private int keyStackSize = 64;
     private @Nullable String caseTranslationKey;
     private @Nullable String keyTranslationKey;
+    private String singleOpenText = "cs2lootbox.case_screen.single_open";
+    private @Nullable String tooltipDescription;
     private @Nullable String resultCollectionTranslationKey;
     private @Nullable ResourceLocation resultCollectionIconTexture;
     private final List<LootEntry> loot = new ArrayList<>();
@@ -118,6 +121,7 @@ public final class LootboxDefinitionBuilder {
         this.model = definition.model();
         this.texture = definition.texture();
         this.animation = definition.animation();
+        this.image = definition.image();
         this.keyTexture = definition.keyTexture();
         this.itemJson = definition.itemJson();
         this.dropSound = definition.dropSound();
@@ -180,6 +184,8 @@ public final class LootboxDefinitionBuilder {
         this.keyStackSize = definition.keyStackSize();
         this.caseTranslationKey = definition.caseTranslationKey();
         this.keyTranslationKey = definition.keyTranslationKey();
+        this.singleOpenText = definition.singleOpenText();
+        this.tooltipDescription = definition.tooltipDescription();
         this.resultCollectionTranslationKey = definition.resultCollectionTranslationKey();
         this.resultCollectionIconTexture = definition.resultCollectionIconTexture();
 
@@ -218,6 +224,23 @@ public final class LootboxDefinitionBuilder {
     @Info("Sets the GeckoLib .geo.json resource, for example kubejs:geo/revolution.geo.json.")
     public @NotNull LootboxDefinitionBuilder model(@NotNull String resource) {
         model = parse(resource, id.getNamespace());
+        return this;
+    }
+
+    @Info("Replaces the case model with a static square image in the opening screen and item renderer. No model or animation assets are required. Uses position, rotation and scale; scale is the image width in GUI pixels.")
+    public @NotNull LootboxDefinitionBuilder image(@NotNull String resource) {
+        return image(resource, 1, 1);
+    }
+
+    @Info("Replaces the case model with a static image. Supply its pixel width and height to preserve aspect ratio. Uses existing preview and item transforms, with no case animations.")
+    public @NotNull LootboxDefinitionBuilder image(@NotNull String resource, int width, int height) {
+        image = new LootboxDefinition.PreviewImage(parse(resource, id.getNamespace()), width, height);
+        return this;
+    }
+
+    @Info("Clears the static image override and restores the configured GeckoLib model and animations.")
+    public @NotNull LootboxDefinitionBuilder useModel() {
+        image = null;
         return this;
     }
 
@@ -354,6 +377,13 @@ public final class LootboxDefinitionBuilder {
     @Info("Sets the one-shot sound played when the case first falls/appears. It inherits defaultSound(...) tuning.")
     public @NotNull LootboxDefinitionBuilder dropSound(@NotNull String sound) {
         dropSound = parse(sound, "minecraft");
+        dropSoundTuning = null;
+        return this;
+    }
+
+    @Info("Disables the drop sound played when the case opening screen appears. Use dropSound(...) to enable it again.")
+    public @NotNull LootboxDefinitionBuilder noDropSound() {
+        dropSound = null;
         dropSoundTuning = null;
         return this;
     }
@@ -662,6 +692,19 @@ public final class LootboxDefinitionBuilder {
         return keyName(translationKey);
     }
 
+    @Info("Sets the case item tooltip description above its collection and contents. Accepts literal text or a translation key, with newlines for multiple lines. Pass null or blank text to clear it.")
+    public @NotNull LootboxDefinitionBuilder tooltipDescription(@Nullable String textOrTranslationKey) {
+        tooltipDescription = textOrTranslationKey == null || textOrTranslationKey.isBlank()
+                ? null : textOrTranslationKey.trim();
+        return this;
+    }
+
+    @Info("Sets the opening-screen message that defaults to 'This Container can only be opened once'. Accepts literal text or a translation key.")
+    public @NotNull LootboxDefinitionBuilder singleOpenText(@NotNull String textOrTranslationKey) {
+        singleOpenText = requireTranslationKey(textOrTranslationKey, "singleOpenText");
+        return this;
+    }
+
     @Info("Sets the collection text shown below the won item. The value may be either literal text "
             + "(for example 'The Kilowatt Collection') or a translation key "
             + "(for example item.kubejs.kilowatt_collection).")
@@ -809,9 +852,10 @@ public final class LootboxDefinitionBuilder {
                 Objects.requireNonNull(model, "model"),
                 Objects.requireNonNull(texture, "texture"),
                 Objects.requireNonNull(animation, "animation"),
+                image,
                 Objects.requireNonNull(keyTexture, "keyTexture"),
                 Objects.requireNonNull(itemJson, "itemJson"),
-                Objects.requireNonNull(dropSound, "dropSound"),
+                dropSound,
                 Objects.requireNonNull(openSound, "openSound"),
                 openLoopSound,
                 Objects.requireNonNull(carouselTickSound, "carouselTickSound"),
@@ -873,6 +917,8 @@ public final class LootboxDefinitionBuilder {
                 clampStackSize(keyStackSize),
                 caseTranslationKey != null ? caseTranslationKey : Util.makeDescriptionId("item", caseItemId),
                 keyTranslationKey != null ? keyTranslationKey : Util.makeDescriptionId("item", keyItemId),
+                singleOpenText,
+                tooltipDescription,
                 resultCollectionTranslationKey,
                 resultCollectionIconTexture,
                 loot,

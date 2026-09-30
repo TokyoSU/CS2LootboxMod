@@ -20,9 +20,10 @@ public record LootboxDefinition(
         @NotNull ResourceLocation model,
         @NotNull ResourceLocation texture,
         @NotNull ResourceLocation animation,
+        @Nullable PreviewImage image,
         @NotNull ResourceLocation keyTexture,
         @NotNull ResourceLocation itemJson,
-        @NotNull ResourceLocation dropSound,
+        @Nullable ResourceLocation dropSound,
         @NotNull ResourceLocation openSound,
         @Nullable ResourceLocation openLoopSound,
         @NotNull ResourceLocation carouselTickSound,
@@ -43,6 +44,8 @@ public record LootboxDefinition(
         int keyStackSize,
         @NotNull String caseTranslationKey,
         @NotNull String keyTranslationKey,
+        @NotNull String singleOpenText,
+        @Nullable String tooltipDescription,
         @Nullable String resultCollectionTranslationKey,
         @Nullable ResourceLocation resultCollectionIconTexture,
         @NotNull List<LootEntry> loot,
@@ -57,7 +60,6 @@ public record LootboxDefinition(
         animation = Objects.requireNonNull(animation, "animation");
         keyTexture = Objects.requireNonNull(keyTexture, "keyTexture");
         itemJson = Objects.requireNonNull(itemJson, "itemJson");
-        dropSound = Objects.requireNonNull(dropSound, "dropSound");
         openSound = Objects.requireNonNull(openSound, "openSound");
         carouselTickSound = Objects.requireNonNull(carouselTickSound, "carouselTickSound");
         rewardSound = Objects.requireNonNull(rewardSound, "rewardSound");
@@ -74,6 +76,7 @@ public record LootboxDefinition(
         uiSkin = Objects.requireNonNull(uiSkin, "uiSkin");
         caseTranslationKey = Objects.requireNonNull(caseTranslationKey, "caseTranslationKey");
         keyTranslationKey = Objects.requireNonNull(keyTranslationKey, "keyTranslationKey");
+        singleOpenText = Objects.requireNonNull(singleOpenText, "singleOpenText");
         loot = List.copyOf(Objects.requireNonNull(loot, "loot"));
         legendaryLoot = List.copyOf(Objects.requireNonNull(legendaryLoot, "legendaryLoot"));
     }
@@ -143,6 +146,16 @@ public record LootboxDefinition(
         public @NotNull SoundTuning classifiedResolved() { return resolve(classified); }
         public @NotNull SoundTuning covertResolved() { return resolve(covert); }
         public @NotNull SoundTuning specialResolved() { return resolve(special); }
+    }
+
+    /** Static image replacing all case model rendering and animation. */
+    public record PreviewImage(@NotNull ResourceLocation texture, int width, int height) {
+        public PreviewImage {
+            texture = Objects.requireNonNull(texture, "texture");
+            if (width <= 0 || height <= 0) {
+                throw new IllegalArgumentException("Lootbox image dimensions must be positive");
+            }
+        }
     }
 
     public record AnimationSet(

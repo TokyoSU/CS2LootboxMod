@@ -93,6 +93,15 @@ public final class LootEntryBuilder {
         return this;
     }
 
+    /** Sets the tier, translated label and color from the shared built-in grade. */
+    public @NotNull LootEntryBuilder rarityGrade(@NotNull LootRarityGrade grade) {
+        Objects.requireNonNull(grade, "grade");
+        rarityTier = grade.id();
+        rarityTranslationKey = grade.translationKey();
+        rarityColor = grade.color();
+        return this;
+    }
+
     @Info("Sets the translated rarity label shown on the final prize screen.")
     public @NotNull LootEntryBuilder rarity(@NotNull String translationKey) {
         rarityTranslationKey = requireTranslationKey(translationKey, "rarity");

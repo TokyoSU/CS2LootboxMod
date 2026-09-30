@@ -53,6 +53,13 @@ public final class LootboxStartupRegisterEvent extends StartupEventJS {
         LootboxRegistrationService.change(builder);
     }
 
+    @Info("Registers a standalone static GeckoLib item for use as loot. Does not create a case or key.")
+    public void addItem(String id, Consumer<net.tokyosu.cs2lootbox.api.lootbox.ModelItemDefinitionBuilder> config) {
+        var builder = new net.tokyosu.cs2lootbox.api.lootbox.ModelItemDefinitionBuilder(parseId(id));
+        Objects.requireNonNull(config, "config").accept(builder);
+        LootboxRegistrationService.registerItem(builder);
+    }
+
     private static @NotNull ResourceLocation parseId(@NotNull String value) {
         if (value == null || value.isBlank()) {
             throw new IllegalArgumentException("Lootbox id cannot be empty");

@@ -11,8 +11,8 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.ForgeRenderTypes;
 import net.tokyosu.cs2lootbox.api.lootbox.LootboxDefinition;
-import net.tokyosu.cs2lootbox.client.model.LootboxCaseItemModel;
-import net.tokyosu.cs2lootbox.item.LootboxCaseItem;
+import net.tokyosu.cs2lootbox.client.model.StaticItemModel;
+import net.tokyosu.cs2lootbox.item.ModelItem;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
@@ -20,7 +20,7 @@ import software.bernie.geckolib.cache.object.BakedGeoModel;
 import software.bernie.geckolib.renderer.GeoItemRenderer;
 
 /**
- * GeckoLib ItemStack renderer for lootbox cases, including the optional exact
+ * GeckoLib ItemStack renderer for static model items, including the optional exact
  * glTF weighted-skin extension used by CS2/Source 2 assets.
  *
  * Item display transforms are applied here instead of relying on vanilla model
@@ -28,11 +28,11 @@ import software.bernie.geckolib.renderer.GeoItemRenderer;
  * FIRST_PERSON_RIGHT_HAND fully independent for GeckoLib custom-rendered items
  * and lets KubeJS own all seven useful item display contexts.
  */
-public final class LootboxCaseItemRenderer extends GeoItemRenderer<LootboxCaseItem> {
-    private static final float DEG_TO_RAD = (float) (Math.PI / 180.0D);
+public final class ModelItemRenderer extends GeoItemRenderer<ModelItem> {
 
-    public LootboxCaseItemRenderer() {
-        super(new LootboxCaseItemModel());
+
+    public ModelItemRenderer() {
+        super(new StaticItemModel());
     }
 
     @Override
@@ -45,7 +45,7 @@ public final class LootboxCaseItemRenderer extends GeoItemRenderer<LootboxCaseIt
             int packedOverlay) {
         poseStack.pushPose();
         try {
-            if (stack.getItem() instanceof LootboxCaseItem item) {
+            if (stack.getItem() instanceof ModelItem item) {
                 // ItemRenderer has already applied its custom-renderer centering
                 // translation (-0.5, -0.5, -0.5) before renderByItem is called.
                 // Vanilla JSON display transforms are applied *before* that step.
@@ -58,11 +58,7 @@ public final class LootboxCaseItemRenderer extends GeoItemRenderer<LootboxCaseIt
                         ModelItemTransforms.isLeftHandContext(transformType)
                 );
                 poseStack.translate(-0.5F, -0.5F, -0.5F);
-                if (item.getDefinition().image() != null) {
-                    poseStack.translate(0.5F, 0.5F, 0.5F);
-                    LootboxImageRenderer.render(poseStack, bufferSource, item.getDefinition().image());
-                    return;
-                }
+
             }
 
             super.renderByItem(
@@ -80,7 +76,7 @@ public final class LootboxCaseItemRenderer extends GeoItemRenderer<LootboxCaseIt
 
     @Override
     public @NotNull RenderType getRenderType(
-            @NotNull LootboxCaseItem animatable,
+            @NotNull ModelItem animatable,
             @NotNull ResourceLocation texture,
             @Nullable MultiBufferSource bufferSource,
             float partialTick) {
@@ -96,7 +92,7 @@ public final class LootboxCaseItemRenderer extends GeoItemRenderer<LootboxCaseIt
     @Override
     public void actuallyRender(
             PoseStack poseStack,
-            LootboxCaseItem animatable,
+            ModelItem animatable,
             BakedGeoModel model,
             RenderType renderType,
             MultiBufferSource bufferSource,
@@ -123,3 +119,4 @@ public final class LootboxCaseItemRenderer extends GeoItemRenderer<LootboxCaseIt
     }
 
 }
+

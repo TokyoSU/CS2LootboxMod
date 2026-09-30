@@ -56,6 +56,7 @@ import net.tokyosu.cs2lootbox.api.lootbox.LootboxDefinition;
 import net.tokyosu.cs2lootbox.client.animation.LootboxAnimatable;
 import net.tokyosu.cs2lootbox.client.animation.LootboxAnimationState;
 import net.tokyosu.cs2lootbox.client.renderer.LootboxGuiRenderer;
+import net.tokyosu.cs2lootbox.client.renderer.LootboxImageRenderer;
 import net.tokyosu.cs2lootbox.config.CS2LootboxClientConfig;
 import net.tokyosu.cs2lootbox.config.CS2LootboxServerConfig;
 import net.tokyosu.cs2lootbox.item.LootboxCaseItem;
@@ -220,7 +221,7 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
 
     /** Reset whenever a new case UI is created/re-opened. */
     public void resetAnimation() {
-        animationState = LootboxAnimationState.FALL;
+        animationState = definition().image() != null ? LootboxAnimationState.IDLE : LootboxAnimationState.FALL;
         pendingReward = ItemStack.EMPTY;
         openingCommitted = false;
         rewardGranted = false;
@@ -585,7 +586,12 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
             clientStatus = null;
             setAnimationState(LootboxAnimationState.OPEN);
             playOpenSound();
-            startOpenLoopSound();
+            if (definition().image() != null) {
+                setAnimationState(LootboxAnimationState.OPEN_IDLE);
+                scheduleCarouselAfterOpen();
+            } else {
+                startOpenLoopSound();
+            }
             return;
         }
 
@@ -664,6 +670,14 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
 
             MultiBufferSource.BufferSource bufferSource = getIsolatedBufferSource();
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+
+            LootboxDefinition.PreviewImage image = definition().image();
+            if (image != null) {
+                LootboxImageRenderer.render(poseStack, bufferSource, image);
+                bufferSource.endBatch();
+                graphics.flush();
+                return;
+            }
 
             RenderType renderType = renderer.getRenderType(
                     animatable,
@@ -1509,6 +1523,12 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
 
     @OnlyIn(Dist.CLIENT)
     private void ensureRenderer() {
+        if (definition().image() != null) {
+            if (animationState == LootboxAnimationState.FALL) {
+                setAnimationState(LootboxAnimationState.IDLE);
+            }
+            return;
+        }
         if (animatable == null) {
             animatable = new LootboxAnimatable(definition());
             animatable.setAnimationState(animationState);
@@ -1994,7 +2014,7 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
                 centerX, position.y + 16, ColorUtils.withAlpha(0xFFFFFF, alpha));
         graphics.drawCenteredString(font, caseAction,
                 centerX, position.y + 34, ColorUtils.withAlpha(0xFFDCDCDC, alpha));
-        graphics.drawCenteredString(font, Component.translatable("cs2lootbox.case_screen.single_open"),
+        graphics.drawCenteredString(font, Component.translatable(definition().singleOpenText()),
                 centerX, position.y + 52, ColorUtils.withAlpha(0xFFC7C7C7, alpha));
     }
 
