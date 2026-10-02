@@ -19,15 +19,9 @@ public final class CSGOWeaponCase {
     public static synchronized void register() {
         LootboxDefinitionBuilder builder = new LootboxDefinitionBuilder(CASE_ID);
 
-        DefaultLootBoxRegistries.registerNewCrate(builder,
-                "csgo_case_weapon",
-                "csgo_case_weapon_key",
-                "csgo_drop_crate_armsdeal1.geo.json",
-                "csgo_drop_crate_armsdeal1.png",
-                "csgo_drop_crate_armsdeal1.animation.json",
-                "weapon_case_key", true, false);
-        
+        DefaultLootBoxRegistries.registerNewCrate(builder, "csgo_case_weapon", "csgo_case_weapon_key", "csgo_drop_crate_armsdeal1.geo.json", "csgo_drop_crate_armsdeal1.png", "csgo_drop_crate_armsdeal1.animation.json", "weapon_case_key", true, false);
         builder.collection("collection.arms_deal", CS2LootBoxMod.MOD_ID + ":textures/gui/collections/arms_deal.png");
+        builder.collectionImageScale(1.5F);
 
         // Arms Deal skins, from blue through red.
         addSkin(builder, "minecraft:iron_axe", "item.cs2lootbox.aug.wings", LootRarityGrade.MIL_SPEC);

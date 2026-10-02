@@ -1,5 +1,7 @@
 package net.tokyosu.cs2lootbox.client.widget;
 
+import net.tokyosu.cs2lootbox.client.renderer.ItemGuiRenderContext;
+
 import net.tokyosu.apocalypselib.utils.ResourceUtils;
 
 import net.tokyosu.apocalypselib.utils.ColorUtils;
@@ -1148,7 +1150,9 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
                 bgLeft + 34, bgTop + 16, ColorUtils.withAlpha(0x4C62D9, alpha), true);
 
         float itemScale = 4.35F * (0.93F + 0.07F * alpha);
-        renderItemScaled(graphics, clientWinningStack, itemCenterX, itemCenterY, itemScale, alpha);
+        ItemGuiRenderContext.render(
+                ItemGuiRenderContext.Purpose.REVEAL,
+                () -> renderItemScaledForPurpose(graphics, clientWinningStack, itemCenterX, itemCenterY, itemScale, alpha));
 
         Component name = prizeName(entry, clientWinningStack);
         graphics.drawString(font, name, textLeft, nameY, ColorUtils.withAlpha(0xFFFFFF, alpha), true);
@@ -1159,7 +1163,7 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
         // CS2-like collection row: keep it a little higher and render the
         // emblem larger so 128x128 / 512x512 collection images stay readable.
         int collectionTop = nameY + 16;
-        int collectionIconSize = 40;
+        int collectionIconSize = Math.max(1, Math.round(40 * definition().collectionImageScale()));
         int collectionTextX = textLeft;
         int collectionTextY = collectionTop + (collectionIconSize - font.lineHeight) / 2;
 
@@ -1610,7 +1614,13 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
     }
 
     @OnlyIn(Dist.CLIENT)
-    private void renderItemScaled(
+    private void renderItemScaled(GuiGraphics graphics, ItemStack stack, int centerX, int centerY, float scale, float alpha) {
+        ItemGuiRenderContext.render(
+                ItemGuiRenderContext.Purpose.CAROUSEL,
+                () -> renderItemScaledForPurpose(graphics, stack, centerX, centerY, scale, alpha));
+    }
+
+    private void renderItemScaledForPurpose(
             @NotNull GuiGraphics graphics,
             @NotNull ItemStack stack,
             int centerX,

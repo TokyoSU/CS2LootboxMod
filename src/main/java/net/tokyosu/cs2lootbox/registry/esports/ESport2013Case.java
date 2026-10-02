@@ -19,6 +19,7 @@ public class ESport2013Case {
 
         DefaultLootBoxRegistries.registerNewESportCase(builder, "crate_esports_2013", "crate_esports_2013_key", "crate_esports_2013.png", "weapon_case_key_special_1", 228, 176);
         builder.collection("collection.esports_2013", CS2LootBoxMod.MOD_ID + ":textures/gui/collections/set_esports_2013.png");
+        builder.collectionImageScale(1.5F);
 
         builder.clearLoot().clearLegendary();
 

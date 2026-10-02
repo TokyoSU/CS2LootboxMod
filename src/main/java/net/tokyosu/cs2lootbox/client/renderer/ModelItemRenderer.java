@@ -10,12 +10,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.ForgeRenderTypes;
-import net.tokyosu.cs2lootbox.api.lootbox.LootboxDefinition;
 import net.tokyosu.cs2lootbox.client.model.StaticItemModel;
 import net.tokyosu.cs2lootbox.item.ModelItem;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Quaternionf;
 import software.bernie.geckolib.cache.object.BakedGeoModel;
 import software.bernie.geckolib.renderer.GeoItemRenderer;
 
@@ -29,8 +27,6 @@ import software.bernie.geckolib.renderer.GeoItemRenderer;
  * and lets KubeJS own all seven useful item display contexts.
  */
 public final class ModelItemRenderer extends GeoItemRenderer<ModelItem> {
-
-
     public ModelItemRenderer() {
         super(new StaticItemModel());
     }

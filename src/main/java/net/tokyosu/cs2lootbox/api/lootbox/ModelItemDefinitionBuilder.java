@@ -28,6 +28,10 @@ public final class ModelItemDefinitionBuilder {
     public ModelItemDefinitionBuilder ground(float tx, float ty, float tz, float rx, float ry, float rz, float scale) { display.ground(tx, ty, tz, rx, ry, rz, scale); return this; }
     public ModelItemDefinitionBuilder gui(float tx, float ty, float tz, float rx, float ry, float rz, float scale) { display.gui(tx, ty, tz, rx, ry, rz, scale); return this; }
     public ModelItemDefinitionBuilder fixed(float tx, float ty, float tz, float rx, float ry, float rz, float scale) { display.fixed(tx, ty, tz, rx, ry, rz, scale); return this; }
+    public ModelItemDefinitionBuilder guiCarousel(float tx, float ty, float tz, float rx, float ry, float rz, float scale) { display.guiCarousel(tx, ty, tz, rx, ry, rz, scale); return this; }
+    public ModelItemDefinitionBuilder guiCarousel(float tx, float ty, float tz, float rx, float ry, float rz, float sx, float sy, float sz) { display.guiCarousel(tx, ty, tz, rx, ry, rz, sx, sy, sz); return this; }
+    public ModelItemDefinitionBuilder guiReveal(float tx, float ty, float tz, float rx, float ry, float rz, float scale) { display.guiReveal(tx, ty, tz, rx, ry, rz, scale); return this; }
+    public ModelItemDefinitionBuilder guiReveal(float tx, float ty, float tz, float rx, float ry, float rz, float sx, float sy, float sz) { display.guiReveal(tx, ty, tz, rx, ry, rz, sx, sy, sz); return this; }
     public Definition build() {
         if (!hasModel || !hasTexture) throw new IllegalStateException("Model items require model() and texture()");
         return new Definition(display.build(), grade);

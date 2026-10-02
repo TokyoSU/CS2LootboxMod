@@ -876,7 +876,95 @@ function base64ToBytes(b64) {
 }
 
 /** Splits a .glb container into its JSON and binary chunks. */
-function parseGLB(bytes) {
+/** Find the end of one JSON value without allocating its nested objects. */
+function jsonValueEnd(bytes, start) {
+    let depth = 0, quoted = false, escaped = false;
+    for (let i = start; i < bytes.length; i++) {
+        const c = bytes[i];
+        if (quoted) {
+            if (escaped) escaped = false;
+            else if (c === 92) escaped = true;
+            else if (c === 34) quoted = false;
+            continue;
+        }
+        if (c === 34) quoted = true;
+        else if (c === 123 || c === 91) depth++;
+        else if (c === 125 || c === 93) {
+            if (!depth) return i;
+            depth--;
+        } else if (c === 44 && !depth) return i;
+    }
+    return bytes.length;
+}
+
+/** Large Source 2 exports contain millions of animation-only accessors. */
+function lazyJsonArray(bytes, start, end, cacheValues = true) {
+    const starts = [], ends = [], cache = new Map();
+    let i = start + 1;
+    while (i < end && bytes[i] !== 93) {
+        while (bytes[i] === 32 || bytes[i] === 10 || bytes[i] === 13 || bytes[i] === 9) i++;
+        if (bytes[i] === 93) break;
+        const stop = jsonValueEnd(bytes.subarray(0, end), i);
+        starts.push(i); ends.push(stop);
+        i = stop;
+        if (bytes[i] === 44) i++;
+        else break;
+    }
+    return new Proxy({ length: starts.length, clearCache: () => cache.clear() }, {
+        get(target, key) {
+            if (key === 'length') return target.length;
+            if (key === Symbol.iterator) return function* () {
+                for (let index = 0; index < starts.length; index++)
+                    yield JSON.parse(new TextDecoder().decode(bytes.subarray(starts[index], ends[index])));
+            };
+            if (typeof key !== 'string' || !/^\d+$/.test(key)) return target[key];
+            const index = Number(key);
+            if (index >= starts.length) return undefined;
+            if (!cacheValues) return JSON.parse(new TextDecoder().decode(bytes.subarray(starts[index], ends[index])));
+            if (!cache.has(index)) cache.set(index, JSON.parse(new TextDecoder().decode(bytes.subarray(starts[index], ends[index]))));
+            return cache.get(index);
+        },
+    });
+}
+
+/** Geometry-only JSON parser: leaves animation metadata unallocated. */
+function parseLightweightGLTF(bytes, includeAnimations = false) {
+    const result = {};
+    const decode = (a, b) => JSON.parse(new TextDecoder().decode(bytes.subarray(a, b)));
+    let i = 0;
+    const whitespace = () => { while ([32, 9, 10, 13].includes(bytes[i])) i++; };
+    whitespace();
+    if (bytes[i++] !== 123) throw new Error('glTF JSON must be an object');
+    while (i < bytes.length) {
+        whitespace();
+        if (bytes[i] === 125) break;
+        const keyStart = i;
+        if (bytes[i++] !== 34) throw new Error('Invalid glTF JSON property');
+        let escaped = false;
+        while (i < bytes.length) {
+            const c = bytes[i++];
+            if (escaped) escaped = false;
+            else if (c === 92) escaped = true;
+            else if (c === 34) break;
+        }
+        const key = decode(keyStart, i);
+        whitespace();
+        if (bytes[i++] !== 58) throw new Error('Invalid glTF JSON separator');
+        whitespace();
+        const start = i, end = jsonValueEnd(bytes, start);
+        if (key === 'animations') result.animations = includeAnimations ? lazyJsonArray(bytes, start, end, false) : [];
+        else if ((key === 'accessors' || key === 'bufferViews') && bytes[start] === 91)
+            result[key] = lazyJsonArray(bytes, start, end);
+        else result[key] = decode(start, end);
+        i = end; whitespace();
+        if (bytes[i] === 44) i++;
+        else if (bytes[i] === 125) break;
+        else throw new Error('Invalid glTF JSON object');
+    }
+    return result;
+}
+
+function parseGLB(bytes, lightweight = false) {
 	const dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
 	if (dv.getUint32(0, true) !== 0x46546C67) throw new Error('not a .glb file (missing glTF signature)');
 	const total = dv.getUint32(8, true);
@@ -885,7 +973,10 @@ function parseGLB(bytes) {
 		const len = dv.getUint32(offset, true);
 		const type = dv.getUint32(offset + 4, true);
 		const start = offset + 8;
-		if (type === 0x4E4F534A) json = JSON.parse(new TextDecoder().decode(bytes.subarray(start, start + len)));
+		if (type === 0x4E4F534A) {
+            const chunk = bytes.subarray(start, start + len);
+            json = parseLightweightGLTF(chunk, !lightweight);
+        }
 		else if (type === 0x004E4942) bin = bytes.subarray(start, start + len);
 		offset = start + len + (len % 4 ? 4 - (len % 4) : 0);
 	}
@@ -1066,14 +1157,42 @@ function boneDeltaPosition(rest, parentQuat, value, mode, deltaRot, unitScale = 
  * The conversion happens later, once each bone's rest pose is known — here we
  * only extract the data faithfully.
  */
-function parseAnimations(gltf, buffers, warnings) {
+/** Exclude Source 2 weapon skeleton branches, never generic hand/attachment names. */
+function weaponSkeletonNodes(nodes, includeWeapons = true) {
+    const excluded = new Set();
+    if (includeWeapons !== false) return excluded;
+    const stack = [];
+    for (let i = 0; i < nodes.length; i++) {
+        const name = String(nodes[i] && nodes[i].name || '').replace(/\\/g, '/');
+        if (/(^|\/)animation\/skeletons\/weapons\//i.test(name)) stack.push(i);
+    }
+    while (stack.length) {
+        const index = stack.pop();
+        if (excluded.has(index)) continue;
+        excluded.add(index);
+        for (const child of nodes[index] && nodes[index].children || []) stack.push(child);
+    }
+    return excluded;
+}
+
+function parseAnimations(gltf, buffers, warnings, limit = 0, excludedNodes = new Set()) {
 	const out = [];
 	for (const anim of gltf.animations || []) {
+        if (limit > 0 && out.length >= limit) {
+            warnings.push("Animation import limited to " + limit + " clips by setting.");
+            break;
+        }
 		const channels = [];
 		let length = 0;
 		for (const ch of anim.channels || []) {
 			const sampler = anim.samplers[ch.sampler];
 			if (!sampler || !ch.target || ch.target.node === undefined) continue;
+            if (excludedNodes.has(ch.target.node)) {
+                // Preserve clip duration without decoding excluded transform values.
+                const times = readAccessor(gltf, buffers, sampler.input);
+                if (times.length) length = Math.max(length, times[times.length - 1][0]);
+                continue;
+            }
 			if (ch.target.path === 'weights') {
 				warnings.push(`animation “${anim.name}”: morph targets are not supported`);
 				continue;
@@ -1385,12 +1504,15 @@ function parseGLTFFiles(files, opts) {
 	}
 
 	let gltf, glbBin = null;
-	if (glbName) {
-		const parsed = parseGLB(files[glbName]);
+	if (o.document) {
+        gltf = o.document.gltf;
+        glbBin = o.document.glbBin;
+    } else if (glbName) {
+        const parsed = parseGLB(files[glbName], o.lightweight || o.animations === false);
 		gltf = parsed.json;
 		glbBin = parsed.bin;
 	} else {
-		gltf = JSON.parse(new TextDecoder().decode(files[gltfName]));
+		gltf = parseLightweightGLTF(files[gltfName], !(o.lightweight || o.animations === false));
 	}
 
 	// buffers: inline base64, a .glb chunk, or a neighbouring file in the archive
@@ -1540,7 +1662,10 @@ function parseGLTFFiles(files, opts) {
 		}
 	}
 
+	const excludedNodes = weaponSkeletonNodes(gltf.nodes || [], o.includeWeaponSkeletons);
+	if (excludedNodes.size) warnings.push(`Weapon skeletons excluded: ${excludedNodes.size} nodes (character attachment bones retained).`);
 	const visit = (nodeIndex, parent, parentIndex, parentQuat) => {
+		if (excludedNodes.has(nodeIndex)) return;
 		const node = gltf.nodes[nodeIndex];
 		if (!node) return;
 		const wrap = skipSet.get(nodeIndex);
@@ -1698,6 +1823,7 @@ function parseGLTFFiles(files, opts) {
 						if (boneNode === undefined) continue;
 						const weight = weights ? Number(ws[j] || 0) : (j === 0 ? 1 : 0);
 						if (!Number.isFinite(weight) || weight <= 1e-8) continue;
+                        if (excludedNodes.has(boneNode)) throw new Error('Retained mesh references an excluded weapon joint; enable Include weapon skeletons.');
 						influences.push({ node: boneNode, weight });
 					}
 					influences.sort((a, b) => b.weight - a.weight);
@@ -1806,7 +1932,7 @@ function parseGLTFFiles(files, opts) {
 		worstBone: bindPivotWorst,
 	};
 
-	return { objects, images, warnings, hierarchy, animations: parseAnimations(gltf, buffers, warnings), unitScale: scale, bindPivotStats };
+	return { objects, images, warnings, hierarchy, document: { gltf, glbBin, buffers, excludedNodes }, animations: o.skipAnimationDecode || o.animations === false || o.lightweight ? [] : parseAnimations(gltf, buffers, warnings, o.animationLimit || 0, excludedNodes), unitScale: scale, bindPivotStats };
 }
 
 /**
@@ -3256,7 +3382,7 @@ function meshFromTriangleFaces(name, faces, texture, preserveSkinVertices = fals
 		}));
 	}
 
-	mesh.addFaces(...meshFaces);
+	for (let i = 0; i < meshFaces.length; i += 1024) mesh.addFaces(...meshFaces.slice(i, i + 1024));
 	if (Object.keys(vertexSkin).length) mesh.__cs2VertexSkin = vertexSkin;
 	return mesh;
 }
@@ -4452,6 +4578,52 @@ function animationSampleTimes(animation, channels, fps) {
  * 142 nodes have a non-identity rest pose, so values cannot be taken as they
  * are: rotation becomes R(t)·R0⁻¹ and translation T(t)-T0.
  */
+/** Only remove redundant keys on exactly constant, linearly interpolated spans. */
+function compactBatchAnimation(animation) {
+    const equal = (a, b) => a.length === b.length && a.every((v, i) => v === b[i]);
+    for (const bone of Object.values(animation.bones)) {
+        for (const channel of Object.keys(bone)) {
+            if (Array.isArray(bone[channel])) continue;
+            const keys = Object.entries(bone[channel]).sort((a, b) => Number(a[0]) - Number(b[0]));
+            if (!keys.length) continue;
+            if (keys.every(key => equal(key[1], keys[0][1]))) {
+                bone[channel] = keys[0][1];
+                continue;
+            }
+            const compact = Object.create(null);
+            for (let i = 0; i < keys.length; i++) {
+                if (i > 0 && i + 1 < keys.length && equal(keys[i - 1][1], keys[i][1])
+                        && equal(keys[i][1], keys[i + 1][1])) continue;
+                compact[keys[i][0]] = keys[i][1];
+            }
+            bone[channel] = compact;
+        }
+    }
+    return animation;
+}
+
+/** A batch-only sink: keep converted numeric keys out of the editor entirely. */
+function createBatchAnimationSink(settings) {
+    const result = { animation_length: settings.length, bones: Object.create(null) };
+    if (settings.loop === 'loop') result.loop = true;
+    else if (settings.loop === 'hold') result.loop = 'hold_on_last_frame';
+    return {
+        add() { return this; },
+        setLength() {},
+        getBoneAnimator(group) {
+            if (Object.prototype.hasOwnProperty.call(result.bones, group.name))
+                throw new Error('Duplicate exported bone name: ' + group.name);
+            const bone = result.bones[group.name] = {};
+            return { createKeyframe(data, time, channel) {
+                const keys = bone[channel] || (bone[channel] = Object.create(null));
+                keys[String(time)] = [data.x, data.y, data.z];
+                return {};
+            } };
+        },
+        compileBedrockAnimation() { return compactBatchAnimation(result); },
+    };
+}
+
 function applyAnimations(parsed, groupByNode, report, opts) {
 	if (!parsed.animations.length) return;
 	// Keep animation translation in the exact same unit scale as the imported
@@ -4467,9 +4639,12 @@ function applyAnimations(parsed, groupByNode, report, opts) {
 		report.push('Animations skipped: the Animation class is unavailable in this build.');
 		return;
 	}
+	// All batch clips share skeleton calibration.
+	if (!opts || !opts.batch_calibrated) {
 	report.push(calibrateBoneRotation());
 	probeBonePositionFrame(groupByNode, parsed, report);
 	calibrateAnimRotation(groupByNode, parsed, report);
+	}
 	const preMultiply = !!(opts && opts.anim_order === 'pre');
 	const accuracy = animationAccuracyConfig(opts);
 	const sampleFps = accuracy.fps;
@@ -4536,7 +4711,8 @@ function applyAnimations(parsed, groupByNode, report, opts) {
 			// otherwise it looks like an animation a millisecond long.
 			const isPose = a.length < 1e-6;
 			if (isPose) poses.push(a.name);
-			const anim = new Animation({
+			const AnimationType = opts && opts.batch_sink ? createBatchAnimationSink : Animation;
+			const anim = new AnimationType({
 				name: a.name,
 				loop: importedAnimationLoopMode(a.name, isPose, opts),
 				length: isPose ? 0.25 : a.length,
@@ -4545,8 +4721,10 @@ function applyAnimations(parsed, groupByNode, report, opts) {
 			// When creating a keyframe Blockbench touches the SELECTED animation, and
 			// without one it fails on `null.setLength()`. The keyframes still get
 			// written, but some settings are not applied — hence the drift.
-			try { if (anim.select) anim.select(); } catch (e) { /* fallback below */ }
-			if (typeof Animation !== 'undefined' && !Animation.selected) Animation.selected = anim;
+			if (opts && opts.batch_sink) opts.batch_sink.push(anim);
+			else if (opts && opts.animation_batch) Animation.selected = anim;
+			else try { if (anim.select) anim.select(); } catch (e) { /* fallback below */ }
+			if (!(opts && opts.batch_sink) && typeof Animation !== 'undefined' && !Animation.selected) Animation.selected = anim;
 
 			// channels of one node go into a single animator
 			const byNode = {};
@@ -4732,7 +4910,7 @@ function applyAnimations(parsed, groupByNode, report, opts) {
 		}
 	} catch (e) { /* not critical */ }
 
-	verifyAnimationPose(parsed, groupByNode, report);
+	if (!opts || !opts.animation_batch) verifyAnimationPose(parsed, groupByNode, report);
 
 	// Return the model to its rest pose. Otherwise the last animation stays
 	// selected, Blockbench shows the pose FROM IT, and that is indistinguishable
@@ -4740,7 +4918,7 @@ function applyAnimations(parsed, groupByNode, report, opts) {
 	try {
 		if (typeof Animation !== 'undefined') Animation.selected = null;
 		if (typeof Timeline !== 'undefined' && Timeline.setTime) Timeline.setTime(0);
-		if (typeof Modes !== 'undefined' && Modes.options && Modes.options.edit) Modes.options.edit.select();
+		if ((!opts || !opts.animation_batch) && typeof Modes !== 'undefined' && Modes.options && Modes.options.edit) Modes.options.edit.select();
 	} catch (e) { report.push(`  could not restore the rest pose: ${(e && e.message) || e}`); }
 
 	report.push(`Animations transferred: ${ok}, failed: ${failed} (bone axis order: ${BONE_EULER_ORDER})`);
@@ -4764,6 +4942,7 @@ function applyAnimations(parsed, groupByNode, report, opts) {
 	if (kfErrors) report.push(`  first keyframe error: ${kfErrors}`);
 	const skipped = parsed.animations.reduce((s, a) => s + a.channels.filter(c => c.path === 'scale').length, 0);
 	if (skipped) report.push(`  scale channels skipped: ${skipped} — GeckoLib does not animate them`);
+    return { ok, failed, keyframeError: kfErrors };
 }
 
 /**
@@ -5046,8 +5225,8 @@ function buildPolyMeshProject(ctx) {
 				const influences = [];
 				const islandFaces = [];
 				for (const component of island) {
-					islandFaces.push(...component.faces);
-					influences.push(...component.influences);
+					for (const face of component.faces) islandFaces.push(face);
+					for (const influence of component.influences) influences.push(influence);
 				}
 				let anchor = commonAncestor(influences);
 				if (anchor === undefined) anchor = islandFaces.find(face => face.boneNode !== undefined)?.boneNode;
@@ -5146,6 +5325,10 @@ function buildPolyMeshProject(ctx) {
 		parsed, solved: [], images, layout, size, chosenScale, sourceName,
 		texture: atlasTexture, needAtlas, geometryMode: 'poly_mesh',
 	};
+	if (opts && opts.animation_batch) {
+        setTimeout(() => exportAnimationBatch(parsed, groupByNode, opts), 0);
+        return lastImport;
+    }
 	showImportReport({
 		title: 'Import finished — Poly Mesh',
 		summary: [
@@ -5165,7 +5348,232 @@ function buildPolyMeshProject(ctx) {
 	return lastImport;
 }
 
+/** Blockbench may expose a partial fs.promises shim; use stable callback APIs. */
+function callbackFileOperation(fs, method, ...args) {
+    // Electron filesystem bridges may expose callback stubs that fail internally.
+    // Prefer the synchronous API already used successfully for model/texture reads.
+    return new Promise((resolve, reject) => {
+        try {
+            if (typeof fs[method + 'Sync'] === 'function') {
+                resolve(fs[method + 'Sync'](...args));
+            } else if (typeof fs[method] === 'function') {
+                fs[method](...args, (error, value) => error ? reject(error) : resolve(value));
+            } else {
+                reject(new Error('Blockbench filesystem provides neither ' + method + 'Sync nor ' + method));
+            }
+        } catch (error) {
+            reject(new Error('Filesystem ' + method + ' failed: ' + (error.message || error)));
+        }
+    });
+}
+
+async function openAnimationOutput(fs, filename) {
+    if (typeof fs.writeFileSync === 'function') {
+        // Use high-level operations supported by Blockbench's filesystem bridge.
+        // No open/write/close descriptors or callback APIs are required.
+        fs.writeFileSync(filename, '', { flag: 'wx' });
+        let closed = false;
+        return {
+            async writeFile(text) {
+                if (closed) throw new Error('Animation output is closed');
+                fs.writeFileSync(filename, text, { encoding: 'utf8', flag: 'a' });
+            },
+            async close() { closed = true; },
+        };
+    }
+    const descriptor = await callbackFileOperation(fs, 'open', filename, 'wx');
+    let closed = false;
+    return {
+        async writeFile(text) {
+            if (closed) throw new Error('Animation output is closed');
+            const bytes = Buffer.from(text, 'utf8');
+            let offset = 0;
+            while (offset < bytes.length) {
+                const written = await callbackFileOperation(fs, 'write', descriptor, bytes,
+                    offset, Math.min(65536, bytes.length - offset), null);
+                if (!(written > 0)) throw new Error('Animation output write made no progress');
+                offset += written;
+            }
+        },
+        async close() {
+            if (!closed) {
+                await callbackFileOperation(fs, 'close', descriptor);
+                closed = true;
+            }
+        },
+    };
+}
+let animationBatchState = null;
+
+function createAnimationProgressPanel(state, total, outputPath) {
+    const dialog = new Dialog({
+        id: PLUGIN_ID + '_animation_progress', title: 'Exporting animations',
+        buttons: ['Stop export'],
+        lines: [
+            '<div style="padding:8px 0">' +
+            '<div class="cs2_batch_count" aria-live="polite">Preparing export…</div>' +
+            '<progress class="cs2_batch_bar" max="100" value="0" style="width:100%;height:22px;margin:12px 0"></progress>' +
+            '<div class="cs2_batch_clip" style="overflow-wrap:anywhere"></div>' +
+            '<div class="cs2_batch_path" style="margin-top:12px;opacity:0.7;overflow-wrap:anywhere"></div>' +
+            '</div>',
+        ],
+        onConfirm() { stop(); return false; },
+        onCancel() { stop(); },
+    });
+    dialog.show();
+    const root = dialog.object || document;
+    const countElement = root.querySelector('.cs2_batch_count');
+    const barElement = root.querySelector('.cs2_batch_bar');
+    const clipElement = root.querySelector('.cs2_batch_clip');
+    const pathElement = root.querySelector('.cs2_batch_path');
+    if (pathElement) pathElement.textContent = 'Output: ' + outputPath;
+    function stop() {
+        state.cancelled = true;
+        if (countElement) countElement.textContent = 'Stopping after the current clip…';
+    }
+    return {
+        update(count, total, name, finishing = false) {
+            const percent = total ? Math.round(count / total * 100) : 100;
+            if (barElement) barElement.value = percent;
+            if (countElement && !state.cancelled)
+                countElement.textContent = count + ' / ' + total + ' exported (' + percent + '%)';
+            if (clipElement) clipElement.textContent = finishing ? 'Finalizing animation library…' :
+                (name ? 'Current animation: ' + name : 'Preparing animations…');
+        },
+        close() { dialog.hide(); },
+    };
+}
+/** Write clips sequentially; cleanup runs after every clip, including failures. */
+async function writeAnimationLibrary(clips, output, convert, cleanup, cancelled, progress, beforeClip = () => {}) {
+    let count = 0;
+    const names = new Set();
+    await output.writeFile('{"format_version":"1.8.0","animations":{');
+    for (let index = 0; index < clips.length; index++) {
+        if (cancelled()) throw new Error('Animation batch cancelled');
+        try {
+            const clip = clips[index];
+            beforeClip(count, clips.length, clip.name);
+            await new Promise(resolve => setTimeout(resolve, 0));
+            if (cancelled()) throw new Error('Animation batch cancelled');
+            if (names.has(clip.name)) throw new Error('Duplicate animation name: ' + clip.name);
+            let converted;
+            try { converted = await convert(clip); }
+            catch (error) { throw new Error("Converting " + clip.name + ": " + (error.message || error)); }
+            await output.writeFile((count ? ',' : '') + JSON.stringify(clip.name) + ':' + JSON.stringify(converted));
+            names.add(clip.name);
+            count++;
+        } finally { await cleanup(); }
+        progress(count, clips.length);
+        // Let Blockbench redraw and let discarded keyframes become collectable.
+        await new Promise(resolve => setTimeout(resolve, 0));
+    }
+    await output.writeFile('}}');
+    return count;
+}
+
+async function exportAnimationBatch(parsed, groupByNode, opts) {
+    if (animationBatchState) throw new Error('An animation batch is already running');
+    const fs = require('fs'), path = require('path');
+    const state = animationBatchState = { cancelled: false };
+    const document = parsed.document;
+    const clips = document.gltf.animations || [];
+    const fileName = 'shared_' + Date.now() + '.animation.json';
+    const finalPath = path.join(opts.batch_output, fileName);
+    const partialPath = finalPath + '.partial';
+    let output;
+    let panel;
+    let generated = [];
+    const clear = () => {
+        for (const animation of generated) animation.remove(false, false);
+        generated = [];
+        parsed.animations = [];
+        if (document.gltf.accessors.clearCache) document.gltf.accessors.clearCache();
+        if (document.gltf.bufferViews.clearCache) document.gltf.bufferViews.clearCache();
+    };
+    try {
+        panel = createAnimationProgressPanel(state, clips.length, finalPath);
+        panel.update(0, clips.length);
+        output = await openAnimationOutput(fs, partialPath);
+        const count = await writeAnimationLibrary(clips, output, raw => {
+            const warnings = [];
+            const decoded = parseAnimations({ ...document.gltf, animations: [raw] }, document.buffers, warnings, 0, document.excludedNodes);
+            if (warnings.length) throw new Error(warnings[0]);
+            parsed.animations = decoded;
+            const sinks = [];
+            let result;
+            try {
+                result = applyAnimations(parsed, groupByNode, [], { ...opts, animations: true,
+                    batch_calibrated: state.calibrated, batch_sink: sinks,
+                    animation_accuracy_preset: opts.batch_animation_accuracy_preset || 'original' });
+                state.calibrated = true;
+            }
+            finally { generated = []; }
+            if (!result || result.failed || result.keyframeError || sinks.length !== 1)
+                throw new Error('Could not completely convert animation ' + raw.name);
+            const animation = sinks[0];
+            if (typeof animation.compileBedrockAnimation !== 'function')
+                throw new Error('This Blockbench version has no compatible animation compiler');
+            return animation.compileBedrockAnimation();
+        }, clear, () => state.cancelled, (count, total) => {
+            Blockbench.setProgress(total ? count / total : 1);
+            Blockbench.setStatusBarText('Animation export: ' + count + '/' + total);
+            panel.update(count, total, null, count === total);
+        }, (count, total, name) => panel.update(count, total, name));
+        await output.close(); output = null;
+        await callbackFileOperation(fs, 'rename', partialPath, finalPath);
+        if (panel) panel.close();
+        Blockbench.showMessageBox({ title: 'Animation batch exported', message: count + ' animations exported to:\n' + finalPath + '\nThe model remains open without imported animations.' });
+    } catch (error) {
+        if (panel) panel.close();
+        console.error('[geckolib-import] animation batch failed', error);
+        Blockbench.showMessageBox({ title: 'Animation batch stopped', message: String(error.message || error) + '\nIncomplete output, if created, is kept at:\n' + partialPath });
+    } finally {
+        if (panel) panel.close();
+        if (output) await output.close();
+        clear();
+        // lastImport may retain parsed; do not retain the huge source document there.
+        parsed.document = null;
+        Blockbench.setProgress(0);
+        Blockbench.setStatusBarText('');
+        animationBatchState = null;
+    }
+}
+
 function buildFromFiles(files, sourceName, opts) {
+    if (opts && opts.animation_batch && !opts.batch_output) {
+        if (typeof require !== 'function') {
+            Blockbench.showMessageBox({ title: 'Batch export', message: 'Batch export requires Blockbench desktop.' });
+            return;
+        }
+        Promise.resolve(Blockbench.pickDirectory({ title: 'Select animation export folder', resource_id: PLUGIN_ID + '_batch_output' }))
+            .then(selection => {
+                const folder = Array.isArray(selection) ? selection[0] : selection;
+                if (folder) buildFromFiles(files, sourceName, { ...opts, batch_output: folder, lightweight: false });
+            }).catch(error => Blockbench.showMessageBox({ title: 'Batch export failed', message: String(error.message || error) }));
+        return;
+    }
+    const largestModel = Math.max(0, ...Object.keys(files)
+        .filter(name => /\.(glb|gltf)$/i.test(name))
+        .map(name => files[name].byteLength || 0));
+    if (largestModel > 128 * 1024 * 1024 && !(opts && (opts.large_import_confirmed || opts.animation_batch))
+            && !(opts && (opts.lightweight || opts.animations === false))) {
+        new Dialog({
+            id: PLUGIN_ID + '_large_animation_import', title: 'Large animated model',
+            form: {
+                explanation: { type: 'info', text: 'This model is over 128 MB. Importing and baking every animation can exhaust Blockbench memory and close its interface. Start with a small clip batch or geometry only.' },
+                geometry_only: { label: 'Import geometry only', type: 'checkbox', value: false },
+                animation_limit: { label: 'Maximum animation clips (0 = all)', type: 'number', value: 10, min: 0, step: 1 },
+                animation_accuracy: { label: 'Animation sampling', type: 'select', default: 'original',
+                    options: { original: 'Original source keys (smallest)', balanced: '30 FPS bake', high: '60 FPS bake', ultra: '120 FPS bake', exact: '240 FPS bake' } },
+            },
+            onConfirm(form) {
+                this.hide();
+                buildFromFiles(files, sourceName, { ...opts, large_import_confirmed: true,
+                    lightweight: form.geometry_only, animation_accuracy_preset: form.animation_accuracy, animation_limit: Math.max(0, Math.floor(Number(form.animation_limit) || 0)) });
+            },
+        }).show();
+        return;
+    }
 	const report = [];
 
 	// A probe parse in glTF units: both the texture size and the model bounds are
@@ -5176,7 +5584,7 @@ function buildFromFiles(files, sourceName, opts) {
 		Number((opts && opts.rot_y) || 0),
 		0,
 	];
-	try { probe = parseGLTFFiles(files, { scale: 1, uvWidth: 1, uvHeight: 1, rotate }); }
+	try { probe = parseGLTFFiles(files, { scale: 1, uvWidth: 1, uvHeight: 1, rotate, lightweight: !!(opts && opts.lightweight) || !!(opts && opts.animations === false), skipAnimationDecode: true, includeWeaponSkeletons: !(opts && opts.include_weapon_skeletons === false) }); }
 	catch (e) { Blockbench.showMessageBox({ title: 'Import failed', message: String((e && e.message) || e) }); return; }
 
 	// Objects reference an image by its glTF index, and unreadable ones fall out
@@ -5396,8 +5804,12 @@ function buildFromFiles(files, sourceName, opts) {
 		}
 	}
 
+	probe.objects = []; // Release the first geometry pass before building the final one.
 	const parsed = parseGLTFFiles(files, {
 		scale: chosenScale, offset, rotate,
+        includeWeaponSkeletons: !(opts && opts.include_weapon_skeletons === false),
+        document: probe.document, animations: !(opts && (opts.animations === false || opts.lightweight || opts.animation_batch)),
+        animationLimit: Number(opts && opts.animation_limit) || 0,
 		uvWidth: size.width, uvHeight: size.height,
 		// The rectangles are converted to glTF image numbering. Besides the atlas
 		// rectangle we keep the ORIGINAL image dimensions and the first baked tile:
@@ -5646,6 +6058,10 @@ function buildFromFiles(files, sourceName, opts) {
 		texture: atlasTexture,
 		needAtlas,
 	};
+	if (opts && opts.animation_batch) {
+        setTimeout(() => exportAnimationBatch(parsed, groupByNode, opts), 0);
+        return lastImport;
+    }
 	showImportReport({
 		title: 'Import finished',
 		summary: [
@@ -6024,7 +6440,7 @@ function askImportOptions(onReady) {
 
 	new Dialog({
 		id: PLUGIN_ID + '_import_dialog',
-		title: 'Import GeckoLib from ZIP',
+		title: 'GeckoLib import options',
 		// Expanded by a checkbox: an ordinary user needs four settings, the other
 		// eight are levers for diagnosing breakage. Eleven fields in a row read like
 		// a cockpit and get in the way of anyone who just wants to open a model.
@@ -6033,6 +6449,14 @@ function askImportOptions(onReady) {
 				label: 'Model size', type: 'select', default: 'auto',
 				options: { auto: 'Detect automatically', 16: '×16 (unit = block)', 1: '×1 (unit = pixel)' },
 			},
+			lightweight: {
+                label: "Large agent model (geometry only)", type: "checkbox", value: false,
+                description: "Use for large T/CT exports. Skips animations and reads accessor metadata on demand. Choose Poly Mesh.",
+            },
+            include_weapon_skeletons: {
+                label: 'Include weapon skeletons', type: 'checkbox', value: true,
+                description: 'Uncheck for character-only Source 2 exports. Removes weapon skeleton branches and their animation tracks; keeps character hands and attachment bones.',
+            },
 			geometry_mode: {
 				label: 'Geometry', type: 'select', default: 'cubes',
 				options: {
@@ -6095,18 +6519,32 @@ function askImportOptions(onReady) {
 				options: { 0: 'none', 90: '90°', 180: '180° (faces backwards)', 270: '270°' },
 			},
 			animations: { label: 'Transfer animations', type: 'checkbox', value: true },
+            animation_batch: {
+                label: 'Export animations one by one (forget after export)', type: 'checkbox', value: false,
+                condition: form => form.animations !== false && !form.lightweight,
+            },
+            animation_batch_hint: {
+                type: 'info', condition: form => !!form.animation_batch,
+                text: 'Desktop only. Choose an output folder; every clip is converted, written to one shared animation JSON, and removed before the next. Use Original source keys for smaller output. The model remains open with no imported clips.',
+            },
 			animation_loop_mode: {
 				label: 'Animation looping', type: 'select', default: 'auto',
-				condition: form => form.animations !== false,
+				condition: form => form.animations !== false && !form.lightweight,
 				options: {
 					auto: 'Auto — idle/walk/run/etc. loop; actions play once',
 					once: 'Play all non-pose animations once',
 					loop: 'Loop all non-pose animations',
 				},
 			},
+            batch_animation_accuracy_preset: {
+                label: 'Batch animation sampling', type: 'select', default: 'original',
+                condition: form => form.animations !== false && !form.lightweight && !!form.animation_batch,
+                options: { original: 'Original source keys (fastest, smallest)', balanced: '30 FPS bake',
+                    high: '60 FPS bake', ultra: '120 FPS bake', exact: '240 FPS bake' },
+            },
 			animation_accuracy_preset: {
 				label: 'Animation accuracy', type: 'select', default: 'ultra',
-				condition: form => form.animations !== false,
+				condition: form => form.animations !== false && !form.lightweight && !form.animation_batch,
 				options: {
 					ultra: 'Ultra — 120 FPS bake (recommended for CS2 cases)',
 					high: 'High — 60 FPS bake',
@@ -6117,7 +6555,7 @@ function askImportOptions(onReady) {
 			},
 			animation_accuracy_hint: {
 				type: 'info',
-				condition: form => form.animations !== false,
+				condition: form => form.animations !== false && !form.lightweight && !form.animation_batch,
 				text: 'Ultra/Exact bake dense rotation + position keys so GeckoLib in-game matches Blockbench as closely as possible. '
 					+ 'Exact is the closest, but it creates the biggest animation JSON.',
 			},
@@ -6222,6 +6660,122 @@ function requireGeckolib() {
 		onCancel() { this.hide(); },
 	}).show();
 	return false;
+}
+
+/** Index a folder without reading every texture or every large model variant. */
+async function indexImportFolder(root, fs, path) {
+    const entries = [];
+    async function visit(directory) {
+        for (const entry of await callbackFileOperation(fs, 'readdir', directory, { withFileTypes: true })) {
+            const absolute = path.join(directory, entry.name);
+            if (entry.isDirectory()) await visit(absolute);
+            else if (entry.isFile() && /\.(glb|gltf|bin|png|jpe?g|gif|webp|tga|bmp)$|license\.txt$/i.test(entry.name))
+                entries.push({ name: path.relative(root, absolute).split(path.sep).join('/'), absolute });
+        }
+    }
+    await visit(root);
+    return entries.sort((a, b) => a.name.localeCompare(b.name));
+}
+
+function folderImportFiles(entries, modelName, fs) {
+    const files = Object.create(null);
+    for (const entry of entries) {
+        // Other variants can be >1GB each; never include or read those models.
+        if (/\.(glb|gltf)$/i.test(entry.name) && entry.name !== modelName) continue;
+        let bytes;
+        Object.defineProperty(files, entry.name, {
+            enumerable: true,
+            get() {
+                if (!bytes) bytes = fs.readFileSync(entry.absolute);
+                return bytes;
+            },
+        });
+    }
+    return files;
+}
+
+function importFromModelFile() {
+    if (typeof require !== 'function') {
+        Blockbench.showMessageBox({ title: 'File import', message: 'Automatic folder texture discovery requires Blockbench desktop.' });
+        return;
+    }
+    if (!requireGeckolib()) return;
+    Blockbench.import({ extensions: ['glb', 'gltf'], type: 'glTF model', readtype: 'buffer' }, async selected => {
+        const file = selected && selected[0];
+        if (!file) return;
+        try {
+            if (!file.path) throw new Error('The selected model has no local file path. Use folder or ZIP import.');
+            const fs = require('fs'), path = require('path');
+            const root = path.dirname(file.path), modelName = path.basename(file.path);
+            Blockbench.setStatusBarText('Finding textures beside the model…');
+            const entries = await indexImportFolder(root, fs, path);
+            Blockbench.setStatusBarText('');
+            const files = folderImportFiles(entries, modelName, fs);
+            // Reuse the bytes supplied by the file picker; do not read a giant GLB twice.
+            const content = file.content instanceof ArrayBuffer ? new Uint8Array(file.content) : file.content;
+            if (content) {
+                // folderImportFiles has lazy read-only properties, so build a new map.
+                const cachedFiles = Object.create(null);
+                for (const name of Object.keys(files)) Object.defineProperty(cachedFiles, name, {
+                    enumerable: true, get: () => name === modelName ? content : files[name],
+                });
+                askImportOptions(opts => {
+                    try { buildFromFiles(cachedFiles, file.name || modelName, opts); }
+                    catch (error) { Blockbench.showMessageBox({ title: 'File import failed', message: String(error.message || error) }); }
+                });
+            } else askImportOptions(opts => {
+                try { buildFromFiles(files, file.name || modelName, opts); }
+                catch (error) { Blockbench.showMessageBox({ title: 'File import failed', message: String(error.message || error) }); }
+            });
+        } catch (error) {
+            Blockbench.setStatusBarText('');
+            console.error('[geckolib-import] file import failed', error);
+            Blockbench.showMessageBox({ title: 'File import failed', message: String(error.message || error) });
+        }
+    });
+}
+async function importFromFolder() {
+    if (typeof require !== 'function' || typeof Blockbench.pickDirectory !== 'function') {
+        Blockbench.showMessageBox({ title: 'Folder import', message: 'Folder import requires Blockbench desktop. Use ZIP import in the web version.' });
+        return;
+    }
+    if (!requireGeckolib()) return;
+    try {
+        const selection = await Blockbench.pickDirectory({
+            title: 'Select model and texture folder', resource_id: PLUGIN_ID + '_folder',
+        });
+        const root = Array.isArray(selection) ? selection[0] : selection;
+        if (!root) return;
+        const fs = require('fs'), path = require('path');
+        Blockbench.setStatusBarText('Finding glTF models and textures…');
+        const entries = await indexImportFolder(root, fs, path);
+        Blockbench.setStatusBarText('');
+        const models = entries.filter(entry => /\.(glb|gltf)$/i.test(entry.name));
+        if (!models.length) throw new Error('No .glb or .gltf model found in this folder or its subfolders.');
+        const load = modelName => askImportOptions(opts => {
+            try {
+                const files = folderImportFiles(entries, modelName, fs);
+                buildFromFiles(files, path.basename(modelName), opts);
+            } catch (error) {
+                console.error('[geckolib-import] folder import failed', error);
+                Blockbench.showMessageBox({ title: 'Folder import failed', message: String(error.message || error) });
+            }
+        });
+        if (models.length === 1) load(models[0].name);
+        else {
+            const options = {};
+            for (const model of models) options[model.name] = model.name;
+            new Dialog({
+                id: PLUGIN_ID + '_folder_model', title: 'Choose model from folder',
+                form: { model: { label: 'Model', type: 'select', options, default: models[0].name } },
+                onConfirm(form) { this.hide(); load(form.model); },
+            }).show();
+        }
+    } catch (error) {
+        Blockbench.setStatusBarText('');
+        console.error('[geckolib-import] folder import failed', error);
+        Blockbench.showMessageBox({ title: 'Folder import failed', message: String(error.message || error) });
+    }
 }
 
 function importFromZip() {
@@ -6878,7 +7432,7 @@ function fuseSelectedPolyMeshes(options) {
 
 	if (targetParent && targetParent !== 'root' && typeof fused.addTo === 'function') fused.addTo(targetParent);
 	else fused.addTo('root');
-	fused.addFaces(...newFaces);
+	for (let i = 0; i < newFaces.length; i += 1024) fused.addFaces(...newFaces.slice(i, i + 1024));
 	fused.init();
 
 	if (options.delete_sources !== false) {
@@ -6940,6 +7494,9 @@ let action;
 let fusePolyMeshesAction;
 let envAction;
 let importAction;
+let folderImportAction;
+let modelFileImportAction;
+let cancelBatchAction;
 let sketchfabAction;
 let cpmAction;
 
@@ -6948,7 +7505,7 @@ Plugin.register(PLUGIN_ID, {
 	author: 'MopicMP',
 	icon: 'view_in_ar',
 	description: 'Import glTF models — including straight from Sketchfab — into GeckoLib as cubes or preserved Poly Mesh geometry, or turn them into a Customizable Player Models skin.',
-	version: '0.1.12-native-weighted-preview',
+	version: '0.1.23-compact-animation-keys',
 	variant: 'both',
 	min_version: '4.9.0',
 	tags: ['Minecraft: Java Edition', 'Import', 'Animation'],
@@ -7017,6 +7574,28 @@ Plugin.register(PLUGIN_ID, {
 			click: importFromZip,
 		});
 		MenuBar.addAction(importAction, 'file');
+        folderImportAction = new Action(PLUGIN_ID + '_import_folder', {
+            name: 'Import GeckoLib from Folder',
+            description: 'Select an extracted folder, choose a model, and resolve textures without creating a ZIP',
+            icon: 'folder_open',
+            condition: () => typeof require === 'function' && !Blockbench.isWeb,
+            click: importFromFolder,
+        });
+        MenuBar.addAction(folderImportAction, 'file');
+        modelFileImportAction = new Action(PLUGIN_ID + '_import_file', {
+            name: 'Import GeckoLib from File',
+            description: 'Open a GLB/glTF model and discover textures in its folder and subfolders',
+            icon: 'insert_drive_file',
+            condition: () => typeof require === 'function' && !Blockbench.isWeb,
+            click: importFromModelFile,
+        });
+        MenuBar.addAction(modelFileImportAction, 'file');
+        cancelBatchAction = new Action(PLUGIN_ID + '_cancel_batch', {
+            name: 'Stop Animation Batch Export', icon: 'stop',
+            condition: () => !!animationBatchState,
+            click: () => { if (animationBatchState) animationBatchState.cancelled = true; },
+        });
+        MenuBar.addAction(cancelBatchAction, 'file');
 
 		cpmAction = new Action(PLUGIN_ID + '_cpm', {
 			name: 'Customizable Player Models from ZIP (glTF + texture)',
@@ -7046,6 +7625,10 @@ Plugin.register(PLUGIN_ID, {
 		if (fusePolyMeshesAction) fusePolyMeshesAction.delete();
 		if (envAction) envAction.delete();
 		if (importAction) importAction.delete();
+        if (folderImportAction) folderImportAction.delete();
+        if (modelFileImportAction) modelFileImportAction.delete();
+        if (cancelBatchAction) cancelBatchAction.delete();
+        if (animationBatchState) animationBatchState.cancelled = true;
 		if (cpmAction) cpmAction.delete();
 		if (sketchfabAction) sketchfabAction.delete();
 		if (importFormat && importFormat.delete) importFormat.delete();

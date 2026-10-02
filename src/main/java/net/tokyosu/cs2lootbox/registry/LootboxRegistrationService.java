@@ -4,11 +4,16 @@ import dev.latvian.mods.kubejs.registry.RegistryInfo;
 import net.minecraft.resources.ResourceLocation;
 import net.tokyosu.cs2lootbox.api.lootbox.LootboxDefinition;
 import net.tokyosu.cs2lootbox.api.lootbox.LootboxDefinitionBuilder;
+import net.tokyosu.cs2lootbox.api.lootbox.ModelItemDefinitionBuilder;
 import net.tokyosu.cs2lootbox.integration.kubejs.builder.LootboxCaseItemBuilder;
 import net.tokyosu.cs2lootbox.integration.kubejs.builder.LootboxKeyItemBuilder;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -22,10 +27,10 @@ import java.util.Set;
  */
 public final class LootboxRegistrationService {
     private static final Set<ResourceLocation> FINALIZED_ITEM_BUILDERS = new HashSet<>();
-    private static final java.util.Map<ResourceLocation, net.tokyosu.cs2lootbox.api.lootbox.ModelItemDefinitionBuilder.Definition> MODEL_ITEMS = new java.util.LinkedHashMap<>();
+    private static final Map<ResourceLocation, ModelItemDefinitionBuilder.Definition> MODEL_ITEMS = new LinkedHashMap<>();
     private static boolean finalized;
 
-    public static synchronized void registerItem(net.tokyosu.cs2lootbox.api.lootbox.ModelItemDefinitionBuilder builder) {
+    public static synchronized void registerItem(ModelItemDefinitionBuilder builder) {
         if (finalized) throw new IllegalStateException("Model items must be added during startup registration");
         var definition = builder.build();
         var id = definition.display().caseItemId();
@@ -33,6 +38,16 @@ public final class LootboxRegistrationService {
             throw new IllegalArgumentException("Duplicate model item: " + id);
     }
 
+    /** Cases and keys first, then standalone rewards, preserving definition order. */
+    public static synchronized List<ResourceLocation> creativeItemIds() {
+        Set<ResourceLocation> ids = new LinkedHashSet<>();
+        for (LootboxDefinition definition : LootboxRegistry.values()) {
+            ids.add(definition.caseItemId());
+            if (definition.requiresKey()) ids.add(definition.keyItemId());
+        }
+        ids.addAll(MODEL_ITEMS.keySet());
+        return List.copyOf(ids);
+    }
     private LootboxRegistrationService() {
     }
 

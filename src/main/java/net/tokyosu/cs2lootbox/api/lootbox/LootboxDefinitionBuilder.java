@@ -92,6 +92,9 @@ public final class LootboxDefinitionBuilder {
     private LootboxDefinition.ItemTransform fixedTransform = transform(
             0.0F, -1.5F, 0.0F, 0.0F, 0.0F, 0.0F, 1.5F, 1.5F, 1.5F);
 
+    private @Nullable LootboxDefinition.ItemTransform guiCarouselTransform;
+    private @Nullable LootboxDefinition.ItemTransform guiRevealTransform;
+
     private boolean requiresKey = true;
     private int caseStackSize = 16;
     private int keyStackSize = 64;
@@ -101,6 +104,7 @@ public final class LootboxDefinitionBuilder {
     private @Nullable String tooltipDescription;
     private @Nullable String resultCollectionTranslationKey;
     private @Nullable ResourceLocation resultCollectionIconTexture;
+    private float collectionImageScale = 1.0F;
     private final List<LootEntry> loot = new ArrayList<>();
     private final List<LegendaryLootBuilder> legendaryLoot = new ArrayList<>();
 
@@ -177,6 +181,8 @@ public final class LootboxDefinitionBuilder {
         this.thirdPersonLeft = definition.itemTransforms().thirdPersonLeft();
         this.groundTransform = definition.itemTransforms().ground();
         this.guiTransform = definition.itemTransforms().gui();
+        this.guiCarouselTransform = definition.itemTransforms().guiCarousel();
+        this.guiRevealTransform = definition.itemTransforms().guiReveal();
         this.fixedTransform = definition.itemTransforms().fixed();
 
         this.requiresKey = definition.requiresKey();
@@ -188,6 +194,7 @@ public final class LootboxDefinitionBuilder {
         this.tooltipDescription = definition.tooltipDescription();
         this.resultCollectionTranslationKey = definition.resultCollectionTranslationKey();
         this.resultCollectionIconTexture = definition.resultCollectionIconTexture();
+        this.collectionImageScale = definition.collectionImageScale();
 
         this.loot.addAll(definition.loot());
         for (LegendaryLoot legendary : definition.legendaryLoot()) {
@@ -339,7 +346,25 @@ public final class LootboxDefinitionBuilder {
         return this;
     }
 
-    @Info("Sets all seven renderer-owned item transforms to identity. Call this before defining a completely custom transform set.")
+    /** Overrides the item display transform for guiCarousel; defaults to gui when unset. */
+    public LootboxDefinitionBuilder guiCarousel(float tx, float ty, float tz, float rx, float ry, float rz, float scale) {
+        return guiCarousel(tx, ty, tz, rx, ry, rz, scale, scale, scale);
+    }
+    public LootboxDefinitionBuilder guiCarousel(float tx, float ty, float tz, float rx, float ry, float rz, float sx, float sy, float sz) {
+        guiCarouselTransform = transform(tx, ty, tz, rx, ry, rz, sx, sy, sz);
+        return this;
+    }
+
+    /** Overrides the item display transform for guiReveal; defaults to gui when unset. */
+    public LootboxDefinitionBuilder guiReveal(float tx, float ty, float tz, float rx, float ry, float rz, float scale) {
+        return guiReveal(tx, ty, tz, rx, ry, rz, scale, scale, scale);
+    }
+    public LootboxDefinitionBuilder guiReveal(float tx, float ty, float tz, float rx, float ry, float rz, float sx, float sy, float sz) {
+        guiRevealTransform = transform(tx, ty, tz, rx, ry, rz, sx, sy, sz);
+        return this;
+    }
+
+    @Info("Resets item transforms to identity and clears carousel/reveal overrides.")
     public @NotNull LootboxDefinitionBuilder identityItemTransforms() {
         firstPersonRight = LootboxDefinition.ItemTransform.IDENTITY;
         firstPersonLeft = LootboxDefinition.ItemTransform.IDENTITY;
@@ -347,6 +372,8 @@ public final class LootboxDefinitionBuilder {
         thirdPersonLeft = LootboxDefinition.ItemTransform.IDENTITY;
         groundTransform = LootboxDefinition.ItemTransform.IDENTITY;
         guiTransform = LootboxDefinition.ItemTransform.IDENTITY;
+        guiCarouselTransform = null;
+        guiRevealTransform = null;
         fixedTransform = LootboxDefinition.ItemTransform.IDENTITY;
         return this;
     }
@@ -713,8 +740,19 @@ public final class LootboxDefinitionBuilder {
         return this;
     }
 
-    @Info("Sets the collection image shown beside the collection text, for example "
-            + "kubejs:textures/gui/collections/kilowatt.png.")
+    @Info("Scales the collection image on the reward screen. 1 is the default 40px size; 0.5 is 20px and 2 is 80px.")
+    public @NotNull LootboxDefinitionBuilder collectionImageScale(float scale) {
+        if (!Float.isFinite(scale) || scale <= 0)
+            throw new IllegalArgumentException("collectionImageScale must be finite and positive");
+        collectionImageScale = scale;
+        return this;
+    }
+
+    /** Sets the collection texture and its display scale together. */
+    public @NotNull LootboxDefinitionBuilder collectionImage(@NotNull String resource, float scale) {
+        return collectionImage(resource).collectionImageScale(scale);
+    }
+
     public @NotNull LootboxDefinitionBuilder collectionImage(@NotNull String resource) {
         resultCollectionIconTexture = parse(resource, id.getNamespace());
         return this;
@@ -904,7 +942,9 @@ public final class LootboxDefinitionBuilder {
                         thirdPersonLeft,
                         groundTransform,
                         guiTransform,
-                        fixedTransform
+                        fixedTransform,
+                        guiCarouselTransform,
+                        guiRevealTransform
                 ),
                 new LootboxDefinition.UiSkin(
                         Objects.requireNonNull(slotBorderTexture, "slotBorderTexture"),
@@ -921,6 +961,7 @@ public final class LootboxDefinitionBuilder {
                 tooltipDescription,
                 resultCollectionTranslationKey,
                 resultCollectionIconTexture,
+                collectionImageScale,
                 loot,
                 builtLegendaryLoot
         );

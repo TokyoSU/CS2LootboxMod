@@ -71,13 +71,15 @@ public class CSGOPatchPack {
                 .rarityGrade(tier);
         // The imported mesh is a 0.1016-unit plane in Y/Z; face it toward the
         // viewer and center its lower-edge origin in every display context.
-        item.gui(0, -6.4F, 0, 0, 90, 0, 8)
-            .fixed(0, -6.4F, 0, 0, 90, 0, 8)
-            .ground(0, 0, 0, 0, 90, 0, 4)
-            .firstPersonRight(0, -3.2F, 0, 0, 90, 0, 4)
-            .firstPersonLeft(0, -3.2F, 0, 0, 90, 0, 4)
-            .thirdPersonRight(0, 0, 0, 0, 90, 0, 4)
-            .thirdPersonLeft(0, 0, 0, 0, 90, 0, 4);
+        item.gui(0, -9.5F, 0, 0, -90.0F, 0, 10.0F)
+            .guiCarousel(0, -15.5F, 0, 0, -90.0F, 0, 18.0F)
+            .guiReveal(0, -25.5F, 0, 0, -90.0F, 0, 25.0F)
+            .fixed(0, -9.5F, 0, 0, -90.0F, 0, 10.0F)
+            .ground(0, 0, 0, 0, -90.0F, 0, 4.0F)
+            .firstPersonRight(0, -1.2F, 0, 0, -90.0F, 0, 4.0F)
+            .firstPersonLeft(0, -1.2F, 0, 0, -90.0F, 0, 4.0F)
+            .thirdPersonRight(0, 0, 0, 0, -90.0F, 0, 4.0F)
+            .thirdPersonLeft(0, 0, 0, 0, -90.0F, 0, 4.0F);
         LootboxRegistrationService.registerItem(item);
         double weight = LootRarityWeights.perEntry(LootRarityWeights.Profile.PATCH_PACK, tier);
         builder.loot(itemId, weight, loot -> loot.count(1).position(0, 8).scale(2.0F)

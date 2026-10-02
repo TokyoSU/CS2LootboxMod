@@ -48,6 +48,7 @@ public record LootboxDefinition(
         @Nullable String tooltipDescription,
         @Nullable String resultCollectionTranslationKey,
         @Nullable ResourceLocation resultCollectionIconTexture,
+        float collectionImageScale,
         @NotNull List<LootEntry> loot,
         @NotNull List<LegendaryLoot> legendaryLoot) {
 
@@ -77,6 +78,8 @@ public record LootboxDefinition(
         caseTranslationKey = Objects.requireNonNull(caseTranslationKey, "caseTranslationKey");
         keyTranslationKey = Objects.requireNonNull(keyTranslationKey, "keyTranslationKey");
         singleOpenText = Objects.requireNonNull(singleOpenText, "singleOpenText");
+        if (!Float.isFinite(collectionImageScale) || collectionImageScale <= 0)
+            throw new IllegalArgumentException("collectionImageScale must be finite and positive");
         loot = List.copyOf(Objects.requireNonNull(loot, "loot"));
         legendaryLoot = List.copyOf(Objects.requireNonNull(legendaryLoot, "legendaryLoot"));
     }
@@ -241,7 +244,9 @@ public record LootboxDefinition(
             @NotNull ItemTransform thirdPersonLeft,
             @NotNull ItemTransform ground,
             @NotNull ItemTransform gui,
-            @NotNull ItemTransform fixed) {
+            @NotNull ItemTransform fixed,
+            @Nullable ItemTransform guiCarousel,
+            @Nullable ItemTransform guiReveal) {
         public ItemDisplayTransforms {
             firstPersonRight = Objects.requireNonNull(firstPersonRight, "firstPersonRight");
             firstPersonLeft = Objects.requireNonNull(firstPersonLeft, "firstPersonLeft");

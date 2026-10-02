@@ -1994,3 +1994,52 @@ The global `CS2LootboxRarity` class owns the shared RGB color constants and
 Minecraft rarity instances. Java code can use `CS2LootboxRarity.MIL_SPEC`
 (or another grade) directly with `Item.Properties.rarity(...)`.
 `LootRarityGrade.color()` and `.minecraftRarity()` reference those same globals.
+
+### Separate inventory, carousel, and reveal transforms
+
+Both model item and lootbox builders support independent item transforms:
+
+```js
+item.gui(0, -6.4, 0, 0, 90, 0, 8)          // inventory and normal GUI draws
+    .guiCarousel(0, -4.8, 0, 0, 90, 0, 6) // roulette slots
+    .guiReveal(0, -8, 0, 0, 90, 0, 10)    // winning item/result panel
+```
+
+The arguments are `(tx, ty, tz, rx, ry, rz, scale)`, with optional separate
+`(sx, sy, sz)` instead of uniform scale. Each override replaces the item's GUI
+transform; the panel's own sizing is then applied. Unset overrides fall back to
+`.gui(...)`. Contents-list icons continue to use `.gui(...)`.
+
+### Collection image scale
+
+```js
+crate.collectionImage('kubejs:textures/gui/collections/revolution.png')
+    .collectionImageScale(1.5)
+// Or set the texture and scale together:
+crate.collectionImage('kubejs:textures/gui/collections/revolution.png', 1.5)
+```
+
+The default scale is 1 (40 GUI pixels). 0.5 draws at 20 pixels; 2 draws at
+80 pixels. The collection text moves alongside the resized image and stays
+vertically centered. Scale must be finite and greater than zero. This setting
+is preserved by changeCase().
+
+### Creative tab
+
+The mod registers the `cs2lootbox:main` creative tab through KubeJS. It contains
+registered cases, their required keys, and all standalone model items (including
+patches). Cases/items added through CS2LootboxEvents.register are included
+automatically, even when they use a different namespace. Ordinary loot rewards
+from other mods are not added automatically.
+
+Customize the tab in a startup script:
+
+```js
+StartupEvents.modifyCreativeTab('cs2lootbox:main', event => {
+    event.setDisplayName(Text.of('My Lootboxes'))
+    event.setIcon(Item.of('cs2lootbox:csgo_patch_pack'))
+    event.add(['minecraft:diamond'])
+})
+```
+
+Restart Minecraft after changing startup scripts.

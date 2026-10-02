@@ -16,7 +16,7 @@ public final class ModelItemTransforms {
             case THIRD_PERSON_RIGHT_HAND -> transforms.thirdPersonRight();
             case THIRD_PERSON_LEFT_HAND -> transforms.thirdPersonLeft();
             case GROUND -> transforms.ground();
-            case GUI -> transforms.gui();
+            case GUI -> ItemGuiRenderContext.select(transforms);
             case FIXED -> transforms.fixed();
             default -> LootboxDefinition.ItemTransform.IDENTITY;
         };

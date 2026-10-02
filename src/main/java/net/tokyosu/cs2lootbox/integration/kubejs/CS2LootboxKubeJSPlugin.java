@@ -40,5 +40,6 @@ public final class CS2LootboxKubeJSPlugin extends KubeJSPlugin {
         BuiltInLootBoxes.register();
         REGISTER.post(new LootboxStartupRegisterEvent());
         LootboxRegistrationService.finalizeItemRegistrations();
+        net.tokyosu.cs2lootbox.registry.CS2LootboxCreativeTab.register();
     }
 }

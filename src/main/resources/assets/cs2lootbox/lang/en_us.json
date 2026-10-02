@@ -1,4 +1,5 @@
 {
+  "itemGroup.cs2lootbox": "CS2 Lootbox",
   "cs2lootbox.case_screen": "CS2 Lootbox",
   "cs2lootbox.case_screen.opening": "Opening...",
   "cs2lootbox.carousel.rolling": "Rolling...",
@@ -57,7 +58,6 @@
   "tooltip.cs2lootbox.rare_gloves": "or the Exceedingly Rare Gloves!",
   "legendary.kubejs.rare_gloves": "★ Rare Gloves ★",
   "tooltip.kubejs.rare_gloves": "or an exceedingly rare pair of gloves!",
-  
   "item.cs2lootbox.csgo_case_weapon": "CS:GO Weapon Case",
   "item.cs2lootbox.csgo_case_weapon_key": "CS:GO Case Key",
   "collection.arms_deal": "The Arms Deal Collection",
@@ -154,7 +154,6 @@
   "item.cs2lootbox.sawedoff.kiss_love": "Sawed-Off | Kiss♥Love",
   "item.cs2lootbox.usps.printstream": "USP-S | Printstream",
   "item.cs2lootbox.awp.chromatic_aberration": "AWP | Chromatic Aberration",
-  
   "cs2lootbox.rarity.patch.exotic": "Exotic",
   "cs2lootbox.rarity.patch.remarkable": "Remarkable",
   "cs2lootbox.rarity.patch.high_grade": "High Grade",
@@ -181,7 +180,6 @@
   "item.cs2lootbox.patch.payback": "Payback",
   "item.cs2lootbox.csgo_patch_pack": "CS:GO Patch Pack",
   "item.cs2lootbox.csgo_patch_pack.desc": "This pack contains a variety of embroidered patches.\nPatches can be applied to any agent you own.",
-  
   "item.cs2lootbox.crate_esports_2013": "eSports 2013 Case",
   "item.cs2lootbox.crate_esports_2013_key": "eSports 2013 Key",
   "collection.esports_2013": "The eSports 2013 Collection",
