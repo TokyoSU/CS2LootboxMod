@@ -35,6 +35,7 @@ import net.tokyosu.cs2lootbox.api.lootbox.LootEntry;
 import net.tokyosu.cs2lootbox.api.lootbox.LootboxDefinition;
 import net.tokyosu.cs2lootbox.config.CS2LootboxClientConfig;
 import net.tokyosu.cs2lootbox.loot.LootboxLootRoller;
+import net.tokyosu.cs2lootbox.client.renderer.StaticGuiItemCache;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import java.util.List;
@@ -60,6 +61,7 @@ public final class LootboxOverlayWidget extends Widget {
     private static final int MAX_COLUMNS = 11;
     private static final int LEGENDARY_GOLD = 0xFFD85A;
     private final LootboxModelWidget model;
+    private final LootPreviewCache previews = new LootPreviewCache();
 
     // Only regular crate.loot(...) entries can be inspected. Legendary panels
     // are category/background entries, not concrete items, so they are never
@@ -308,7 +310,8 @@ public final class LootboxOverlayWidget extends Widget {
 
     @OnlyIn(Dist.CLIENT)
     private void drawLootEntry(@NotNull GuiGraphics graphics, @NotNull Font font, @NotNull LootEntry entry, int x, int y, int width, int height, boolean hovered) {
-        ItemStack stack = LootboxLootRoller.createPreviewStack(entry);
+        LootPreviewCache.Preview preview = previews.get(model.getDefinition(), entry);
+        ItemStack stack = preview.stack;
         int rarity = rarityColor(entry);
 
         graphics.fill(x, y, x + width, y + height, hovered ? 0x665F6469 : 0x465B5957);
@@ -334,12 +337,13 @@ public final class LootboxOverlayWidget extends Widget {
             }
         }
 
-        String sourceFallback = (entry.itemTagSource() ? "#" : "") + entry.itemId();
-        String name = entry.nameTranslationKey() != null
-                ? Component.translatable(entry.nameTranslationKey()).getString()
-                : (stack.isEmpty() ? sourceFallback : stack.getHoverName().getString());
-        name = ellipsize(font, name, width - 8);
-        graphics.drawString(font, name, x + 4, y + height - 12, 0xFFF8F8F8, false);
+        String name = preview.name();
+        if (preview.width != width || !name.equals(preview.fullName)) {
+            preview.width = width;
+            preview.fullName = name;
+            preview.clippedName = ellipsize(font, name, width - 8);
+        }
+        graphics.drawString(font, preview.clippedName, x + 4, y + height - 12, 0xFFF8F8F8, false);
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -1058,9 +1062,13 @@ public final class LootboxOverlayWidget extends Widget {
              * including every fixed foil/glint RenderType, so the enchanted
              * pass is completed before any later LDLib panel is drawn.
              */
-            graphics.flush();
-            graphics.renderItem(stack, 0, 0);
-            graphics.flush();
+            // X/Y rotations alter translucent face ordering; retain the original renderer there.
+            boolean cached = transform.rotationX() == 0 && transform.rotationY() == 0
+                    && transform.scaleZ() > 0 && StaticGuiItemCache.render(graphics, stack);
+            if (!cached) {
+                graphics.renderItem(stack, 0, 0);
+                graphics.flush();
+            }
         } finally {
             pose.popPose();
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);

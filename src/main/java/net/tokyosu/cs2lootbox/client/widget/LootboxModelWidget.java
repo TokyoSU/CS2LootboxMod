@@ -1,6 +1,8 @@
 package net.tokyosu.cs2lootbox.client.widget;
 
 import net.tokyosu.cs2lootbox.client.renderer.ItemGuiRenderContext;
+import net.tokyosu.cs2lootbox.client.renderer.StaticGuiItemCache;
+import net.tokyosu.cs2lootbox.client.renderer.CarouselTextureRenderer;
 
 import net.tokyosu.apocalypselib.utils.ResourceUtils;
 
@@ -107,6 +109,8 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
     private static final long CLOSE_FADE_MS = 320L;
     private static final ResourceLocation RESULT_GLOW_TEXTURE = ResourceLocation.fromNamespaceAndPath(
             CS2LootBoxMod.MOD_ID, "textures/gui/glow_radial.png");
+    private static final ResourceLocation CIRCLE_TEXTURE = ResourceLocation.fromNamespaceAndPath(
+            CS2LootBoxMod.MOD_ID, "textures/gui/circle.png");
     private static final int LEGENDARY_GOLD = 0xFFD85A;
     private static final int LEGENDARY_TOP = 0x4A3A0D;
     private static final int LEGENDARY_CENTER = 0xA77D17;
@@ -1601,16 +1605,7 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
         }
 
         int radius = Math.max(1, Math.round(CAROUSEL_MAX_BLUR_PIXELS * amount));
-        float tapAlpha = alpha * (0.08F * amount);
-        blitPlain(graphics, texture, x - radius, y, width, height, tapAlpha);
-        blitPlain(graphics, texture, x + radius, y, width, height, tapAlpha);
-        blitPlain(graphics, texture, x, y - radius, width, height, tapAlpha);
-        blitPlain(graphics, texture, x, y + radius, width, height, tapAlpha);
-        blitPlain(graphics, texture, x - radius, y - radius, width, height, tapAlpha);
-        blitPlain(graphics, texture, x + radius, y - radius, width, height, tapAlpha);
-        blitPlain(graphics, texture, x - radius, y + radius, width, height, tapAlpha);
-        blitPlain(graphics, texture, x + radius, y + radius, width, height, tapAlpha);
-        blitPlain(graphics, texture, x, y, width, height, alpha * (1.0F - 0.65F * amount));
+        CarouselTextureRenderer.blurred(graphics, texture, x, y, width, height, alpha, amount, radius);
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -1667,9 +1662,10 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
              * The second flush completes all fixed foil/glint buffers before
              * we restore the roulette/result UI render state.
              */
-            graphics.flush();
-            graphics.renderItem(stack, 0, 0);
-            graphics.flush();
+            if (!StaticGuiItemCache.render(graphics, stack)) {
+                graphics.renderItem(stack, 0, 0);
+                graphics.flush();
+            }
         } finally {
             pose.popPose();
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
@@ -1951,45 +1947,23 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
         BufferBuilder builder = Tesselator.getInstance().getBuilder();
         builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
 
-        float[] uvBL = rotatedGlowUv(left, bottom, centerX, centerY, textureSpan, rotationDegrees, mirrored);
-        float[] uvBR = rotatedGlowUv(right, bottom, centerX, centerY, textureSpan, rotationDegrees, mirrored);
-        float[] uvTR = rotatedGlowUv(right, top, centerX, centerY, textureSpan, rotationDegrees, mirrored);
-        float[] uvTL = rotatedGlowUv(left, top, centerX, centerY, textureSpan, rotationDegrees, mirrored);
-
-        builder.vertex(matrix, left, bottom, 0.0F).uv(uvBL[0], uvBL[1]).endVertex();
-        builder.vertex(matrix, right, bottom, 0.0F).uv(uvBR[0], uvBR[1]).endVertex();
-        builder.vertex(matrix, right, top, 0.0F).uv(uvTR[0], uvTR[1]).endVertex();
-        builder.vertex(matrix, left, top, 0.0F).uv(uvTL[0], uvTL[1]).endVertex();
+        double radians = Math.toRadians(rotationDegrees);
+        float cos = (float)Math.cos(radians), sin = (float)Math.sin(radians);
+        glowVertex(builder, matrix, left, bottom, centerX, centerY, textureSpan, cos, sin, mirrored);
+        glowVertex(builder, matrix, right, bottom, centerX, centerY, textureSpan, cos, sin, mirrored);
+        glowVertex(builder, matrix, right, top, centerX, centerY, textureSpan, cos, sin, mirrored);
+        glowVertex(builder, matrix, left, top, centerX, centerY, textureSpan, cos, sin, mirrored);
 
         BufferUploader.drawWithShader(builder.end());
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
     }
 
-    private static @NotNull float[] rotatedGlowUv(
-            float x,
-            float y,
-            float centerX,
-            float centerY,
-            float textureSpan,
-            float rotationDegrees,
-            boolean mirrored) {
-        float dx = x - centerX;
-        float dy = y - centerY;
-
-        // Inverse rotation of the sample position = visible texture rotation.
-        double radians = Math.toRadians(rotationDegrees);
-        float cos = (float) Math.cos(radians);
-        float sin = (float) Math.sin(radians);
-        float tx = cos * dx + sin * dy;
-        float ty = -sin * dx + cos * dy;
-
-        if (mirrored) {
-            tx = -tx;
-        }
-
-        float u = 0.5F + tx / textureSpan;
-        float v = 0.5F + ty / textureSpan;
-        return new float[]{u, v};
+    private static void glowVertex(BufferBuilder builder, Matrix4f matrix, float x, float y,
+            float centerX, float centerY, float span, float cos, float sin, boolean mirrored) {
+        float dx = x - centerX, dy = y - centerY;
+        float tx = cos * dx + sin * dy, ty = -sin * dx + cos * dy;
+        if (mirrored) tx = -tx;
+        builder.vertex(matrix, x, y, 0).uv(0.5F + tx / span, 0.5F + ty / span).endVertex();
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -2151,14 +2125,10 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
     }
 
     @OnlyIn(Dist.CLIENT)
-    private static void drawFilledCircle(@NotNull GuiGraphics graphics, int cx, int cy, int radius, int color) {
-        if (radius <= 0) {
-            return;
-        }
-        for (int dy = -radius; dy <= radius; dy++) {
-            int span = (int) Math.round(Math.sqrt(radius * radius - dy * dy));
-            graphics.fill(cx - span, cy + dy, cx + span + 1, cy + dy + 1, color);
-        }
+    private void drawFilledCircle(@NotNull GuiGraphics graphics, int cx, int cy, int radius, int color) {
+        if (radius <= 0) return;
+        blitTinted(graphics, CIRCLE_TEXTURE, cx - radius, cy - radius, radius * 2 + 1, radius * 2 + 1,
+                color & 0xFFFFFF, ((color >>> 24) & 255) / 255.0F);
     }
 
     @OnlyIn(Dist.CLIENT)

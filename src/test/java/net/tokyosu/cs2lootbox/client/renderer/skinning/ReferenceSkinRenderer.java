@@ -1,3 +1,4 @@
+// Frozen pre-optimization renderer: numerical regression oracle, not used by the mod.
 package net.tokyosu.cs2lootbox.client.renderer.skinning;
 
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -12,9 +13,6 @@ import software.bernie.geckolib.core.state.BoneSnapshot;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.IdentityHashMap;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * CPU linear-blend skinning driven by GeckoLib's already-evaluated GeoBone pose.
@@ -25,16 +23,13 @@ import java.util.List;
  * transforms before submitting them to the same VertexConsumer used by the
  * normal GeckoLib renderer.</p>
  */
-public final class GeckoLibWeightedSkinRenderer {
+public final class ReferenceSkinRenderer {
     private static final float EPSILON = 1.0E-8F;
-    // Bounded and identity-keyed: model reloads must never reuse another skeleton's matrices.
-    private static final Map<BakedGeoModel, SkinContext> CACHE = new IdentityHashMap<>();
-    public static synchronized void clear() { CACHE.clear(); }
 
-    private GeckoLibWeightedSkinRenderer() {
+    private ReferenceSkinRenderer() {
     }
 
-    public static synchronized void render(
+    public static void render(
             PoseStack poseStack,
             BakedGeoModel model,
             SkinnedGeoModelData data,
@@ -49,121 +44,58 @@ public final class GeckoLibWeightedSkinRenderer {
             return;
         }
 
-        SkinContext context = CACHE.get(model);
-        if (context == null || context.data != data || !context.matchesSnapshots()) {
-            context = new SkinContext(model, data);
-            if (CACHE.size() >= 64) CACHE.clear();
-            CACHE.put(model, context);
+        Map<String, Matrix4f> skinMatrices = new HashMap<>();
+        Matrix4f identity = new Matrix4f();
+        for (GeoBone root : model.topLevelBones()) {
+            collectSkinMatrices(root, identity, identity, skinMatrices);
         }
-        context.evaluate();
-        for (MeshScratch scratch : context.meshes) {
-            renderMesh(scratch, poseStack.last().pose(), poseStack.last().normal(), buffer,
+
+        Matrix4f renderPose = new Matrix4f(poseStack.last().pose());
+        Matrix3f renderNormal = new Matrix3f(poseStack.last().normal());
+
+        for (SkinnedGeoModelData.SkinnedMesh mesh : data.meshes()) {
+            renderMesh(mesh, skinMatrices, renderPose, renderNormal, buffer,
                     packedLight, packedOverlay, red, green, blue, alpha);
         }
     }
 
-    private static final class SkinContext {
-        final SkinnedGeoModelData data;
-        final List<BoneState> bones = new ArrayList<>();
-        final List<MeshScratch> meshes = new ArrayList<>();
-        final Matrix4f identity = new Matrix4f();
-        final boolean complete;
-        SkinContext(BakedGeoModel model, SkinnedGeoModelData data) {
-            this.data = data;
-            Map<String, BoneState> names = new HashMap<>();
-            for (GeoBone root : model.topLevelBones()) add(root, null, names);
-            for (var mesh : data.meshes()) meshes.add(new MeshScratch(mesh, names));
-            complete = bones.stream().allMatch(state -> state.snapshot != null);
-        }
-        private void add(GeoBone bone, BoneState parent, Map<String, BoneState> names) {
-            BoneState state = new BoneState(bone, parent);
-            bones.add(state);
-            names.put(bone.getName(), state); // Preserve the original last-name-wins behavior.
-            for (GeoBone child : bone.getChildBones()) add(child, state, names);
-        }
-        boolean matchesSnapshots() {
-            for (BoneState state : bones) {
-                if (!state.matchesBind()) return false;
-            }
-            return true;
-        }
-        void evaluate() {
-            for (BoneState state : bones) {
-                GeoBone bone = state.bone;
-                applyBoneTransform(state.current.set(state.parent == null ? identity : state.parent.current),
-                        bone.getPosX(), bone.getPosY(), bone.getPosZ(),
-                        bone.getRotX(), bone.getRotY(), bone.getRotZ(),
-                        bone.getScaleX(), bone.getScaleY(), bone.getScaleZ(),
-                        bone.getPivotX(), bone.getPivotY(), bone.getPivotZ());
-                if (!complete) {
-                    // Do not retain a pose-dependent bind matrix before GeckoLib initializes snapshots.
-                    state.prepareBind();
-                }
-                if (state.invertible) state.skin.set(state.current).mul(state.inverseBind);
-                else state.skin.identity();
-            }
-        }
-    }
+    private static void collectSkinMatrices(
+            GeoBone bone,
+            Matrix4f parentCurrent,
+            Matrix4f parentBind,
+            Map<String, Matrix4f> output) {
+        Matrix4f current = applyBoneTransform(
+                new Matrix4f(parentCurrent),
+                bone.getPosX(), bone.getPosY(), bone.getPosZ(),
+                bone.getRotX(), bone.getRotY(), bone.getRotZ(),
+                bone.getScaleX(), bone.getScaleY(), bone.getScaleZ(),
+                bone.getPivotX(), bone.getPivotY(), bone.getPivotZ());
 
-    private static final class BoneState {
-        final GeoBone bone;
-        final BoneState parent;
-        final BoneSnapshot snapshot;
-        final Matrix4f bind = new Matrix4f(), inverseBind = new Matrix4f();
-        final Matrix4f current = new Matrix4f(), skin = new Matrix4f();
-        final float[] bindValues;
-        boolean invertible;
-        BoneState(GeoBone bone, BoneState parent) {
-            this.bone = bone;
-            this.parent = parent;
-            this.snapshot = bone.getInitialSnapshot();
-            this.bindValues = snapshot == null ? null : new float[] {
-                    snapshot.getOffsetX(), snapshot.getOffsetY(), snapshot.getOffsetZ(),
-                    snapshot.getRotX(), snapshot.getRotY(), snapshot.getRotZ(),
-                    snapshot.getScaleX(), snapshot.getScaleY(), snapshot.getScaleZ(),
-                    bone.getPivotX(), bone.getPivotY(), bone.getPivotZ() };
-            prepareBind();
+        BoneSnapshot initial = bone.getInitialSnapshot();
+        Matrix4f bind;
+        if (initial != null) {
+            bind = applyBoneTransform(
+                    new Matrix4f(parentBind),
+                    initial.getOffsetX(), initial.getOffsetY(), initial.getOffsetZ(),
+                    initial.getRotX(), initial.getRotY(), initial.getRotZ(),
+                    initial.getScaleX(), initial.getScaleY(), initial.getScaleZ(),
+                    bone.getPivotX(), bone.getPivotY(), bone.getPivotZ());
+        } else {
+            // This should only happen before GeckoLib registers the active model.
+            // Using the current pose as bind pose is safer than producing NaNs.
+            bind = new Matrix4f(current);
         }
-        boolean matchesBind() {
-            return snapshot != null && snapshot == bone.getInitialSnapshot()
-                    && bindValues[0] == snapshot.getOffsetX() && bindValues[1] == snapshot.getOffsetY()
-                    && bindValues[2] == snapshot.getOffsetZ() && bindValues[3] == snapshot.getRotX()
-                    && bindValues[4] == snapshot.getRotY() && bindValues[5] == snapshot.getRotZ()
-                    && bindValues[6] == snapshot.getScaleX() && bindValues[7] == snapshot.getScaleY()
-                    && bindValues[8] == snapshot.getScaleZ() && bindValues[9] == bone.getPivotX()
-                    && bindValues[10] == bone.getPivotY() && bindValues[11] == bone.getPivotZ();
-        }
-        void prepareBind() {
-            if (snapshot != null) {
-                if (parent == null) bind.identity(); else bind.set(parent.bind);
-                applyBoneTransform(bind,
-                        snapshot.getOffsetX(), snapshot.getOffsetY(), snapshot.getOffsetZ(),
-                        snapshot.getRotX(), snapshot.getRotY(), snapshot.getRotZ(),
-                        snapshot.getScaleX(), snapshot.getScaleY(), snapshot.getScaleZ(),
-                        bone.getPivotX(), bone.getPivotY(), bone.getPivotZ());
-            } else bind.set(current);
-            updateInverse();
-        }
-        void updateInverse() {
-            invertible = Math.abs(bind.determinant()) > EPSILON;
-            if (invertible) inverseBind.set(bind).invert();
-        }
-    }
 
-    private static final class MeshScratch {
-        final SkinnedGeoModelData.SkinnedMesh mesh;
-        final float[] skinned;
-        final Matrix4f[] jointMatrices;
-        final Vector4f source = new Vector4f(), transformed = new Vector4f(), rendered = new Vector4f();
-        final Vector3f normal = new Vector3f();
-        MeshScratch(SkinnedGeoModelData.SkinnedMesh mesh, Map<String, BoneState> names) {
-            this.mesh = mesh;
-            skinned = new float[mesh.positions().length];
-            jointMatrices = new Matrix4f[mesh.bones().length];
-            for (int i = 0; i < jointMatrices.length; i++) {
-                BoneState state = names.get(mesh.bones()[i]);
-                jointMatrices[i] = state == null ? null : state.skin;
-            }
+        Matrix4f inverseBind = new Matrix4f(bind);
+        if (Math.abs(inverseBind.determinant()) > EPSILON) {
+            inverseBind.invert();
+            output.put(bone.getName(), new Matrix4f(current).mul(inverseBind));
+        } else {
+            output.put(bone.getName(), new Matrix4f());
+        }
+
+        for (GeoBone child : bone.getChildBones()) {
+            collectSkinMatrices(child, current, bind, output);
         }
     }
 
@@ -201,7 +133,8 @@ public final class GeckoLibWeightedSkinRenderer {
     }
 
     private static void renderMesh(
-            MeshScratch scratch,
+            SkinnedGeoModelData.SkinnedMesh mesh,
+            Map<String, Matrix4f> matrices,
             Matrix4f renderPose,
             Matrix3f renderNormal,
             VertexConsumer buffer,
@@ -211,16 +144,21 @@ public final class GeckoLibWeightedSkinRenderer {
             float green,
             float blue,
             float alpha) {
-        SkinnedGeoModelData.SkinnedMesh mesh = scratch.mesh;
         int vertexCount = mesh.vertexCount();
-        float[] skinned = scratch.skinned;
+        float[] skinned = new float[vertexCount * 3];
+        String[] bones = mesh.bones();
         float[] positions = mesh.positions();
         int[] joints = mesh.joints();
         float[] weights = mesh.weights();
 
-        Matrix4f[] jointMatrices = scratch.jointMatrices;
-        Vector4f source = scratch.source;
-        Vector4f transformed = scratch.transformed;
+        // Resolve the compact per-mesh joint table once, not once per vertex.
+        Matrix4f[] jointMatrices = new Matrix4f[bones.length];
+        for (int i = 0; i < bones.length; i++) {
+            jointMatrices[i] = matrices.get(bones[i]);
+        }
+
+        Vector4f source = new Vector4f();
+        Vector4f transformed = new Vector4f();
         for (int vertex = 0; vertex < vertexCount; vertex++) {
             int p = vertex * 3;
             int w = vertex * 4;
@@ -276,8 +214,8 @@ public final class GeckoLibWeightedSkinRenderer {
 
         int[] indices = mesh.indices();
         float[] uvs = mesh.uvs();
-        Vector3f normal = scratch.normal;
-        Vector4f rendered = scratch.rendered;
+        Vector3f normal = new Vector3f();
+        Vector4f rendered = new Vector4f();
 
         for (int triangle = 0; triangle + 2 < indices.length; triangle += 3) {
             int i0 = indices[triangle];

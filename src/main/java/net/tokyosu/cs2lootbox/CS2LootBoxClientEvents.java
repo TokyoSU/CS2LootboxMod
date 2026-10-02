@@ -6,6 +6,9 @@ import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.tokyosu.cs2lootbox.client.renderer.skinning.SkinnedGeoModelLoader;
+import net.tokyosu.cs2lootbox.client.renderer.skinning.GeckoLibWeightedSkinRenderer;
+import net.tokyosu.cs2lootbox.client.renderer.StaticGuiItemCache;
+import net.tokyosu.cs2lootbox.client.renderer.ClientRenderRevision;
 import org.jetbrains.annotations.NotNull;
 
 /** Client-only lifecycle hooks. */
@@ -16,6 +19,11 @@ public final class CS2LootBoxClientEvents {
 
     @SubscribeEvent
     public static void onRegisterReloadListeners(@NotNull RegisterClientReloadListenersEvent event) {
-        event.registerReloadListener((ResourceManagerReloadListener) resourceManager -> SkinnedGeoModelLoader.clear());
+        event.registerReloadListener((ResourceManagerReloadListener) resourceManager -> {
+            SkinnedGeoModelLoader.clear();
+            GeckoLibWeightedSkinRenderer.clear();
+            StaticGuiItemCache.clear();
+            ClientRenderRevision.invalidate();
+        });
     }
 }

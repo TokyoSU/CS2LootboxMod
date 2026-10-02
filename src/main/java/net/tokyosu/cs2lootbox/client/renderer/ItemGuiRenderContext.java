@@ -8,6 +8,8 @@ public final class ItemGuiRenderContext {
     private static final ThreadLocal<Purpose> CURRENT = ThreadLocal.withInitial(() -> Purpose.INVENTORY);
     private ItemGuiRenderContext() {}
 
+    public static Purpose currentPurpose() { return CURRENT.get(); }
+
     public static void render(Purpose purpose, Runnable draw) {
         Purpose previous = CURRENT.get();
         CURRENT.set(purpose);

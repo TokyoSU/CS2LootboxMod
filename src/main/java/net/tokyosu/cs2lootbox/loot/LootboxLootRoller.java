@@ -19,11 +19,21 @@ import net.tokyosu.cs2lootbox.config.CS2LootboxServerConfig;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /** Shared weighted-selection logic used by the authoritative server roll and client visuals. */
 public final class LootboxLootRoller {
+    private static final Map<ResourceLocation, List<Item>> TAG_ITEMS = new ConcurrentHashMap<>();
+    private static final AtomicLong TAG_REVISION = new AtomicLong();
+    public static long tagRevision() { return TAG_REVISION.get(); }
+    public static void clearTagCache() {
+        TAG_ITEMS.clear();
+        TAG_REVISION.incrementAndGet();
+    }
     private LootboxLootRoller() {
     }
 
@@ -209,7 +219,11 @@ public final class LootboxLootRoller {
     }
 
     private static @NotNull List<Item> resolveTagItems(@NotNull LootEntry entry) {
-        TagKey<Item> key = TagKey.create(Registries.ITEM, entry.itemId());
+        return TAG_ITEMS.computeIfAbsent(entry.itemId(), LootboxLootRoller::loadTagItems);
+    }
+
+    private static @NotNull List<Item> loadTagItems(ResourceLocation id) {
+        TagKey<Item> key = TagKey.create(Registries.ITEM, id);
 
         var tagManager = ForgeRegistries.ITEMS.tags();
         if (tagManager == null) {
@@ -220,11 +234,11 @@ public final class LootboxLootRoller {
         tagManager.getTag(key).forEach(items::add);
 
         items.sort(Comparator.comparing(item -> {
-            ResourceLocation id = ResourceUtils.getResourcebyItem(item);
-            return id == null ? "" : id.toString();
+            ResourceLocation itemId = ResourceUtils.getResourcebyItem(item);
+            return itemId == null ? "" : itemId.toString();
         }));
 
-        return items;
+        return List.copyOf(items);
     }
 
     /**

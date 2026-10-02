@@ -6,6 +6,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+import net.minecraftforge.event.TagsUpdatedEvent;
+import net.tokyosu.cs2lootbox.loot.LootboxLootRoller;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.tokyosu.cs2lootbox.config.CS2LootboxClientConfig;
@@ -23,6 +25,9 @@ import org.jetbrains.annotations.NotNull;
 public final class CS2LootBoxForgeEvents {
     private CS2LootBoxForgeEvents() {
     }
+
+    @SubscribeEvent
+    public static void onTagsUpdated(TagsUpdatedEvent event) { LootboxLootRoller.clearTagCache(); }
 
 
     /**
