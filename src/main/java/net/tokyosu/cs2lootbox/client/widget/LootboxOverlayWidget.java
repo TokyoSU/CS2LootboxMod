@@ -36,6 +36,7 @@ import net.tokyosu.cs2lootbox.api.lootbox.LootboxDefinition;
 import net.tokyosu.cs2lootbox.config.CS2LootboxClientConfig;
 import net.tokyosu.cs2lootbox.loot.LootboxLootRoller;
 import net.tokyosu.cs2lootbox.client.renderer.StaticGuiItemCache;
+import net.tokyosu.cs2lootbox.client.renderer.GuiRenderBatch;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import java.util.List;
@@ -314,11 +315,13 @@ public final class LootboxOverlayWidget extends Widget {
         ItemStack stack = preview.stack;
         int rarity = rarityColor(entry);
 
-        graphics.fill(x, y, x + width, y + height, hovered ? 0x665F6469 : 0x465B5957);
-        graphics.fill(x + 1, y + 1, x + width - 1, y + height - 1, hovered ? 0x48484B4F : 0x303B3A39);
-        graphics.fill(x + 1, y + 1, x + width - 1, y + 18, hovered ? 0x28FFFFFF : 0x18FFFFFF);
-        GuiDrawUtils.drawBorder(graphics, x, y, width, height, hovered ? 0xA8FFFFFF : 0x26FFFFFF);
-        graphics.fill(x + 1, y + height - 4, x + width - 1, y + height - 1, (0xB8000000 | rarity));
+        GuiRenderBatch.fills(graphics, () -> {
+            graphics.fill(x, y, x + width, y + height, hovered ? 0x665F6469 : 0x465B5957);
+            graphics.fill(x + 1, y + 1, x + width - 1, y + height - 1, hovered ? 0x48484B4F : 0x303B3A39);
+            graphics.fill(x + 1, y + 1, x + width - 1, y + 18, hovered ? 0x28FFFFFF : 0x18FFFFFF);
+            GuiDrawUtils.drawBorder(graphics, x, y, width, height, hovered ? 0xA8FFFFFF : 0x26FFFFFF);
+            graphics.fill(x + 1, y + height - 4, x + width - 1, y + height - 1, (0xB8000000 | rarity));
+        });
         blitTinted(graphics, model.getDefinition().uiSkin().slotBorderTexture(), x, y, width, height, rarity, 0.28F);
 
         if (!stack.isEmpty()) {
@@ -1091,7 +1094,6 @@ public final class LootboxOverlayWidget extends Widget {
         RenderSystem.defaultBlendFunc();
         RenderSystem.setShaderColor(r, g, b, alpha);
         graphics.blit(texture, x, y, 0, 0, width, height, width, height);
-        graphics.flush();
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
     }
 

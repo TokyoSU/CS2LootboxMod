@@ -7,6 +7,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexBuffer;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.nio.ByteOrder;
 
 /** Bounded GPU geometry cache for our controller-free ModelItems only.
  * Textures, including animated resource-pack textures, remain live and full resolution.
@@ -35,12 +37,25 @@ public final class StaticGuiItemCache {
     private StaticGuiItemCache() {}
 
     public static boolean render(GuiGraphics graphics, ItemStack stack) {
-        if (!(stack.getItem() instanceof ModelItem item) || stack.hasFoil()) return false;
+        Mesh mesh = mesh(stack);
+        if (mesh == null) return false;
+        ModelItem item = (ModelItem) stack.getItem();
+        AnimatableTexture.setAndUpdate(item.getDefinition().texture());
+        boolean flat = !mesh.baked.usesBlockLight();
+        if (flat) Lighting.setupForFlatItems();
+        Matrix4f view = new Matrix4f(RenderSystem.getModelViewMatrix()).mul(graphics.pose().last().pose());
+        try { draw(mesh, view); }
+        finally { if (flat) Lighting.setupFor3DItems(); }
+        return true;
+    }
+
+    static Mesh mesh(ItemStack stack) {
+        if (!(stack.getItem() instanceof ModelItem item) || stack.hasFoil()) return null;
         if (!(IClientItemExtensions.of(stack).getCustomRenderer() instanceof ModelItemRenderer renderer)
-                || !renderer.getRenderLayers().isEmpty()) return false;
+                || !renderer.getRenderLayers().isEmpty()) return null;
         Minecraft mc = Minecraft.getInstance();
         BakedModel baked = mc.getItemRenderer().getModel(stack, mc.level, mc.player, 0);
-        if (!baked.isCustomRenderer()) return false;
+        if (!baked.isCustomRenderer()) return null;
         Key key = new Key(item, ItemGuiRenderContext.currentPurpose(), baked);
         Mesh mesh = CACHE.get(key);
         if (mesh == null) {
@@ -54,27 +69,20 @@ public final class StaticGuiItemCache {
                 oldest.remove();
             }
         }
-        // GeckoLib textures can advance independently from this item's static geometry.
-        AnimatableTexture.setAndUpdate(item.getDefinition().texture());
-        // Match GuiGraphics.renderItem's lighting and local transforms exactly.
-        boolean flat = !baked.usesBlockLight();
-        if (flat) Lighting.setupForFlatItems();
-        Matrix4f view = new Matrix4f(RenderSystem.getModelViewMatrix()).mul(graphics.pose().last().pose());
-        try {
-            for (Part part : mesh.parts) {
-                part.type.setupRenderState();
-                try {
-                    part.vertices.bind();
-                    part.vertices.drawWithShader(view, RenderSystem.getProjectionMatrix(), RenderSystem.getShader());
-                } finally {
-                    VertexBuffer.unbind();
-                    part.type.clearRenderState();
-                }
+        return mesh;
+    }
+
+    static void draw(Mesh mesh, Matrix4f view) {
+        for (Part part : mesh.parts) {
+            part.type.setupRenderState();
+            try {
+                part.vertices.bind();
+                part.vertices.drawWithShader(view, RenderSystem.getProjectionMatrix(), RenderSystem.getShader());
+            } finally {
+                VertexBuffer.unbind();
+                part.type.clearRenderState();
             }
-        } finally {
-            if (flat) Lighting.setupFor3DItems();
         }
-        return true;
     }
 
     private static Mesh bake(ItemStack stack, BakedModel baked) {
@@ -84,6 +92,7 @@ public final class StaticGuiItemCache {
         pose.scale(16, 16, 16);
         Capture capture = new Capture();
         List<Part> parts = new ArrayList<>();
+        ArtworkBounds bounds = new ArtworkBounds();
         try {
             Minecraft.getInstance().getItemRenderer().render(stack, ItemDisplayContext.GUI, false,
                     pose, capture, 15728880, OverlayTexture.NO_OVERLAY, baked);
@@ -92,12 +101,19 @@ public final class StaticGuiItemCache {
                     entry.getValue().setQuadSorting(RenderSystem.getVertexSorting());
                 BufferBuilder.RenderedBuffer data = entry.getValue().end();
                 if (data.isEmpty()) { data.release(); continue; }
+                if (entry.getKey().format() == DefaultVertexFormat.NEW_ENTITY) {
+                    var bytes = data.vertexBuffer().order(ByteOrder.nativeOrder());
+                    int stride = entry.getKey().format().getVertexSize();
+                    for (int i = 0; i < data.drawState().vertexCount(); i++) {
+                        bounds.include(bytes.getFloat(i * stride), bytes.getFloat(i * stride + 4), bytes.getFloat(i * stride + 8));
+                    }
+                } else bounds.supported = false;
                 VertexBuffer vertices = new VertexBuffer(VertexBuffer.Usage.STATIC);
                 parts.add(new Part(entry.getKey(), vertices));
                 vertices.bind();
                 vertices.upload(data);
             }
-            return new Mesh(parts);
+            return new Mesh(parts, baked, bounds);
         } catch (RuntimeException | Error failure) {
             for (Part part : parts) part.vertices.close();
             throw failure;
@@ -114,9 +130,31 @@ public final class StaticGuiItemCache {
     }
 
     private record Key(ModelItem item, ItemGuiRenderContext.Purpose purpose, BakedModel baked) {}
-    private record Part(RenderType type, VertexBuffer vertices) {}
-    private record Mesh(List<Part> parts) {
-        void close() { for (Part part : parts) part.vertices.close(); }
+    record Part(RenderType type, VertexBuffer vertices) {}
+    static final class Mesh {
+        final List<Part> parts;
+        final BakedModel baked;
+        final ArtworkBounds bounds;
+        CarouselItemArtwork.Image artwork;
+        Boolean artworkSupported;
+        Mesh(List<Part> parts, BakedModel baked, ArtworkBounds bounds) {
+            this.parts = parts; this.baked = baked; this.bounds = bounds;
+        }
+        void close() {
+            if (artwork != null) artwork.close();
+            for (Part part : parts) part.vertices.close();
+        }
+    }
+    static final class ArtworkBounds {
+        float minX = Float.POSITIVE_INFINITY, minY = Float.POSITIVE_INFINITY;
+        float maxX = Float.NEGATIVE_INFINITY, maxY = Float.NEGATIVE_INFINITY, depth;
+        int vertices;
+        boolean supported = true;
+        void include(float x, float y, float z) {
+            minX = Math.min(minX, x); minY = Math.min(minY, y);
+            maxX = Math.max(maxX, x); maxY = Math.max(maxY, y); depth = Math.max(depth, Math.abs(z));
+            vertices++;
+        }
     }
     private static final class Capture implements MultiBufferSource {
         final Map<RenderType, BufferBuilder> builders = new LinkedHashMap<>();

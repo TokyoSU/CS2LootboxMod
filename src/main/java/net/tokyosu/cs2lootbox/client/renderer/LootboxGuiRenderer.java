@@ -1,6 +1,7 @@
 package net.tokyosu.cs2lootbox.client.renderer;
 
 import net.tokyosu.cs2lootbox.client.renderer.skinning.WeightedSkinPass;
+import net.tokyosu.cs2lootbox.client.renderer.skinning.SkinnedGeoModelLoader;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -13,6 +14,7 @@ import net.tokyosu.cs2lootbox.client.model.LootboxModel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.cache.object.BakedGeoModel;
+import software.bernie.geckolib.cache.object.GeoBone;
 import software.bernie.geckolib.renderer.GeoObjectRenderer;
 
 /**
@@ -25,6 +27,7 @@ import software.bernie.geckolib.renderer.GeoObjectRenderer;
  * and submitted through the same render pass.</p>
  */
 public final class LootboxGuiRenderer extends GeoObjectRenderer<LootboxAnimatable> {
+    private boolean deferGeometry;
     public LootboxGuiRenderer() {
         super(new LootboxModel());
     }
@@ -57,6 +60,39 @@ public final class LootboxGuiRenderer extends GeoObjectRenderer<LootboxAnimatabl
             float green,
             float blue,
             float alpha) {
+        ResourceLocation resource = getGeoModel().getModelResource(animatable, this);
+        String clip = switch (animatable.getAnimationState()) {
+            case IDLE -> animatable.getDefinition().animations().idle();
+            case OPEN_IDLE -> animatable.getDefinition().animations().hasOpenIdle()
+                    ? animatable.getDefinition().animations().openIdle() : null;
+            default -> null;
+        };
+        if (!isReRender && clip != null && getRenderLayers().isEmpty()
+                && CaseGeometryCache.supports(poseStack) && CaseGeometryCache.supports(model.topLevelBones()) && SkinnedGeoModelLoader.get(resource).isEmpty()
+                && StaticItemAnimation.isStatic(animatable.getDefinition().animation(), clip)) {
+            deferGeometry = true;
+            try {
+                super.actuallyRender(poseStack, animatable, model, renderType, bufferSource, buffer,
+                        false, partialTick, packedLight, packedOverlay, red, green, blue, alpha);
+            } finally { deferGeometry = false; }
+            LocalGeometry geometry = CaseGeometryCache.get(model, (localPose, vertices) -> {
+                for (GeoBone root : model.topLevelBones()) {
+                    super.renderRecursively(localPose, animatable, root, renderType, bufferSource, vertices,
+                            true, partialTick, packedLight, packedOverlay, 1, 1, 1, 1);
+                }
+            });
+            if (bufferSource instanceof MultiBufferSource.BufferSource immediate) {
+                immediate.endBatch();
+                try {
+                    HeldCaseMeshCache.render(poseStack, model, renderType, packedLight, packedOverlay,
+                            red, green, blue, alpha, (localPose, vertices) -> geometry.emit(localPose, vertices,
+                                    packedLight, packedOverlay, red, green, blue, alpha));
+                } finally { immediate.getBuffer(renderType); }
+            } else {
+                geometry.emit(poseStack, buffer, packedLight, packedOverlay, red, green, blue, alpha);
+            }
+            return;
+        }
         // This evaluates GeckoLib's controllers/keyframes and renders ordinary
         // cubes/GeckoMesh geometry first. The GeoBone state is then the exact
         // pose we need for weighted skinning below.
@@ -74,6 +110,14 @@ public final class LootboxGuiRenderer extends GeoObjectRenderer<LootboxAnimatabl
                     modelResource, poseStack, model, buffer,
                     packedLight, packedOverlay, red, green, blue, alpha);
         }
+    }
+
+    @Override
+    public void renderRecursively(PoseStack pose, LootboxAnimatable animatable, GeoBone bone, RenderType type,
+                                  MultiBufferSource buffers, VertexConsumer vertices, boolean reRender,
+                                  float tick, int light, int overlay, float r, float g, float b, float a) {
+        if (!deferGeometry) super.renderRecursively(pose, animatable, bone, type, buffers, vertices,
+                reRender, tick, light, overlay, r, g, b, a);
     }
 
     /**

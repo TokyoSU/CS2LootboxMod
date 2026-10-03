@@ -3,6 +3,8 @@ package net.tokyosu.cs2lootbox.client.widget;
 import net.tokyosu.cs2lootbox.client.renderer.ItemGuiRenderContext;
 import net.tokyosu.cs2lootbox.client.renderer.StaticGuiItemCache;
 import net.tokyosu.cs2lootbox.client.renderer.CarouselTextureRenderer;
+import net.tokyosu.cs2lootbox.client.renderer.GuiRenderBatch;
+import net.tokyosu.cs2lootbox.client.renderer.CarouselItemArtwork;
 
 import net.tokyosu.apocalypselib.utils.ResourceUtils;
 
@@ -127,10 +129,10 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
     private static final int CAROUSEL_EDGE_FADE_WIDTH = 150;
     private static final int CAROUSEL_SLOT_Y = 174;
     // The marker circle is the sharp-focus area. Carousel item artwork outside
-    // it receives a small multi-tap blur, matching the CS2 focus-lens look.
-    private static final int CAROUSEL_FOCUS_CLEAR_RADIUS = 54;
-    private static final int CAROUSEL_FOCUS_BLUR_RANGE = 92;
-    private static final int CAROUSEL_MAX_BLUR_PIXELS = 4;
+    // it receives a visible multi-tap blur, matching the CS2 focus-lens look.
+    private static final float CAROUSEL_FOCUS_CLEAR_FRACTION = 0.75F;
+    private static final int CAROUSEL_FOCUS_BLUR_RANGE = 120;
+    private static final int CAROUSEL_MAX_BLUR_PIXELS = 6;
 
     @Configurable(name = "Model scale")
     @NumberRange(range = {1, 200}, wheel = 1)
@@ -940,7 +942,7 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
                     continue;
                 }
 
-                float focusBlur = carouselFocusBlur(centerX, markerX);
+                float focusBlur = carouselFocusBlur(centerX, markerX, focusRadius);
                 drawCarouselSlot(graphics, slot, left, slotY, slotAlpha, focusBlur);
             }
 
@@ -1005,10 +1007,12 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
                         LEGENDARY_GOLD, alpha * 0.48F);
             }
         } else {
-            graphics.fill(x, y, x + CAROUSEL_SLOT_WIDTH, y + CAROUSEL_SLOT_HEIGHT,
-                    ColorUtils.withAlpha(0x202020, alpha));
-            graphics.fill(x + 1, y + 1, x + CAROUSEL_SLOT_WIDTH - 1, y + CAROUSEL_SLOT_HEIGHT - 1,
-                    ColorUtils.withAlpha(0x343434, alpha));
+            GuiRenderBatch.fills(graphics, () -> {
+                graphics.fill(x, y, x + CAROUSEL_SLOT_WIDTH, y + CAROUSEL_SLOT_HEIGHT,
+                        ColorUtils.withAlpha(0x202020, alpha));
+                graphics.fill(x + 1, y + 1, x + CAROUSEL_SLOT_WIDTH - 1, y + CAROUSEL_SLOT_HEIGHT - 1,
+                        ColorUtils.withAlpha(0x343434, alpha));
+            });
         }
         drawTexturedSlotBorder(graphics, x, y, CAROUSEL_SLOT_WIDTH, CAROUSEL_SLOT_HEIGHT, rarity, alpha);
         graphics.fill(x + 1, y + CAROUSEL_SLOT_HEIGHT - 5,
@@ -1063,15 +1067,17 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
                 ColorUtils.withAlpha(LEGENDARY_GOLD, alpha));
     }
 
-    private static float carouselFocusBlur(int contentCenterX, int markerX) {
-        float outside = Math.abs(contentCenterX - markerX) - CAROUSEL_FOCUS_CLEAR_RADIUS;
+    private static float carouselFocusBlur(int contentCenterX, int markerX, int focusRadius) {
+        // Fade to sharp at 75% of the visible circle's radius, keeping the
+        // clear region proportional to the circle at every UI size.
+        float outside = Math.abs(contentCenterX - markerX) - focusRadius * CAROUSEL_FOCUS_CLEAR_FRACTION;
         if (outside <= 0.0F) {
             return 0.0F;
         }
 
         float t = Math.max(0.0F, Math.min(1.0F, outside / CAROUSEL_FOCUS_BLUR_RANGE));
         // Smoothstep keeps the focus transition from popping as an item crosses
-        // the circular marker boundary.
+        // the visible focus-circle boundary.
         return t * t * (3.0F - 2.0F * t);
     }
 
@@ -1089,17 +1095,19 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
             @NotNull GuiGraphics graphics, int viewportX, int viewportW, int y, int height, float alpha) {
         int steps = 36;
         int fadeWidth = Math.min(CAROUSEL_EDGE_FADE_WIDTH, viewportW / 3);
-        for (int i = 0; i < steps; i++) {
-            float t0 = i / (float) steps;
-            float t1 = (i + 1) / (float) steps;
-            int x0 = Math.round(fadeWidth * t0);
-            int x1 = Math.max(x0 + 1, Math.round(fadeWidth * t1));
-            float veil = (1.0F - t0);
-            veil = veil * veil * 0.58F * alpha;
-            int color = ColorUtils.withAlpha(0x050505, veil);
-            graphics.fill(viewportX + x0, y, viewportX + x1, y + height, color);
-            graphics.fill(viewportX + viewportW - x1, y, viewportX + viewportW - x0, y + height, color);
-        }
+        GuiRenderBatch.fills(graphics, () -> {
+            for (int i = 0; i < steps; i++) {
+                float t0 = i / (float) steps;
+                float t1 = (i + 1) / (float) steps;
+                int x0 = Math.round(fadeWidth * t0);
+                int x1 = Math.max(x0 + 1, Math.round(fadeWidth * t1));
+                float veil = (1.0F - t0);
+                veil = veil * veil * 0.58F * alpha;
+                int color = ColorUtils.withAlpha(0x050505, veil);
+                graphics.fill(viewportX + x0, y, viewportX + x1, y + height, color);
+                graphics.fill(viewportX + viewportW - x1, y, viewportX + viewportW - x0, y + height, color);
+            }
+        });
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -1570,7 +1578,8 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
         }
 
         int radius = Math.max(1, Math.round(CAROUSEL_MAX_BLUR_PIXELS * amount));
-        float tapAlpha = alpha * (0.08F * amount);
+        float tapAlpha = alpha * (0.10F * amount);
+        if (CarouselItemArtwork.render(graphics, stack, centerX, centerY, scale, alpha, amount, radius)) return;
 
         // Eight low-alpha taps form a small Gaussian-like smear without using
         // Minecraft's full-screen post-processing chain (which would blur the
@@ -1585,7 +1594,7 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
         renderItemScaled(graphics, stack, centerX + radius, centerY + radius, scale, tapAlpha);
 
         // Keep a reduced sharp core so pixel-art items remain recognizable.
-        renderItemScaled(graphics, stack, centerX, centerY, scale, alpha * (1.0F - 0.65F * amount));
+        renderItemScaled(graphics, stack, centerX, centerY, scale, alpha * (1.0F - 0.78F * amount));
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -1850,7 +1859,6 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
         RenderSystem.defaultBlendFunc();
         RenderSystem.setShaderColor(r, g, b, Math.max(0.0F, Math.min(1.0F, alpha)));
         graphics.blit(texture, x, y, 0, 0, width, height, width, height);
-        graphics.flush();
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
     }
 

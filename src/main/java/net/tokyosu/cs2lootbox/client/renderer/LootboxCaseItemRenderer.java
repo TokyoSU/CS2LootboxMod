@@ -1,6 +1,7 @@
 package net.tokyosu.cs2lootbox.client.renderer;
 
 import net.tokyosu.cs2lootbox.client.renderer.skinning.WeightedSkinPass;
+import net.tokyosu.cs2lootbox.client.renderer.skinning.SkinnedGeoModelLoader;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -15,6 +16,7 @@ import net.tokyosu.cs2lootbox.item.LootboxCaseItem;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.cache.object.BakedGeoModel;
+import software.bernie.geckolib.cache.object.GeoBone;
 import software.bernie.geckolib.renderer.GeoItemRenderer;
 
 /**
@@ -27,6 +29,8 @@ import software.bernie.geckolib.renderer.GeoItemRenderer;
  * and lets KubeJS own all seven useful item display contexts.
  */
 public final class LootboxCaseItemRenderer extends GeoItemRenderer<LootboxCaseItem> {
+    private boolean deferGeometry;
+
     public LootboxCaseItemRenderer() {
         super(new LootboxCaseItemModel());
     }
@@ -105,16 +109,65 @@ public final class LootboxCaseItemRenderer extends GeoItemRenderer<LootboxCaseIt
             float green,
             float blue,
             float alpha) {
+        ResourceLocation modelResource = getGeoModel().getModelResource(animatable, this);
+        if (!isReRender && currentItemStack != null && getRenderLayers().isEmpty()
+                && CaseGeometryCache.supports(poseStack) && CaseGeometryCache.supports(model.topLevelBones())
+                && SkinnedGeoModelLoader.get(modelResource).isEmpty()
+                && StaticItemAnimation.isStatic(animatable.getDefinition().animation(),
+                        animatable.getDefinition().animations().itemIdle())) {
+            // Keep GeckoLib's controllers, animated texture updates and render events live.
+            // Only defer the expensive vertex traversal until we know whether a rebake is needed.
+            deferGeometry = true;
+            try {
+                super.actuallyRender(poseStack, animatable, model, renderType, bufferSource, buffer,
+                        false, partialTick, packedLight, packedOverlay, red, green, blue, alpha);
+            } finally {
+                deferGeometry = false;
+            }
+            LocalGeometry geometry = CaseGeometryCache.get(model, (localPose, vertices) -> {
+                for (GeoBone root : model.topLevelBones()) {
+                    super.renderRecursively(localPose, animatable, root, renderType,
+                            bufferSource, vertices, true, partialTick, packedLight, packedOverlay, 1, 1, 1, 1);
+                }
+            });
+            if (!currentItemStack.hasFoil() && bufferSource instanceof MultiBufferSource.BufferSource immediate
+                    && renderType == ForgeRenderTypes.getUnlitTranslucent(getTextureLocation(animatable), false)) {
+                // Unlit hands/inventory can draw the GPU mesh directly. Keep world
+                // lighting and translucent sorting in the normal buffered path below.
+                immediate.endBatch();
+                try {
+                    HeldCaseMeshCache.render(poseStack, model, renderType,
+                            packedLight, packedOverlay, red, green, blue, alpha,
+                            (localPose, vertices) -> geometry.emit(localPose, vertices,
+                                    packedLight, packedOverlay, red, green, blue, alpha));
+                } finally {
+                    immediate.getBuffer(renderType);
+                }
+            } else {
+                geometry.emit(poseStack, buffer, packedLight, packedOverlay, red, green, blue, alpha);
+            }
+            return;
+        }
         super.actuallyRender(
                 poseStack, animatable, model, renderType, bufferSource, buffer,
                 isReRender, partialTick, packedLight, packedOverlay,
                 red, green, blue, alpha);
 
         if (!isReRender) {
-            ResourceLocation modelResource = getGeoModel().getModelResource(animatable, this);
             WeightedSkinPass.render(
                     modelResource, poseStack, model, buffer,
                     packedLight, packedOverlay, red, green, blue, alpha);
+        }
+    }
+
+    @Override
+    public void renderRecursively(PoseStack poseStack, LootboxCaseItem animatable, GeoBone bone,
+                                  RenderType renderType, MultiBufferSource bufferSource, VertexConsumer buffer,
+                                  boolean isReRender, float partialTick, int packedLight, int packedOverlay,
+                                  float red, float green, float blue, float alpha) {
+        if (!deferGeometry) {
+            super.renderRecursively(poseStack, animatable, bone, renderType, bufferSource, buffer,
+                    isReRender, partialTick, packedLight, packedOverlay, red, green, blue, alpha);
         }
     }
 

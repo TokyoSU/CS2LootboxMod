@@ -22,13 +22,13 @@ public final class CarouselTextureRenderer {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.disableDepthTest();
-        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+        RenderSystem.setShader(GuiArtworkShader.get() != null ? GuiArtworkShader::get : GameRenderer::getPositionTexColorShader);
         RenderSystem.setShaderTexture(0, texture);
         RenderSystem.setShaderColor(1, 1, 1, 1);
         Matrix4f matrix = graphics.pose().last().pose();
         BufferBuilder builder = Tesselator.getInstance().getBuilder();
         builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-        float tapAlpha = alpha * (0.08F * amount);
+        float tapAlpha = alpha * (0.10F * amount);
         quad(builder, matrix, x - radius, y, width, height, tapAlpha);
         quad(builder, matrix, x + radius, y, width, height, tapAlpha);
         quad(builder, matrix, x, y - radius, width, height, tapAlpha);
@@ -37,7 +37,7 @@ public final class CarouselTextureRenderer {
         quad(builder, matrix, x + radius, y - radius, width, height, tapAlpha);
         quad(builder, matrix, x - radius, y + radius, width, height, tapAlpha);
         quad(builder, matrix, x + radius, y + radius, width, height, tapAlpha);
-        quad(builder, matrix, x, y, width, height, alpha * (1 - 0.65F * amount));
+        quad(builder, matrix, x, y, width, height, alpha * (1 - 0.78F * amount));
         try { BufferUploader.drawWithShader(builder.end()); }
         finally {
             // GuiGraphics.flush restores depth testing after its ordinary blits as well.

@@ -1,6 +1,7 @@
 package net.tokyosu.cs2lootbox.client.renderer;
 
 import net.tokyosu.cs2lootbox.client.renderer.skinning.WeightedSkinPass;
+import net.tokyosu.cs2lootbox.client.renderer.skinning.SkinnedGeoModelLoader;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -15,6 +16,7 @@ import net.tokyosu.cs2lootbox.item.ModelItem;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.cache.object.BakedGeoModel;
+import software.bernie.geckolib.cache.object.GeoBone;
 import software.bernie.geckolib.renderer.GeoItemRenderer;
 
 /**
@@ -27,6 +29,7 @@ import software.bernie.geckolib.renderer.GeoItemRenderer;
  * and lets KubeJS own all seven useful item display contexts.
  */
 public final class ModelItemRenderer extends GeoItemRenderer<ModelItem> {
+    private boolean deferGeometry;
     public ModelItemRenderer() {
         super(new StaticItemModel());
     }
@@ -101,6 +104,34 @@ public final class ModelItemRenderer extends GeoItemRenderer<ModelItem> {
             float green,
             float blue,
             float alpha) {
+        ResourceLocation resource = getGeoModel().getModelResource(animatable, this);
+        if (!isReRender && getRenderLayers().isEmpty() && CaseGeometryCache.supports(poseStack) && CaseGeometryCache.supports(model.topLevelBones())
+                && SkinnedGeoModelLoader.get(resource).isEmpty()) {
+            deferGeometry = true;
+            try {
+                super.actuallyRender(poseStack, animatable, model, renderType, bufferSource, buffer,
+                        false, partialTick, packedLight, packedOverlay, red, green, blue, alpha);
+            } finally { deferGeometry = false; }
+            LocalGeometry geometry = CaseGeometryCache.get(model, (localPose, vertices) -> {
+                for (GeoBone root : model.topLevelBones()) {
+                    super.renderRecursively(localPose, animatable, root, renderType, bufferSource, vertices,
+                            true, partialTick, packedLight, packedOverlay, 1, 1, 1, 1);
+                }
+            });
+            if (currentItemStack != null && !currentItemStack.hasFoil()
+                    && bufferSource instanceof MultiBufferSource.BufferSource immediate
+                    && renderType == ForgeRenderTypes.getUnlitTranslucent(getTextureLocation(animatable), false)) {
+                immediate.endBatch();
+                try {
+                    HeldCaseMeshCache.render(poseStack, model, renderType, packedLight, packedOverlay,
+                            red, green, blue, alpha, (localPose, vertices) -> geometry.emit(localPose, vertices,
+                                    packedLight, packedOverlay, red, green, blue, alpha));
+                } finally { immediate.getBuffer(renderType); }
+            } else {
+                geometry.emit(poseStack, buffer, packedLight, packedOverlay, red, green, blue, alpha);
+            }
+            return;
+        }
         super.actuallyRender(
                 poseStack, animatable, model, renderType, bufferSource, buffer,
                 isReRender, partialTick, packedLight, packedOverlay,
@@ -112,6 +143,14 @@ public final class ModelItemRenderer extends GeoItemRenderer<ModelItem> {
                     modelResource, poseStack, model, buffer,
                     packedLight, packedOverlay, red, green, blue, alpha);
         }
+    }
+
+    @Override
+    public void renderRecursively(PoseStack pose, ModelItem animatable, GeoBone bone, RenderType type,
+                                  MultiBufferSource buffers, VertexConsumer vertices, boolean reRender,
+                                  float tick, int light, int overlay, float r, float g, float b, float a) {
+        if (!deferGeometry) super.renderRecursively(pose, animatable, bone, type, buffers, vertices,
+                reRender, tick, light, overlay, r, g, b, a);
     }
 
 }
