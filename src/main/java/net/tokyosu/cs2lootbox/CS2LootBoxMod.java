@@ -1,11 +1,14 @@
 package net.tokyosu.cs2lootbox;
 
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.tokyosu.cs2lootbox.client.renderer.ClientRenderDiagnostics;
 import net.tokyosu.cs2lootbox.config.CS2LootboxClientConfig;
 import net.tokyosu.cs2lootbox.config.CS2LootboxCommonConfig;
 import net.tokyosu.cs2lootbox.config.CS2LootboxServerConfig;
@@ -38,6 +41,7 @@ public final class CS2LootBoxMod {
         modBus.addListener(this::onConfigReloaded);
 
         ModSounds.register(modBus);
+        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> ClientRenderDiagnostics::register);
     }
 
     private void onConfigLoaded(ModConfigEvent.Loading event) {

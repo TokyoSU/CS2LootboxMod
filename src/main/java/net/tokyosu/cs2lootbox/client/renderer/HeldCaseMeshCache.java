@@ -19,6 +19,7 @@ import java.util.Map;
 public final class HeldCaseMeshCache {
     private static final int MAX_ENTRIES = 16;
     private static final Map<Key, Mesh> CACHE = new LinkedHashMap<>(16, 0.75F, true);
+    private static long uploads, hits, evictions;
 
     private HeldCaseMeshCache() {}
 
@@ -28,11 +29,14 @@ public final class HeldCaseMeshCache {
     static void render(PoseStack pose, BakedGeoModel model, RenderType type,
                        int light, int overlay, float red, float green, float blue, float alpha,
                        GeometryWriter writer) {
-        Key key = new Key(model, type);
         Attributes attributes = new Attributes(light, overlay, red, green, blue, alpha);
+        // Hand, full-bright hotbar and faded previews can share a model/type
+        // every frame. Keep their vertex attributes in distinct cache entries.
+        Key key = new Key(model, type, attributes);
         Mesh mesh = CACHE.get(key);
-        if (mesh == null || !mesh.attributes.equals(attributes) || !mesh.pose.matches(model)) {
-            Mesh replacement = bake(model, type, attributes, writer);
+        if (mesh == null || !mesh.pose.matches(model)) {
+            Mesh replacement = bake(model, type, writer);
+            uploads++;
             if (mesh != null) mesh.close();
             mesh = replacement;
             CACHE.put(key, mesh);
@@ -40,8 +44,9 @@ public final class HeldCaseMeshCache {
                 var oldest = CACHE.entrySet().iterator();
                 oldest.next().getValue().close();
                 oldest.remove();
+                evictions++;
             }
-        }
+        } else hits++;
         if (mesh.vertices == null) return;
         type.setupRenderState();
         try {
@@ -54,7 +59,7 @@ public final class HeldCaseMeshCache {
         }
     }
 
-    private static Mesh bake(BakedGeoModel model, RenderType type, Attributes attributes, GeometryWriter writer) {
+    private static Mesh bake(BakedGeoModel model, RenderType type, GeometryWriter writer) {
         BufferBuilder builder = new BufferBuilder(4096);
         VertexBuffer vertices = null;
         try {
@@ -68,7 +73,7 @@ public final class HeldCaseMeshCache {
                 vertices.bind();
                 vertices.upload(data);
             }
-            return new Mesh(vertices, new CaseMeshPose(model), attributes);
+            return new Mesh(vertices, new CaseMeshPose(model));
         } catch (RuntimeException | Error failure) {
             if (vertices != null) vertices.close();
             throw failure;
@@ -85,17 +90,21 @@ public final class HeldCaseMeshCache {
         StaticItemAnimation.clear();
     }
 
-    private record Key(BakedGeoModel model, RenderType type) {
+    public record Statistics(long uploads, long hits, long evictions, int entries) {}
+    public static Statistics statistics() { return new Statistics(uploads, hits, evictions, CACHE.size()); }
+    public static void resetStatistics() { uploads = hits = evictions = 0; }
+
+    private record Key(BakedGeoModel model, RenderType type, Attributes attributes) {
         // BakedGeoModel/GeoBone equality is structural and can alias different resources.
         @Override public boolean equals(Object other) {
-            return other instanceof Key key && model == key.model && type == key.type;
+            return other instanceof Key key && model == key.model && type == key.type && attributes.equals(key.attributes);
         }
         @Override public int hashCode() {
-            return 31 * System.identityHashCode(model) + System.identityHashCode(type);
+            return 31 * (31 * System.identityHashCode(model) + System.identityHashCode(type)) + attributes.hashCode();
         }
     }
     private record Attributes(int light, int overlay, float red, float green, float blue, float alpha) {}
-    private record Mesh(VertexBuffer vertices, CaseMeshPose pose, Attributes attributes) {
+    private record Mesh(VertexBuffer vertices, CaseMeshPose pose) {
         void close() { if (vertices != null) vertices.close(); }
     }
 }

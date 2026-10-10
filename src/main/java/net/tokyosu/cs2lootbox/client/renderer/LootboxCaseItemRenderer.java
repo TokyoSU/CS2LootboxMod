@@ -109,6 +109,8 @@ public final class LootboxCaseItemRenderer extends GeoItemRenderer<LootboxCaseIt
             float green,
             float blue,
             float alpha) {
+        boolean held = !isReRender && (renderPerspective == ItemDisplayContext.FIRST_PERSON_LEFT_HAND
+                || renderPerspective == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND);
         ResourceLocation modelResource = getGeoModel().getModelResource(animatable, this);
         if (!isReRender && currentItemStack != null && getRenderLayers().isEmpty()
                 && CaseGeometryCache.supports(poseStack) && CaseGeometryCache.supports(model.topLevelBones())
@@ -134,6 +136,7 @@ public final class LootboxCaseItemRenderer extends GeoItemRenderer<LootboxCaseIt
                     && renderType == ForgeRenderTypes.getUnlitTranslucent(getTextureLocation(animatable), false)) {
                 // Unlit hands/inventory can draw the GPU mesh directly. Keep world
                 // lighting and translucent sorting in the normal buffered path below.
+                if (held) ClientRenderDiagnostics.heldGpu();
                 immediate.endBatch();
                 try {
                     HeldCaseMeshCache.render(poseStack, model, renderType,
@@ -144,10 +147,12 @@ public final class LootboxCaseItemRenderer extends GeoItemRenderer<LootboxCaseIt
                     immediate.getBuffer(renderType);
                 }
             } else {
+                if (held) ClientRenderDiagnostics.heldBuffered();
                 geometry.emit(poseStack, buffer, packedLight, packedOverlay, red, green, blue, alpha);
             }
             return;
         }
+        if (held) ClientRenderDiagnostics.heldLive();
         super.actuallyRender(
                 poseStack, animatable, model, renderType, bufferSource, buffer,
                 isReRender, partialTick, packedLight, packedOverlay,

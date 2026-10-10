@@ -3110,11 +3110,188 @@ function buildCPMFiles(input) {
 	};
 }
 
+// ----------------------------------------------------- rigid mesh reduction
+
+/** Endpoint quadric-error collapse. No face sampling: surviving triangles cover
+ * the surface. Pin UV/material seams, open/non-manifold borders and sharp edges.
+ * Runs independently per Mesh, so bone attachments cannot be merged accidentally.
+ * Kept independent of Blockbench for topology and real-case regression checks.
+ */
+function simplifyTriangleFaces(sourceFaces, options = {}) {
+	const keep = Math.max(0.05, Math.min(1, Number(options.keep_percent ?? 75) / 100));
+	const errorPercent = Math.max(0, Math.min(5, Number(options.error_percent ?? 0.5)));
+	const sharpAngle = Math.max(0, Math.min(180, Number(options.sharp_angle ?? 40)));
+	if (![keep, errorPercent, sharpAngle].every(Number.isFinite)) throw new Error('Invalid mesh reduction settings');
+	const vertices = [], faces = [], byCorner = new Map(), byPosition = new Map(), materials = new Map();
+	const lo = [Infinity, Infinity, Infinity], hi = [-Infinity, -Infinity, -Infinity];
+	for (const face of sourceFaces) {
+		if (!face.positions || face.positions.length !== 3) throw new Error('Mesh reduction requires triangle faces');
+		if (!materials.has(face.texture)) materials.set(face.texture, materials.size);
+		const ids = face.positions.map((position, i) => {
+			const p = position.slice(0, 3), uv = (face.uvs?.[i] || [0, 0]).slice(0, 2);
+			if (p.length !== 3 || uv.length !== 2 || !p.concat(uv).every(Number.isFinite)) throw new Error('Non-finite mesh coordinates');
+			const skin = face.skinVertices?.[i]?.map(inf => ({ node: inf.node, weight: Number(inf.weight) }));
+			if (skin && skin.some(inf => inf.node === undefined || !Number.isFinite(inf.weight) || inf.weight < 0)) throw new Error('Invalid skin weights');
+			const skinKey = skin ? skin.map(inf => inf.node + ':' + inf.weight).sort().join('|') : '';
+			const pk = p.join(','), key = pk + '/' + uv.join(',') + '/' + materials.get(face.texture) + '/' + skinKey;
+			if (!byCorner.has(key)) {
+				const id = vertices.length;
+				byCorner.set(key, id);
+				if (!byPosition.has(pk)) byPosition.set(pk, []);
+				byPosition.get(pk).push(id);
+				vertices.push({ p, uv, skin, skinKey, faces: new Set(), q: new Float64Array(10), weight: 0, pinned: false, alive: true, version: 0 });
+				for (let axis = 0; axis < 3; axis++) { lo[axis] = Math.min(lo[axis], p[axis]); hi[axis] = Math.max(hi[axis], p[axis]); }
+			}
+			return byCorner.get(key);
+		});
+		if (new Set(ids).size < 3) continue;
+		const normal = triangleNormal(ids.map(id => vertices[id].p));
+		if (!normal) continue;
+		const index = faces.length;
+		faces.push({ ids, texture: face.texture, normal, originalNormal: normal, alive: true });
+		for (const id of ids) vertices[id].faces.add(index);
+	}
+	const before = faces.length, target = Math.max(1, Math.ceil(before * keep));
+	if (!before || keep === 1) return { faces: sourceFaces, before, after: before, target, collapses: 0, pinned: 0 };
+	const diagonal = dist(lo, hi), errorSquared = (diagonal * errorPercent / 100) ** 2;
+	const areaEpsilon = Math.max(1e-30, diagonal ** 4 * 1e-24);
+	const edges = new Map();
+	const edgeKey = (a, b) => a < b ? a + ':' + b : b + ':' + a;
+	for (let fi = 0; fi < faces.length; fi++) {
+		const f = faces[fi], p = f.ids.map(id => vertices[id].p), n = f.normal;
+		const area = len(cross(sub(p[1], p[0]), sub(p[2], p[0]))) / 2, d = -dot(n, p[0]);
+		const q = [n[0]*n[0], n[0]*n[1], n[0]*n[2], n[0]*d, n[1]*n[1], n[1]*n[2], n[1]*d, n[2]*n[2], n[2]*d, d*d];
+		for (const id of f.ids) {
+			vertices[id].weight += area;
+			for (let i = 0; i < 10; i++) vertices[id].q[i] += q[i] * area;
+		}
+		for (let i = 0; i < 3; i++) {
+			const a = f.ids[i], b = f.ids[(i + 1) % 3], key = edgeKey(a, b);
+			if (!edges.has(key)) edges.set(key, { a, b, faces: [] });
+			edges.get(key).faces.push(fi);
+		}
+	}
+	for (const ids of byPosition.values()) if (ids.length > 1) for (const id of ids) vertices[id].pinned = true;
+	const sharpCos = Math.cos(sharpAngle * Math.PI / 180);
+	for (const edge of edges.values()) {
+		if (edge.faces.length !== 2 || dot(faces[edge.faces[0]].normal, faces[edge.faces[1]].normal) < sharpCos) {
+			vertices[edge.a].pinned = vertices[edge.b].pinned = true;
+		}
+	}
+	const pinned = vertices.reduce((count, v) => count + Number(v.pinned), 0);
+	const evaluate = (q, p) => Math.max(0, q[0]*p[0]*p[0] + 2*q[1]*p[0]*p[1] + 2*q[2]*p[0]*p[2] + 2*q[3]*p[0]
+		+ q[4]*p[1]*p[1] + 2*q[5]*p[1]*p[2] + 2*q[6]*p[1] + q[7]*p[2]*p[2] + 2*q[8]*p[2] + q[9]);
+	const neighbours = id => {
+		const set = new Set();
+		for (const fi of vertices[id].faces) for (const other of faces[fi].ids) if (other !== id) set.add(other);
+		return set;
+	};
+	const uvArea = ids => {
+		const [a, b, c] = ids.map(id => vertices[id].uv);
+		return (b[0]-a[0])*(c[1]-a[1]) - (b[1]-a[1])*(c[0]-a[0]);
+	};
+	const safeCollapse = (retain, remove) => {
+		// Exact endpoint weights are retained. Do not collapse across different
+		// influences: bind-pose error alone cannot bound animated deformation.
+		if (vertices[retain].skinKey !== vertices[remove].skinKey) return false;
+		const shared = [...vertices[remove].faces].filter(fi => faces[fi].ids.includes(retain));
+		if (shared.length !== 2) return false;
+		// Link condition: forbid holes and non-manifold connections.
+		const na = neighbours(retain), nb = neighbours(remove), opposite = new Set();
+		for (const fi of shared) for (const id of faces[fi].ids) if (id !== retain && id !== remove) opposite.add(id);
+		const common = [...na].filter(id => nb.has(id));
+		if (common.length !== opposite.size || common.some(id => !opposite.has(id))) return false;
+		const seen = new Set(), incident = new Set([...vertices[retain].faces, ...vertices[remove].faces]);
+		for (const fi of incident) {
+			if (shared.includes(fi)) continue;
+			const f = faces[fi], ids = f.ids.map(id => id === remove ? retain : id);
+			const key = ids.slice().sort((a, b) => a - b).join(',');
+			if (seen.has(key)) return false;
+			seen.add(key);
+			const p = ids.map(id => vertices[id].p), normal = cross(sub(p[1], p[0]), sub(p[2], p[0]));
+			if (dot(normal, normal) <= areaEpsilon || dot(norm(normal), f.originalNormal) < 0.5) return false;
+			const oldUV = uvArea(f.ids), newUV = uvArea(ids);
+			if (Math.abs(oldUV) > 1e-12 && (oldUV * newUV <= 0 || Math.abs(newUV / oldUV) < 0.1)) return false;
+		}
+		return true;
+	};
+	// Min-heap and versioned candidates keep this near O(edges log edges), rather
+	// than rescanning the complete model after every removed edge.
+	const heap = [], queued = new Map();
+	const less = (a, b) => a.cost < b.cost || (a.cost === b.cost && (a.a < b.a || (a.a === b.a && a.b < b.b)));
+	const push = entry => {
+		let i = heap.length; heap.push(entry);
+		while (i > 0) { const parent = (i - 1) >> 1; if (!less(entry, heap[parent])) break; heap[i] = heap[parent]; i = parent; }
+		heap[i] = entry;
+	};
+	const pop = () => {
+		const top = heap[0], last = heap.pop();
+		if (heap.length) {
+			let i = 0;
+			while (i * 2 + 1 < heap.length) {
+				let child = i * 2 + 1;
+				if (child + 1 < heap.length && less(heap[child + 1], heap[child])) child++;
+				if (!less(heap[child], last)) break;
+				heap[i] = heap[child]; i = child;
+			}
+			heap[i] = last;
+		}
+		return top;
+	};
+	const schedule = (a, b) => {
+		if (a > b) [a, b] = [b, a];
+		const va = vertices[a], vb = vertices[b];
+		if (!va.alive || !vb.alive || (va.pinned && vb.pinned)) return;
+		const key = edgeKey(a, b), stamp = va.version + ':' + vb.version;
+		if (queued.get(key) === stamp) return;
+		queued.set(key, stamp);
+		const q = va.q.map((value, i) => value + vb.q[i]);
+		const candidates = [];
+		if (!vb.pinned) candidates.push({ retain: a, remove: b, error: evaluate(q, va.p) });
+		if (!va.pinned) candidates.push({ retain: b, remove: a, error: evaluate(q, vb.p) });
+		candidates.sort((x, y) => x.error - y.error);
+		const candidate = candidates.find(c => c.error <= errorSquared * (va.weight + vb.weight) + 1e-18 && safeCollapse(c.retain, c.remove));
+		if (!candidate) return;
+		const distance = sub(va.p, vb.p);
+		push({ a, b, av: va.version, bv: vb.version, ...candidate,
+			cost: candidate.error / (va.weight + vb.weight) + dot(distance, distance) * 1e-12 });
+	};
+	for (const edge of edges.values()) schedule(edge.a, edge.b);
+	let after = before, collapses = 0;
+	while (heap.length && after - 2 >= target) {
+		const entry = pop(), va = vertices[entry.a], vb = vertices[entry.b];
+		if (!va.alive || !vb.alive || va.version !== entry.av || vb.version !== entry.bv) continue;
+		if (!safeCollapse(entry.retain, entry.remove)) continue;
+		const retained = vertices[entry.retain], removed = vertices[entry.remove];
+		const incident = new Set([...retained.faces, ...removed.faces]), affected = new Set();
+		for (const fi of incident) {
+			const f = faces[fi];
+			for (const id of f.ids) { affected.add(id); vertices[id].faces.delete(fi); }
+			f.ids = f.ids.map(id => id === entry.remove ? entry.retain : id);
+			if (new Set(f.ids).size < 3) { f.alive = false; after--; continue; }
+			f.normal = triangleNormal(f.ids.map(id => vertices[id].p));
+			for (const id of f.ids) vertices[id].faces.add(fi);
+		}
+		for (let i = 0; i < 10; i++) retained.q[i] += removed.q[i];
+		retained.weight += removed.weight;
+		removed.alive = false;
+		collapses++;
+		for (const id of affected) vertices[id].version++;
+		for (const id of affected) if (vertices[id].alive) for (const other of neighbours(id)) schedule(id, other);
+	}
+	const output = faces.filter(f => f.alive).map(f => ({
+		positions: f.ids.map(id => vertices[id].p.slice()), uvs: f.ids.map(id => vertices[id].uv.slice()), texture: f.texture,
+		...(f.ids.some(id => vertices[id].skin) ? { skinVertices: f.ids.map(id => vertices[id].skin?.map(inf => ({ ...inf })) || []) } : {}),
+	}));
+	return { faces: output, before, after, target, collapses, pinned };
+}
+
 // ------------------------------------------------------------ Node export
 
 if (typeof Plugin === 'undefined') {
 	if (typeof module !== 'undefined') {
 		module.exports = {
+			simplifyTriangleFaces,
 			solveBox, detectBox, orientations, assignFaces, countUVViolations, buildFaceUV,
 			FACE_DIRS, FACE_NAMES,
 			parseGLTFFiles, parseGLB, parseAnimations, readAccessor, matMul, matFromTRS, matApply, matIdentity,
@@ -3512,15 +3689,65 @@ function compileBlockbenchMeshIntoPolyMesh(polyMesh, mesh) {
 // bind-pose source data.
 let weightedSkinPreviewAnimationHandler = null;
 let weightedSkinPreviewDefaultPoseHandler = null;
+let weightedSkinProperty = null;
+
+// Live Group/THREE references cannot be saved in .bbmodel or Undo snapshots.
+// Persist only bind geometry, weights and stable bone identities as a Property.
+function persistWeightedSkin(mesh) {
+	const source = mesh.__cs2WeightedSource;
+	if (!source) return;
+	const bones = {};
+	for (const face of source.faces) for (const influences of face.skinVertices || []) for (const inf of influences) {
+		const group = source.groupByNode?.[inf.node];
+		bones[inf.node] = { uuid: group?.uuid, name: group?.name || source.hierarchyByNode?.get(inf.node)?.name || `node_${inf.node}` };
+	}
+	mesh.cs2_skinning = {
+		version: 1,
+		faces: source.faces.map(face => ({ positions: face.positions.map(p => p.slice()), uvs: face.uvs.map(uv => uv.slice()),
+			skinVertices: face.skinVertices.map(influences => influences.map(inf => ({ node: inf.node, weight: inf.weight }))) })),
+		vertex_skin: JSON.parse(JSON.stringify(mesh.__cs2VertexSkin || {})), bones,
+		preview_enabled: mesh.__cs2WeightedPreviewEnabled !== false,
+	};
+	mesh.__cs2SkinData = mesh.cs2_skinning;
+}
+
+function weightedSourceForMesh(mesh) {
+	const data = mesh.cs2_skinning;
+	if (!data?.faces?.length) return mesh.__cs2WeightedSource;
+	if (mesh.__cs2SkinData !== data) {
+		const previousPreview = mesh.__cs2WeightedSource?.preview;
+		mesh.__cs2WeightedSource = { faces: data.faces, groupByNode: {} };
+		mesh.__cs2VertexSkin = data.vertex_skin;
+		mesh.__cs2WeightedPreviewEnabled = data.preview_enabled !== false;
+		mesh.__cs2SkinData = data;
+		// Undo/reduction changes vertex keys, but not the original bone bind pose.
+		if (previousPreview && typeof THREE !== 'undefined') {
+			const bindWorldPositions = {};
+			for (const key in mesh.vertices) bindWorldPositions[key] = new THREE.Vector3().fromArray(mesh.vertices[key]).applyMatrix4(previousPreview.bindMeshWorld);
+			mesh.__cs2WeightedSource.preview = { ...previousPreview, bindWorldPositions };
+		}
+	}
+	const groups = typeof Group !== 'undefined' ? Group.all : [];
+	for (const [node, bone] of Object.entries(data.bones || {})) {
+		mesh.__cs2WeightedSource.groupByNode[node] = groups.find(group => group.uuid === bone.uuid) || groups.find(group => group.name === bone.name);
+	}
+	return mesh.__cs2WeightedSource;
+}
+
+function installWeightedSkinProperty() {
+	if (typeof Property === 'undefined' || typeof Mesh === 'undefined' || weightedSkinProperty) return;
+	weightedSkinProperty = new Property(Mesh, 'object', 'cs2_skinning', { exposed: false });
+	for (const mesh of Mesh.all) if (mesh.__cs2WeightedSource && !mesh.cs2_skinning?.faces?.length) persistWeightedSkin(mesh);
+}
 
 function weightedPreviewMeshes() {
 	if (typeof Mesh === 'undefined') return [];
-	return Mesh.all.filter(mesh => mesh && mesh.__cs2WeightedSource && mesh.__cs2WeightedPreviewEnabled !== false);
+	return Mesh.all.filter(mesh => mesh && weightedSourceForMesh(mesh) && mesh.__cs2WeightedPreviewEnabled !== false);
 }
 
 function prepareWeightedSkinPreview(mesh) {
-	if (!mesh || !mesh.__cs2WeightedSource || !mesh.__cs2VertexSkin || typeof THREE === 'undefined') return false;
-	const source = mesh.__cs2WeightedSource;
+	const source = mesh && weightedSourceForMesh(mesh);
+	if (!source || !mesh.__cs2VertexSkin || typeof THREE === 'undefined') return false;
 	const meshObject = mesh.scene_object || mesh.mesh;
 	if (!meshObject || !meshObject.matrixWorld) return false;
 
@@ -3674,6 +3901,9 @@ function installWeightedSkinPreview() {
 		// the full mesh in that hot path; displayDeformation overwrites all preview
 		// positions a moment later. A real return to Edit/default pose clears it.
 		if (!event || !event.reduced_updates) clearWeightedSkinPreview();
+		// A reopened project has no live THREE bind cache. Capture it while the
+		// bones are in their default pose, before the animated frame is applied.
+		for (const mesh of weightedPreviewMeshes()) if (!mesh.__cs2WeightedSource.preview) prepareWeightedSkinPreview(mesh);
 	};
 	Blockbench.on('display_animation_frame', weightedSkinPreviewAnimationHandler);
 	Blockbench.on('display_default_pose', weightedSkinPreviewDefaultPoseHandler);
@@ -3703,7 +3933,7 @@ function uninstallWeightedSkinPreview() {
  * importer as weighted are emitted here.
  */
 function compileWeightedSkinMesh(mesh) {
-	const source = mesh && mesh.__cs2WeightedSource;
+	const source = mesh && weightedSourceForMesh(mesh);
 	if (!source || !Array.isArray(source.faces) || !source.faces.length) return null;
 
 	const bones = [];
@@ -3845,7 +4075,7 @@ function installPolyMeshExporter() {
 
 				let poly = null;
 				for (const mesh of meshes) {
-					if (mesh.__cs2WeightedSource) {
+					if (weightedSourceForMesh(mesh)) {
 						const skin = compileWeightedSkinMesh(mesh);
 						if (skin) weighted.push(skin);
 					} else {
@@ -5136,6 +5366,7 @@ function buildPolyMeshProject(ctx) {
 					const mesh = meshFromTriangleFaces(`${obj.name}_weighted`, valid, atlasTexture, true);
 					mesh.__cs2WeightedSource = { faces: valid, groupByNode, hierarchyByNode };
 					mesh.__cs2WeightedPreviewEnabled = !opts || opts.weighted_skin_preview !== false;
+					persistWeightedSkin(mesh);
 					const parent = groupByNode[anchor] || groupByNode[obj.node];
 					if (parent) mesh.addTo(parent); else mesh.addTo('root');
 					mesh.init();
@@ -6646,7 +6877,7 @@ function requireGeckolib() {
 			+ 'which comes from a separate plugin — and it is not installed right now.</p>'
 			+ '<p style="opacity:0.75">Install <b>GeckoLib Animation Utils</b> from '
 			+ 'File → Plugins and run the import again. Converting an already-open model '
-			+ 'from meshes to cubes (Filter menu) works without it.</p>',
+			+ 'from meshes to cubes (Tools menu) works without it.</p>',
 		],
 		onConfirm() {
 			this.hide();
@@ -7454,6 +7685,126 @@ function fuseSelectedPolyMeshes(options) {
 	Blockbench.showQuickMessage(`Fused ${meshes.length} meshes → ${fusedName} (${faceCount} faces)`, 3000);
 }
 
+function reducibleMeshTriangleFaces(mesh) {
+	const weighted = weightedSourceForMesh(mesh);
+	// Older .bbmodel saves discarded these unregistered fields. The suffix is
+	// the only remaining clue; do not silently reduce it as a rigid mesh.
+	if (!weighted && (mesh.__cs2VertexSkin || /_weighted$/.test(mesh.name))) return null;
+	const faces = [];
+	for (const face of Object.values(mesh.faces)) {
+		const ordered = face.getSortedVertices ? face.getSortedVertices() : face.vertices;
+		if (!ordered || ordered.length !== 3) return null;
+		if (weighted && ordered.some(key => !mesh.__cs2VertexSkin?.[key]?.length)) return null;
+		faces.push({
+			positions: ordered.map(key => mesh.vertices[key].slice()),
+			uvs: ordered.map(key => (face.uv?.[key] || [0, 0]).slice()), texture: face.texture,
+			...(weighted ? { skinVertices: ordered.map(key => mesh.__cs2VertexSkin[key].map(inf => ({ ...inf }))) } : {}),
+		});
+	}
+	return faces;
+}
+
+async function reduceSelectedPolyMeshes(options) {
+	const meshes = selectedPolyMeshes(), project = Project, results = [], skipped = [];
+	let editing = false;
+	try {
+		for (let i = 0; i < meshes.length; i++) {
+			Blockbench.setProgress(i / meshes.length);
+			Blockbench.setStatusBarText('Reducing mesh ' + (i + 1) + '/' + meshes.length);
+			await new Promise(resolve => setTimeout(resolve, 0));
+			if (Project !== project) throw new Error('The active project changed; no meshes were edited.');
+			const mesh = meshes[i], source = reducibleMeshTriangleFaces(mesh);
+			if (!source) { skipped.push(mesh.name); continue; }
+			results.push({ mesh, result: simplifyTriangleFaces(source, options), oldVertices: mesh.vertices, oldFaces: mesh.faces,
+				oldSkin: mesh.cs2_skinning, oldSource: mesh.__cs2WeightedSource, oldVertexSkin: mesh.__cs2VertexSkin, oldSkinData: mesh.__cs2SkinData });
+		}
+		const changed = results.filter(entry => entry.result.after < entry.result.before);
+		if (changed.length) {
+			Undo.initEdit({ elements: changed.map(entry => entry.mesh), selection: true });
+			editing = true;
+			for (const { mesh, result } of changed) {
+				const weighted = weightedSourceForMesh(mesh), vertexSkin = {};
+				mesh.vertices = {}; mesh.faces = {};
+				const keys = new Map(), newFaces = [];
+				for (const face of result.faces) {
+					const vertices = [], uv = {};
+					for (let i = 0; i < 3; i++) {
+						const influences = face.skinVertices?.[i];
+						const pk = face.positions[i].join(',') + (influences ? '#' + influences.map(inf => inf.node + ':' + inf.weight).sort().join('|') : '');
+						if (!keys.has(pk)) {
+							const key = 'reduced_' + keys.size;
+							keys.set(pk, key); mesh.vertices[key] = face.positions[i].slice();
+							if (influences) vertexSkin[key] = influences.map(inf => ({ ...inf }));
+						}
+						const key = keys.get(pk); vertices.push(key); uv[key] = face.uvs[i].slice();
+					}
+					newFaces.push(new MeshFace(mesh, { vertices, uv, texture: face.texture }));
+				}
+				for (let i = 0; i < newFaces.length; i += 1024) mesh.addFaces(...newFaces.slice(i, i + 1024));
+				if (weighted) {
+					mesh.__cs2VertexSkin = vertexSkin;
+					mesh.__cs2WeightedSource = { ...weighted, faces: result.faces.map(face => ({ ...face,
+						positions: face.positions.map(p => meshVertexToWorld(mesh, p)) })) };
+					persistWeightedSkin(mesh);
+					// Hydrate against the original bind cache, with the new vertex keys.
+					mesh.__cs2SkinData = null;
+					weightedSourceForMesh(mesh);
+				}
+				const selection = Project.mesh_selection?.[mesh.uuid];
+				if (selection) for (const key of ['vertices', 'edges', 'faces']) if (Array.isArray(selection[key])) selection[key].length = 0;
+			}
+			Undo.finishEdit('Reduce selected Poly Meshes');
+			editing = false;
+			Canvas.updateAll();
+		}
+		const before = results.reduce((sum, entry) => sum + entry.result.before, 0);
+		const after = results.reduce((sum, entry) => sum + entry.result.after, 0);
+		const percent = before ? ((before - after) * 100 / before).toFixed(1) : '0.0';
+		const details = results.map(({ mesh, result }) => mesh.name + ': ' + result.before + ' → ' + result.after);
+		Blockbench.showMessageBox({
+			title: 'Mesh reduction finished',
+			message: before + ' → ' + after + ' triangles (' + percent + '% removed).\n\n'
+				+ details.join('\n') + '\n\n'
+				+ 'Texture images, bone attachments and animations are unchanged. Export the .geo.json normally; Undo restores the original mesh.'
+				+ (results.some(entry => entry.result.after > entry.result.target + 1)
+					? '\nProtected seams, borders, sharp edges or the surface error budget prevented the full target reduction.' : '')
+				+ (skipped.length ? '\nSkipped non-triangle meshes or meshes missing skin weights: ' + skipped.join(', ')
+					+ '. For an older _weighted .bbmodel, reimport the original glTF with this plugin to restore weights.' : ''),
+		});
+	} catch (error) {
+		if (editing) {
+			for (const entry of results) {
+				entry.mesh.vertices = entry.oldVertices; entry.mesh.faces = entry.oldFaces;
+				entry.mesh.cs2_skinning = entry.oldSkin; entry.mesh.__cs2WeightedSource = entry.oldSource;
+				entry.mesh.__cs2VertexSkin = entry.oldVertexSkin; entry.mesh.__cs2SkinData = entry.oldSkinData;
+			}
+			Undo.cancelEdit();
+			Canvas.updateAll();
+		}
+		console.error('[geckolib-import] mesh reduction failed', error);
+		Blockbench.showMessageBox({ title: 'Mesh reduction failed', message: String(error.message || error) });
+	} finally {
+		Blockbench.setProgress(0); Blockbench.setStatusBarText();
+	}
+}
+
+function openReducePolyMeshesDialog() {
+	const meshes = selectedPolyMeshes();
+	if (!meshes.length) return;
+	new Dialog({
+		id: PLUGIN_ID + '_reduce_poly_meshes', title: 'Reduce selected Poly Meshes',
+		form: {
+			keep_percent: { label: 'Triangles to keep (%)', type: 'number', value: 75, min: 5, max: 100, step: 5 },
+			error_percent: { label: 'Surface error budget (%)', type: 'number', value: 0.5, min: 0, max: 5, step: 0.1 },
+			sharp_angle: { label: 'Protect edges sharper than (°)', type: 'number', value: 40, min: 0, max: 180, step: 5 },
+			hint: { type: 'info', text: 'Start with 75% to keep most detail. Works on rigid and native weighted triangle meshes, including meshes inside selected groups. '
+				+ 'Texture seams and borders are protected. A larger error budget or edge angle permits more shape changes; protected details may prevent reaching the target. '
+				+ 'Skin weights and bone bindings are retained; edges with different weights are protected. Quads and old weighted saves missing weights are skipped. You can compare the result in the viewport and Undo it.' },
+		},
+		onConfirm(form) { this.hide(); reduceSelectedPolyMeshes(form); },
+	}).show();
+}
+
 function openFusePolyMeshesDialog() {
 	const meshes = selectedPolyMeshes();
 	if (meshes.length < 2) {
@@ -7492,6 +7843,7 @@ function openFusePolyMeshesDialog() {
 
 let action;
 let fusePolyMeshesAction;
+let reducePolyMeshesAction;
 let envAction;
 let importAction;
 let folderImportAction;
@@ -7505,7 +7857,7 @@ Plugin.register(PLUGIN_ID, {
 	author: 'MopicMP',
 	icon: 'view_in_ar',
 	description: 'Import glTF models — including straight from Sketchfab — into GeckoLib as cubes or preserved Poly Mesh geometry, or turn them into a Customizable Player Models skin.',
-	version: '0.1.23-compact-animation-keys',
+	version: '0.1.25-weighted-mesh-reduction',
 	variant: 'both',
 	min_version: '4.9.0',
 	tags: ['Minecraft: Java Edition', 'Import', 'Animation'],
@@ -7515,8 +7867,10 @@ Plugin.register(PLUGIN_ID, {
 	creation_date: '2026-08-01',
 
 	onload() {
+		installWeightedSkinProperty();
 		enableGeckoMeshEditing();
 		installPolyMeshExporter();
+		installWeightedSkinPreview();
 
 		action = new Action(PLUGIN_ID, {
 			name: 'Convert Meshes to Cubes',
@@ -7556,6 +7910,15 @@ Plugin.register(PLUGIN_ID, {
 			click: openFusePolyMeshesDialog,
 		});
 		MenuBar.addAction(fusePolyMeshesAction, 'filter');
+		reducePolyMeshesAction = new Action(PLUGIN_ID + '_reduce_poly_meshes', {
+			name: 'Reduce Selected Poly Meshes',
+			description: 'Reduce triangle counts while preserving skin weights, bone bindings, texture seams, borders and sharp edges',
+			icon: 'filter_list',
+			condition: () => typeof Mesh !== 'undefined' && selectedPolyMeshes().length > 0,
+			click: openReducePolyMeshesDialog,
+		});
+		// Blockbench retains "filter" as an alias for the visible Tools menu.
+		MenuBar.addAction(reducePolyMeshesAction, 'filter');
 
 		envAction = new Action(PLUGIN_ID + '_env', {
 			name: 'Environment diagnostics (GeckoLib Importer)',
@@ -7621,8 +7984,11 @@ Plugin.register(PLUGIN_ID, {
 	onunload() {
 		uninstallWeightedSkinPreview();
 		uninstallPolyMeshExporter();
+		if (weightedSkinProperty) weightedSkinProperty.delete();
+		weightedSkinProperty = null;
 		if (action) action.delete();
 		if (fusePolyMeshesAction) fusePolyMeshesAction.delete();
+		if (reducePolyMeshesAction) reducePolyMeshesAction.delete();
 		if (envAction) envAction.delete();
 		if (importAction) importAction.delete();
         if (folderImportAction) folderImportAction.delete();
