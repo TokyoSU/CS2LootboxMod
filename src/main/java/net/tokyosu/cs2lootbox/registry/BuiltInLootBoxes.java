@@ -4,6 +4,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.tokyosu.cs2lootbox.registry.cases.CSGOWeaponCase;
 import net.tokyosu.cs2lootbox.registry.esports.ESport2013Case;
 import net.tokyosu.cs2lootbox.registry.patch.CSGOPatchPack;
+import net.tokyosu.cs2lootbox.registry.music.BuiltInMusicKits;
 
 /**
  * Built-in CS:GO Weapon Case content.
@@ -43,6 +44,7 @@ public final class BuiltInLootBoxes {
         registerCases();
         registerPatch();
         registerESports();
+        BuiltInMusicKits.register();
         
     }
     

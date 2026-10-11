@@ -7,6 +7,7 @@ import dev.latvian.mods.kubejs.script.ScriptType;
 import dev.latvian.mods.kubejs.util.ClassFilter;
 import net.tokyosu.cs2lootbox.integration.kubejs.event.LootboxStartupRegisterEvent;
 import net.tokyosu.cs2lootbox.registry.BuiltInLootBoxes;
+import net.tokyosu.cs2lootbox.registry.LootboxCreativeTab;
 import net.tokyosu.cs2lootbox.registry.LootboxRegistrationService;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,6 +33,7 @@ public final class CS2LootboxKubeJSPlugin extends KubeJSPlugin {
     @Override
     public void registerClasses(@NotNull ScriptType type, @NotNull ClassFilter filter) {
         filter.allow("net.tokyosu.cs2lootbox.api.lootbox");
+        filter.allow("net.tokyosu.cs2lootbox.api.music");
         filter.allow("net.tokyosu.cs2lootbox.integration.kubejs.event");
     }
 
@@ -40,6 +42,6 @@ public final class CS2LootboxKubeJSPlugin extends KubeJSPlugin {
         BuiltInLootBoxes.register();
         REGISTER.post(new LootboxStartupRegisterEvent());
         LootboxRegistrationService.finalizeItemRegistrations();
-        net.tokyosu.cs2lootbox.registry.CS2LootboxCreativeTab.register();
+        LootboxCreativeTab.register();
     }
 }

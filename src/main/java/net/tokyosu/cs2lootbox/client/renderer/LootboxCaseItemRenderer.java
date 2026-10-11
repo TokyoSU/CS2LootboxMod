@@ -117,14 +117,18 @@ public final class LootboxCaseItemRenderer extends GeoItemRenderer<LootboxCaseIt
                 && SkinnedGeoModelLoader.get(modelResource).isEmpty()
                 && StaticItemAnimation.isStatic(animatable.getDefinition().animation(),
                         animatable.getDefinition().animations().itemIdle())) {
-            // Keep GeckoLib's controllers, animated texture updates and render events live.
-            // Only defer the expensive vertex traversal until we know whether a rebake is needed.
+            // Keep the render lifecycle and animated textures live. The item model
+            // reuses only a settled, constant held pose; GUI/opening animations use
+            // their normal managers and a changed shared model pose is restored.
+            LootboxCaseItemModel itemModel = (LootboxCaseItemModel) getGeoModel();
+            itemModel.setStaticHeldModel(held ? model : null);
             deferGeometry = true;
             try {
                 super.actuallyRender(poseStack, animatable, model, renderType, bufferSource, buffer,
                         false, partialTick, packedLight, packedOverlay, red, green, blue, alpha);
             } finally {
                 deferGeometry = false;
+                itemModel.setStaticHeldModel(null);
             }
             LocalGeometry geometry = CaseGeometryCache.get(model, (localPose, vertices) -> {
                 for (GeoBone root : model.topLevelBones()) {
@@ -137,7 +141,8 @@ public final class LootboxCaseItemRenderer extends GeoItemRenderer<LootboxCaseIt
                 // Unlit hands/inventory can draw the GPU mesh directly. Keep world
                 // lighting and translucent sorting in the normal buffered path below.
                 if (held) ClientRenderDiagnostics.heldGpu();
-                immediate.endBatch();
+                if (held) ClientRenderDiagnostics.heldFlush(HeldCaseBufferFlush.flush(immediate));
+                else immediate.endBatch();
                 try {
                     HeldCaseMeshCache.render(poseStack, model, renderType,
                             packedLight, packedOverlay, red, green, blue, alpha,

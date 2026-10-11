@@ -1,0 +1,8 @@
+{
+  "music.my_kit.mainmenu": {
+    "sounds": [{ "name": "kubejs:music/my_kit/mainmenu", "stream": true }]
+  },
+  "music.my_kit.round_win": {
+    "sounds": [{ "name": "kubejs:music/my_kit/round_win", "stream": true }]
+  }
+}

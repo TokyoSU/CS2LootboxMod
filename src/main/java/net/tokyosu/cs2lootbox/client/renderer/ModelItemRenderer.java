@@ -10,9 +10,12 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item;
 import net.minecraftforge.client.ForgeRenderTypes;
 import net.tokyosu.cs2lootbox.client.model.StaticItemModel;
-import net.tokyosu.cs2lootbox.item.ModelItem;
+import net.tokyosu.cs2lootbox.item.StaticModelledItem;
+import net.tokyosu.cs2lootbox.item.MusicKitItem;
+import net.tokyosu.cs2lootbox.client.music.ClientMusicKitAvailability;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.cache.object.BakedGeoModel;
@@ -28,10 +31,10 @@ import software.bernie.geckolib.renderer.GeoItemRenderer;
  * FIRST_PERSON_RIGHT_HAND fully independent for GeckoLib custom-rendered items
  * and lets KubeJS own all seven useful item display contexts.
  */
-public final class ModelItemRenderer extends GeoItemRenderer<ModelItem> {
+public final class ModelItemRenderer<T extends Item & StaticModelledItem> extends GeoItemRenderer<T> {
     private boolean deferGeometry;
     public ModelItemRenderer() {
-        super(new StaticItemModel());
+        super(new StaticItemModel<>());
     }
 
     @Override
@@ -42,9 +45,11 @@ public final class ModelItemRenderer extends GeoItemRenderer<ModelItem> {
             @NotNull MultiBufferSource bufferSource,
             int packedLight,
             int packedOverlay) {
+        if (stack.getItem() instanceof MusicKitItem kit
+                && !ClientMusicKitAvailability.isAvailable(kit.definition())) return;
         poseStack.pushPose();
         try {
-            if (stack.getItem() instanceof ModelItem item) {
+            if (stack.getItem() instanceof StaticModelledItem item) {
                 // ItemRenderer has already applied its custom-renderer centering
                 // translation (-0.5, -0.5, -0.5) before renderByItem is called.
                 // Vanilla JSON display transforms are applied *before* that step.
@@ -75,7 +80,7 @@ public final class ModelItemRenderer extends GeoItemRenderer<ModelItem> {
 
     @Override
     public @NotNull RenderType getRenderType(
-            @NotNull ModelItem animatable,
+            @NotNull T animatable,
             @NotNull ResourceLocation texture,
             @Nullable MultiBufferSource bufferSource,
             float partialTick) {
@@ -91,7 +96,7 @@ public final class ModelItemRenderer extends GeoItemRenderer<ModelItem> {
     @Override
     public void actuallyRender(
             PoseStack poseStack,
-            ModelItem animatable,
+            T animatable,
             BakedGeoModel model,
             RenderType renderType,
             MultiBufferSource bufferSource,
@@ -146,7 +151,7 @@ public final class ModelItemRenderer extends GeoItemRenderer<ModelItem> {
     }
 
     @Override
-    public void renderRecursively(PoseStack pose, ModelItem animatable, GeoBone bone, RenderType type,
+    public void renderRecursively(PoseStack pose, T animatable, GeoBone bone, RenderType type,
                                   MultiBufferSource buffers, VertexConsumer vertices, boolean reRender,
                                   float tick, int light, int overlay, float r, float g, float b, float a) {
         if (!deferGeometry) super.renderRecursively(pose, animatable, bone, type, buffers, vertices,

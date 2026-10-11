@@ -1,4 +1,4 @@
-package net.tokyosu.cs2lootbox.registry;
+package net.tokyosu.cs2lootbox.registry.pools;
 
 import net.tokyosu.cs2lootbox.api.lootbox.LegendarySubLootBuilder;
 import net.tokyosu.cs2lootbox.api.lootbox.LootRarityGrade;

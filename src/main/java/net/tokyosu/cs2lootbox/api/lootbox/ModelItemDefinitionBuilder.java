@@ -15,6 +15,11 @@ public final class ModelItemDefinitionBuilder {
                 .animation("cs2lootbox:animations/static_item.animation.json");
     }
     public ModelItemDefinitionBuilder(ResourceLocation id) { this(id.toString()); }
+    public ModelItemDefinitionBuilder(Definition existing) {
+        display = new LootboxDefinitionBuilder(existing.display());
+        grade = existing.grade();
+        hasModel = hasTexture = true;
+    }
     public ModelItemDefinitionBuilder model(String resource) { display.model(resource); hasModel = true; return this; }
     public ModelItemDefinitionBuilder texture(String resource) { display.texture(resource); hasTexture = true; return this; }
     public ModelItemDefinitionBuilder name(String key) { display.caseName(key); return this; }

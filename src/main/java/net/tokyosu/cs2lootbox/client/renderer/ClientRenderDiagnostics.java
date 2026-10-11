@@ -17,11 +17,16 @@ import java.util.function.Predicate;
 public final class ClientRenderDiagnostics {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static long heldGpu, heldBuffered, heldLive;
+    private static long heldPoseReuses, heldPoseEvaluations;
+    private static long heldSelectiveFlushes, heldFullFlushes;
     private ClientRenderDiagnostics() {}
 
     static void heldGpu() { heldGpu++; }
     static void heldBuffered() { heldBuffered++; }
     static void heldLive() { heldLive++; }
+    public static void heldPoseReused() { heldPoseReuses++; }
+    public static void heldPoseEvaluated() { heldPoseEvaluations++; }
+    static void heldFlush(boolean selective) { if (selective) heldSelectiveFlushes++; else heldFullFlushes++; }
 
     /** Called by the main mod entry point only on a physical client. */
     public static void register() {
@@ -49,7 +54,9 @@ public final class ClientRenderDiagnostics {
                             var cache = HeldCaseMeshCache.statistics();
                             context.getSource().sendSuccess(() -> Component.literal(
                                     "CS2 held cases: GPU cache draws=" + heldGpu + ", buffered draws=" + heldBuffered
-                                            + ", live geometry draws=" + heldLive), false);
+                                            + ", live geometry draws=" + heldLive
+                                            + ", pose reuse=" + heldPoseReuses + ", pose evaluations=" + heldPoseEvaluations
+                                            + ", selective flushes=" + heldSelectiveFlushes + ", full flushes=" + heldFullFlushes), false);
                             context.getSource().sendSuccess(() -> Component.literal(
                                     "CS2 GPU cache (all contexts): uploads=" + cache.uploads() + ", hits=" + cache.hits()
                                             + ", evictions=" + cache.evictions() + ", entries=" + cache.entries()), false);
@@ -57,6 +64,8 @@ public final class ClientRenderDiagnostics {
                         }))
                         .then(Commands.literal("reset").executes(creativeOnly(creativePlayer, context -> {
                             heldGpu = heldBuffered = heldLive = 0;
+                            heldPoseReuses = heldPoseEvaluations = 0;
+                            heldSelectiveFlushes = heldFullFlushes = 0;
                             HeldCaseMeshCache.resetStatistics();
                             context.getSource().sendSuccess(() -> Component.literal("CS2 render counters reset; cached meshes retained."), false);
                             return 1;

@@ -7,6 +7,7 @@ import dev.latvian.mods.kubejs.typings.Param;
 import net.minecraft.resources.ResourceLocation;
 import net.tokyosu.cs2lootbox.api.lootbox.LootboxDefinition;
 import net.tokyosu.cs2lootbox.api.lootbox.LootboxDefinitionBuilder;
+import net.tokyosu.cs2lootbox.api.music.MusicKitDefinitionBuilder;
 import net.tokyosu.cs2lootbox.registry.LootboxRegistrationService;
 import net.tokyosu.cs2lootbox.registry.LootboxRegistry;
 import org.jetbrains.annotations.NotNull;
@@ -66,5 +67,19 @@ public final class LootboxStartupRegisterEvent extends StartupEventJS {
         }
 
         return ResourceUtils.parseRequired(value, "kubejs");
+    }
+
+    @Info("Registers a reusable music kit with a listening screen and jukebox-compatible saved tracks. No key or carousel.")
+    public void addMusicKit(String id, Consumer<MusicKitDefinitionBuilder> config) {
+        var builder = new MusicKitDefinitionBuilder(id);
+        Objects.requireNonNull(config, "config").accept(builder);
+        LootboxRegistrationService.registerMusicKit(builder);
+    }
+
+    @Info("Edits an existing music kit before item registration. Use clearTracks() when replacing its track list.")
+    public void changeMusicKit(String id, Consumer<MusicKitDefinitionBuilder> config) {
+        var builder = new MusicKitDefinitionBuilder(LootboxRegistrationService.musicKit(parseId(id)));
+        Objects.requireNonNull(config, "config").accept(builder);
+        LootboxRegistrationService.changeMusicKit(builder);
     }
 }

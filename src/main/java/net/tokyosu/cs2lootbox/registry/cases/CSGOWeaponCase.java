@@ -10,8 +10,8 @@ import net.tokyosu.cs2lootbox.api.lootbox.LootboxDefinitionBuilder;
 import net.tokyosu.cs2lootbox.api.lootbox.LootRarityGrade;
 import net.tokyosu.cs2lootbox.registry.DefaultLootBoxRegistries;
 import net.tokyosu.cs2lootbox.registry.LootboxRegistrationService;
+import net.tokyosu.cs2lootbox.registry.pools.ClassicKnifePool;
 import net.tokyosu.cs2lootbox.registry.LootRarityWeights;
-import net.tokyosu.cs2lootbox.registry.ClassicKnifePool;
 
 public final class CSGOWeaponCase {
     public static final ResourceLocation CASE_ID = ResourceLocation.fromNamespaceAndPath(CS2LootBoxMod.MOD_ID, "csgo_case_weapon");

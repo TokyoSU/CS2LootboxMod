@@ -10,9 +10,9 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.tokyosu.cs2lootbox.CS2LootBoxMod;
 
 /** KubeJS-backed tab populated after item registries are ready. */
-public final class CS2LootboxCreativeTab {
+public final class LootboxCreativeTab {
     public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(CS2LootBoxMod.MOD_ID, "main");
-    private CS2LootboxCreativeTab() {}
+    private LootboxCreativeTab() {}
 
     public static void register() {
         CreativeTabBuilder tab = new CreativeTabBuilder(ID);

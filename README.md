@@ -6,7 +6,9 @@
 
 **A configurable CS2-inspired lootbox system for Minecraft Forge 1.20.1.**
 
-Create animated cases, optional matching keys, free-to-open drops, weighted loot tables, legendary sub-rolls, rarity effects, StatTrak-style rewards, custom sounds, and CS-style opening screens — all configurable through KubeJS.
+Create animated cases, optional matching keys, free-to-open drops, weighted loot tables, legendary sub-rolls, rarity effects, StatTrak-style rewards, custom sounds, music kits, and CS-style opening screens — all configurable through KubeJS.
+
+Version **1.1.0** adds music-kit listening screens and vanilla jukebox support. Download the full collection pack or individual kit resource packs; shared model geometry stays in the mod.
 
 ![Minecraft](https://img.shields.io/badge/Minecraft-1.20.1-62B47A)
 ![Forge](https://img.shields.io/badge/Forge-47.x-E04E39)
@@ -57,6 +59,14 @@ CS2 Lootbox provides a reusable, registry-driven case system designed for modpac
   - Persistent kill counter stored on the awarded `ItemStack`
   - Main-hand StatTrak item is preferred; offhand is used when applicable
 
+- **Music kits and custom model items**
+  - 101 built-in kits with 1,563 tracks, enabled by optional resource packs
+  - CS2-style listening screen with artwork, track selection and playback controls
+  - Save a track for vanilla jukebox playback, starting at zero
+  - Register custom kits and static 3D rewards through KubeJS
+  - Shared rarity colors and a dedicated CS2 Lootbox creative tab
+  - Independent inventory, carousel and prize-reveal transforms
+
 - **Forge config options**
   - Toggle case opening server-side
   - Toggle 3D inspection
@@ -75,9 +85,10 @@ CS2 Lootbox provides a reusable, registry-driven case system designed for modpac
 | Minecraft | `1.20.1` |
 | Minecraft Forge | `47.x` |
 | Java | `17` |
+| ApocalypseLib | `1.2.0+` |
 | KubeJS | `2001.6.5-build.16+` |
 | GeckoLib | `4.8.4+` |
-| GeckoMesh | `1.0.0+` |
+| GeckoMesh | `1.1+` |
 | LDLib | `1.0.52.a+` |
 
 KubeJS also uses its normal dependencies such as Rhino and Architectury API.
@@ -90,7 +101,8 @@ KubeJS also uses its normal dependencies such as Rhino and Architectury API.
 2. Install the required dependencies listed above.
 3. Place `cs2lootbox-<version>.jar` in your Minecraft `mods` folder.
 4. Start the game once so Forge can generate the configuration files.
-5. Add custom case definitions to:
+5. Optionally install `cs2lootbox-music-full.zip` or individual music-kit ZIPs in `resourcepacks/` and enable them in **Options → Resource Packs**. Music kits require **CS2 Lootbox v1.1.0+**. Packs supply audio and textures; the mod supplies shared geometry. Kits with missing required resources are hidden from creative tabs and cannot open their listening screen.
+6. Add custom case, model-item or music-kit definitions to:
 
 ```text
 kubejs/startup_scripts/
@@ -102,9 +114,9 @@ Custom models, textures, animations and translations belong under:
 kubejs/assets/<namespace>/
 ```
 
-> Case registration happens during startup. Changes to case definitions require a **full game restart**; `/reload` is not enough.
+> Item registration happens during startup. Changes to case, model-item or music-kit definitions require a **full game restart**; `/reload` is not enough. Resource-pack changes can be applied through the pack menu or **F3+T**.
 
-For multiplayer, the client and server should use matching startup scripts and assets.
+For multiplayer, use matching mod versions and startup scripts on the client and server. Music resource packs are client resources; dedicated servers do not need them. Clients need a kit's pack to see its artwork and hear it. Removing a pack preserves existing item IDs and saved selections; re-enable it to restore the kit.
 
 ---
 
@@ -132,6 +144,8 @@ CS2LootboxEvents.register(event => {
         crate.thirdPersonLeft(0, 2.5, 0, 75, 45, 0, 1.3)
         crate.ground(0, 1, 0, 0, 0, 0, 1.5)
         crate.gui(0, -3, 0, 30, 135, 0, 1.5)
+        crate.guiCarousel(0, -3, 0, 30, 135, 0, 1.8)
+        crate.guiReveal(0, -3, 0, 30, 135, 0, 2.2)
         crate.fixed(0, -1.5, 0, 0, 0, 0, 1.5)
 
         crate.position(22, 30)
@@ -143,6 +157,7 @@ CS2LootboxEvents.register(event => {
 
         crate.defaultSound(0.60, 1.0)
         crate.dropSound('cs2lootbox:case_drop')
+        // crate.noDropSound() // silence the case's drop cue
         crate.openSound('minecraft:block.chest.open')
         // Optional: repeated for the full OPEN animation.
         // crate.openLoopSound('cs2lootbox:case_pins_fall')
@@ -157,6 +172,7 @@ CS2LootboxEvents.register(event => {
             'The Revolution Collection',
             'kubejs:textures/gui/collections/revolution.png'
         )
+        crate.collectionImageScale(0.8)
 
         crate.loot('minecraft:iron_ingot', 55, loot => {
             loot.count(1, 4)
@@ -187,6 +203,20 @@ CS2LootboxEvents.register(event => {
 ```
 
 `addCase(...)` is also available as an alias of `addCrate(...)`.
+
+The resource paths in this example require your own assets. See the [example setup guide](examples/kubejs/README.md) before copying scripts.
+
+## Display transforms and collection artwork
+
+`gui(...)` controls inventory and ordinary GUI item rendering. `guiCarousel(...)` controls the roulette item, and `guiReveal(...)` controls the result-panel item. The latter two fall back to `gui(...)` when omitted. Each uses `x, y, z, rotationX, rotationY, rotationZ, scale`; cases and static model items also support separate X/Y/Z scales for the carousel and reveal.
+
+`position`, `scale` and `rotation` on a case control its opening-screen preview. Loot-entry transforms control only the case-content list. These are separate from the registered item's display transforms.
+
+Use `collectionImage('namespace:textures/gui/collection.png')` and `collectionImageScale(0.8)` to set collection artwork and its size, or `collectionImage(path, scale)` to set both together. The scale must be positive. The PNG must exist in the enabled client resources.
+
+## Static 3D rewards
+
+Register a patch or other static model item with `event.addItem(id, item => { ... })`, then use that item ID in `crate.loot(...)` or legendary sub-loot. Set its model, texture, shared rarity grade and display transforms. See the [patch item example](examples/kubejs/startup_scripts/cs2lootbox_items.js), which reuses the mod's patch inspection mesh. These items do not have their own opening carousel.
 
 ---
 
@@ -285,8 +315,8 @@ loot.count(1, 4)
 loot.name('translation.key')
 
 loot.rarity('translation.key')
-loot.rarity('translation.key', 0xRRGGBB)
-loot.rarityColor(0xRRGGBB)
+loot.rarity('translation.key', 0x5E98D9) // RGB hex color
+loot.rarityColor(0x5E98D9)
 loot.rarityTier('covert')
 
 loot.description('translation.key')
@@ -412,6 +442,18 @@ When enabled by server config, a kill caused by the player increments the counte
 
 ---
 
+# Music Kits
+
+Right-click a kit to open its listening screen. Select a track, use Previous/Next, Play/Stop and Pause/Resume, then **Save** to keep the selected track on the item. Inserting it into a vanilla jukebox starts the saved track at zero; ejecting it returns the kit. Closing the listening screen stops its local preview. A music kit has no opening carousel, but can be another case's reward.
+
+Audio uses **Ogg Vorbis (`.ogg`)**, with `stream: true` in `sounds.json`. Use **mono** for jukebox distance attenuation. Preview and jukebox volume follow Minecraft's **Jukebox/Note Blocks** slider.
+
+Use `event.addMusicKit(...)` for a custom kit and `event.changeMusicKit(...)` to edit an existing one. Built-in kits are registered before KubeJS callbacks: edit them instead of registering their IDs again. Keep track IDs stable so saved selections survive reordering. `image(...)` sets the listening-screen artwork; `imageScale(...)` accepts values above zero up to 2. The optional `model(...)` and `texture(...)` must be supplied together; otherwise the item uses its artwork as a 2D texture.
+
+The catalogue includes 27 kits using the shared sleeve/record mesh and 74 using their original 2D artwork. The full collection ZIP enables all 101 kits in one installation, suitable for the CurseForge app. Individual kit ZIPs remain available and use their GUI artwork as the pack icon. See [registration, audio assets and packaging](docs/music-kits.md), the [missing-model list](docs/music-kit-missing-models.md) and the [KubeJS example](examples/kubejs/startup_scripts/cs2lootbox_music_kits.js).
+
+---
+
 # Custom Sounds
 
 Each case has default volume and pitch values:
@@ -450,6 +492,8 @@ crate.carouselTickSound('namespace:sound', 0.30, 1.0)
 
 `openLoopSound(...)` is stopped automatically as soon as GeckoLib's OPEN animation ends, or if the UI closes. Use `noOpenLoopSound()` to clear it when modifying an existing case.
 
+Use `noDropSound()` to disable the drop cue, including on an existing case edited with `changeCase(...)`.
+
 The mod includes its own CS-style case UI sound set, including carousel ticks, reveal sounds and rarity-specific awarded sounds.
 
 ---
@@ -466,9 +510,26 @@ cs2lootbox.rarity.restricted
 cs2lootbox.rarity.classified
 cs2lootbox.rarity.covert
 cs2lootbox.rarity.special
+cs2lootbox.rarity.knives
+cs2lootbox.rarity.contraband
 ```
 
-Custom translation keys and colors can be supplied per loot entry.
+Built-in colors and Minecraft item rarities are shared through `CS2LootboxRarity`; registering items does not create a new rarity per item. For model items, pass a `LootRarityGrade` value to `rarityGrade(...)`; music kits accept the grade's string ID, such as `'milspec'` or `'classified'`.
+
+Loot entries can use the same grade to set their UI label, color and sound tier:
+
+```js
+CS2LootboxEvents.register(event => {
+    const Grade = Java.loadClass('net.tokyosu.cs2lootbox.api.lootbox.LootRarityGrade')
+    event.changeCase('cs2lootbox:csgo_case_weapon', crate => {
+        crate.loot('minecraft:diamond', 10, loot => {
+            loot.rarityGrade(Grade.CLASSIFIED)
+        })
+    })
+})
+```
+
+This controls the loot presentation; it does not replace a vanilla item's inherent Minecraft rarity. Custom translation keys and colors remain available per loot entry. See the [shared-grade example](examples/kubejs/startup_scripts/cs2lootbox_rarity_example.js).
 
 ---
 
@@ -505,7 +566,7 @@ The repository also contains example files under:
 examples/kubejs/
 ```
 
-including example startup scripts and translations.
+including case, shared-rarity, static patch-item and music-kit scripts, translations and music sound definitions. The [setup guide](examples/kubejs/README.md) explains which examples need custom assets.
 
 ---
 
@@ -573,6 +634,10 @@ The roulette animation cannot change the server-selected reward.
 
 Cases use GeckoLib / GeckoMesh for their animated 3D presentation.
 
+Reusable geometry uses a GPU cache. Eligible constant held-case idle poses also reuse evaluated bone transforms and avoid flushing empty fixed buffers; animated or incompatible models use the normal rendering path. These optimisations preserve geometry and texture quality. The [rendering guide](docs/held-case-rendering.md) describes cache eligibility and diagnostics.
+
+In Creative mode, run `/cs2lootbox renderstats reset`, hold the case for about ten seconds, then run `/cs2lootbox renderstats`. Compare FPS against an empty hand at the same location and graphics settings; cache counters show path usage rather than an FPS guarantee.
+
 Carousel rewards use Minecraft's normal `ItemStack` renderer, which means:
 
 - generated item models remain 2D;
@@ -601,6 +666,12 @@ gradlew.bat build
 ```bash
 ./gradlew build
 ```
+
+Build one optional resource-pack ZIP per music kit with `gradlew.bat musicResourcePacks`; the ZIPs are placed in `build/resourcepacks/` and use each kit's GUI artwork as its icon. To package only selected kits, see [Music resource packs](docs/music-kits.md#optional-music-resource-packs).
+
+For one kit, run `gradlew.bat musicResourcePack_treeadams_benbromfield_01`. Alternatively, `python tools/build_music_resource_pack.py --kit treeadams_benbromfield_01` builds that kit with Python's standard library. Omit `--kit` to build all 101 separate ZIPs. A normal `build` produces the mod JAR without bundling music audio or textures.
+
+For the complete CurseForge collection, run `gradlew.bat musicResourcePackFull` or `python tools/build_music_resource_pack.py --combined`. Both produce `build/resourcepacks/cs2lootbox-music-full.zip`, with all audio, artwork and atlases, one merged sound manifest, and the collection logo. Geometry stays in the mod. On Linux/macOS, use `./gradlew` in place of `gradlew.bat`.
 
 The built mod JAR will be placed in:
 
@@ -637,12 +708,25 @@ loot/
 registry/
     LootboxRegistry
     LootboxRegistrationService
-    BuiltInLootboxes
+    BuiltInLootBoxes
+    LootboxCreativeTab
     ModSounds
 
 integration/kubejs/
     CS2LootboxKubeJSPlugin
     LootboxStartupRegisterEvent
+
+api/music/
+    MusicKitDefinition
+    MusicKitDefinitionBuilder
+
+music/
+    MusicKitResources
+    MusicKitSelection
+    MusicKitDiscEvents
+
+ui/
+    MusicKitUI
 
 client/widget/
     LootboxModelWidget

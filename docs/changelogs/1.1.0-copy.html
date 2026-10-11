@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CS2 Lootbox v1.1.0 changelogs</title><style>
+*{box-sizing:border-box}body{margin:0;background:#eef1f4;color:#243142;font:16px/1.6 system-ui,sans-serif}main{max-width:960px;margin:32px auto;padding:0 20px}section{background:white;border:1px solid #d6dce3;border-radius:10px;padding:24px;margin:20px 0}header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px}header h2{font-size:20px;margin:0}button{background:#2267cf;color:white;border:0;border-radius:6px;padding:10px 16px;cursor:pointer;font:600 14px system-ui}button:hover{background:#1954ab}textarea{width:100%;padding:12px;border:1px solid #bdc7d4;border-radius:6px;font:14px/1.5 Consolas,monospace;resize:vertical}#commit-title{height:52px}#commit-description{height:320px}article h1{font-size:26px}article h2{font-size:20px}article li{margin:8px 0}#status{min-height:28px;color:#276a45}label{display:block;font-weight:600;margin:12px 0 8px}.small{color:#596879;font-size:14px}
+</style></head><body><main><h1>CS2 Lootbox v1.1.0</h1>
+<p class="small">Copy the commit fields into GitHub Desktop, or copy the formatted changelog into CurseForge.</p>
+<section><header><h2>GitHub Desktop</h2></header>
+<label for="commit-title">Summary</label><textarea id="commit-title" readonly>Add music kits and improve held-case rendering for v1.1.0</textarea><button data-copy="commit-title">Copy summary</button>
+<label for="commit-description">Description</label><textarea id="commit-description" readonly>- Add 101 music-kit definitions with support for 1,563 streaming tracks through optional resource packs.
+- Add a CS2-style listening GUI with artwork, track selection, playback controls, progress and server-validated saving.
+- Support saved tracks in vanilla jukeboxes, preserving kit identity and NBT when ejected.
+- Add KubeJS addMusicKit/changeMusicKit APIs and share the static model renderer with music-kit items.
+- Hide music kits with missing client resources and refresh availability after resource reloads.
+- Support individual kit ZIPs and a full collection pack without duplicating model geometry or bundling music assets in the mod JAR.
+- Reuse eligible static held-case poses and skip empty buffer flushes, with safe fallbacks for animated models and rendering integrations.
+- Extend render diagnostics with pose reuse/evaluation and buffer-flush counters.
+- Restore patch-envelope animation and correct corrupted Unicode symbols in translations.
+- Update the README and KubeJS examples for shared rarities, model items, separate GUI transforms, collection artwork and music assets.
+- Allow normal mod builds without the optional music source library.</textarea><button data-copy="commit-description">Copy description</button></section>
+<section><header><h2>CurseForge</h2><button data-copy="curseforge" data-formatted="true">Copy formatted changelog</button></header>
+<article id="curseforge"><h1>CS2 Lootbox v1.1.0</h1>
+<h2>Music kits</h2>
+<ul><li>Added support for <strong>101 music kits</strong> and <strong>1,563 tracks</strong>, supplied through optional music resource packs.</li><li>Added a <strong>CS2-style listening screen</strong> with cover artwork, track selection, playback progress, Previous/Next, Play/Stop and Pause/Resume controls.</li><li>Save a selected track to the kit and play it in a <strong>vanilla jukebox</strong>. Playback starts from the beginning, and ejecting the disc returns your music kit with its saved selection.</li><li>Music volume follows the <strong>Jukebox/Note Blocks</strong> slider. Supplied tracks use mono audio for distance attenuation.</li><li>Kits use a 3D sleeve-and-record model when a matching atlas is available, or their original 2D artwork otherwise.</li></ul>
+<h2>Resource packs</h2>
+<ul><li>Music audio and artwork are kept outside the mod JAR. Shared model geometry remains in the mod.</li><li>Choose individual kit packs or the <strong>Full Collection</strong> ZIP to install all kits together through the CurseForge app.</li><li>Kits with missing required resources are hidden from creative tabs and cannot open the listening screen. Existing items and saved selections are preserved when a pack is disabled.</li><li>Resource-pack changes refresh kit availability without changing registered item IDs.</li></ul>
+<h2>Performance and fixes</h2>
+<ul><li>Improved rendering for eligible static cases held in first person by reusing their poses and avoiding empty buffer flushes, while preserving model and texture quality.</li><li>Restored patch-envelope animation after mesh reduction.</li><li>Fixed corrupted text symbols, including <strong>★</strong>, <strong>™</strong>, <strong>•</strong> and <strong>♥</strong>.</li></ul>
+<h2>For pack creators</h2>
+<ul><li>Added KubeJS music-kit registration and editing with customizable artwork, tracks and model transforms.</li><li>Updated the README and examples for music kits, shared rarity grades, static model items, independent carousel/reveal transforms and collection-image scaling.</li><li>Expanded Creative-mode render diagnostics to help investigate held-case performance.</li></ul>
+<p><strong>Music setup:</strong> Install CS2 Lootbox v1.1.0+ and its dependencies, then enable your music ZIP through <strong>Options &gt; Resource Packs</strong>. Dedicated servers do not need the music resource packs; clients and servers still need matching mod versions and KubeJS definitions.</p></article></section><p id="status" role="status" aria-live="polite"></p></main>
+<script>
+async function copy(element,formatted){
+ const status=document.getElementById('status');status.textContent='';
+ try{
+  if(!navigator.clipboard)throw new Error('Clipboard unavailable');
+  if(formatted){await navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([element.innerHTML],{type:'text/html'}),'text/plain':new Blob([element.innerText],{type:'text/plain'})})]);}
+  else await navigator.clipboard.writeText(element.value);
+ }catch(error){
+  let copied=false;
+  if(formatted){const selection=window.getSelection(),range=document.createRange();range.selectNodeContents(element);selection.removeAllRanges();selection.addRange(range);copied=document.execCommand('copy');if(copied)selection.removeAllRanges();}
+  else{element.focus();element.select();copied=document.execCommand('copy');}
+  if(!copied){status.textContent='The text is selected. Press Ctrl+C to copy it.';return;}
+ }
+ status.textContent=formatted?'Formatted changelog copied. Paste into the CurseForge editor.':'Copied. Paste into GitHub Desktop.';
+}
+document.querySelectorAll('[data-copy]').forEach(button=>button.addEventListener('click',()=>copy(document.getElementById(button.dataset.copy),button.dataset.formatted==='true')));
+</script></body></html>

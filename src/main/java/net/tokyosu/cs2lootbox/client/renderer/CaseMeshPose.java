@@ -41,6 +41,31 @@ final class CaseMeshPose {
         return matches(model.topLevelBones(), 0) == bones.length;
     }
 
+    /** Restore a still item's evaluated pose after a GUI/opening renderer used the shared model. */
+    boolean restore(BakedGeoModel model) {
+        if (sameBones(model.topLevelBones(), 0) != bones.length) return false;
+        if (matches(model)) return true;
+        for (int i = 0; i < bones.length; i++) {
+            GeoBone bone = bones[i];
+            int offset = i * 12;
+            bone.setPosX(transforms[offset]); bone.setPosY(transforms[offset + 1]); bone.setPosZ(transforms[offset + 2]);
+            bone.setRotX(transforms[offset + 3]); bone.setRotY(transforms[offset + 4]); bone.setRotZ(transforms[offset + 5]);
+            bone.setScaleX(transforms[offset + 6]); bone.setScaleY(transforms[offset + 7]); bone.setScaleZ(transforms[offset + 8]);
+            bone.setPivotX(transforms[offset + 9]); bone.setPivotY(transforms[offset + 10]); bone.setPivotZ(transforms[offset + 11]);
+            bone.setHidden((flags[i] & 1) != 0); bone.setChildrenHidden((flags[i] & 2) != 0);
+        }
+        return true;
+    }
+
+    private int sameBones(List<GeoBone> list, int index) {
+        for (GeoBone bone : list) {
+            if (index >= bones.length || bone != bones[index]) return -1;
+            index = sameBones(bone.getChildBones(), index + 1);
+            if (index < 0) return -1;
+        }
+        return index;
+    }
+
     private int matches(List<GeoBone> list, int index) {
         for (int j = 0; j < list.size(); j++) {
             GeoBone bone = list.get(j);

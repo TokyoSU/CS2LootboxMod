@@ -7,14 +7,13 @@ import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.tokyosu.cs2lootbox.api.lootbox.LootboxDefinition;
 import net.tokyosu.cs2lootbox.api.lootbox.ModelItemDefinitionBuilder;
 import net.tokyosu.cs2lootbox.client.renderer.ModelItemRenderer;
-import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import java.util.function.Consumer;
 
 /** A static collectible; it has no lootbox UI or animation controller. */
-public final class ModelItem extends Item implements GeoItem {
+public final class ModelItem extends Item implements StaticModelledItem {
     private final LootboxDefinition definition;
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     public ModelItem(Properties properties, ModelItemDefinitionBuilder.Definition definition) {
@@ -28,9 +27,9 @@ public final class ModelItem extends Item implements GeoItem {
     @Override public AnimatableInstanceCache getAnimatableInstanceCache() { return cache; }
     @Override public void initializeClient(Consumer<IClientItemExtensions> consumer) {
         consumer.accept(new IClientItemExtensions() {
-            private ModelItemRenderer renderer;
+            private ModelItemRenderer<ModelItem> renderer;
             @Override public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                if (renderer == null) renderer = new ModelItemRenderer();
+                if (renderer == null) renderer = new ModelItemRenderer<>();
                 return renderer;
             }
         });

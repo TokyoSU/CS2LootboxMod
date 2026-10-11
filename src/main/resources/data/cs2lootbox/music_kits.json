@@ -1,0 +1,6994 @@
+[
+  {
+    "id": "3kliksphilip_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": true,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 319.3324036281179
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 21.490045351473924
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 8.287052154195012
+      },
+      {
+        "id": "startround_01",
+        "seconds": 56.685691609977326
+      },
+      {
+        "id": "startround_02",
+        "seconds": 40.573945578231296
+      },
+      {
+        "id": "startround_03",
+        "seconds": 57.718979591836735
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 24.02392290249433
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 16.13204081632653
+      },
+      {
+        "id": "startaction_03",
+        "seconds": 15.09294784580499
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 45.43272108843537
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 12.501020408163265
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 15.005873015873016
+      },
+      {
+        "id": "wonround",
+        "seconds": 8.066009070294784
+      },
+      {
+        "id": "lostround",
+        "seconds": 13.676530612244898
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 10.498299319727892
+      },
+      {
+        "id": "deathcam",
+        "seconds": 11.978571428571428
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 44.289591836734694
+      }
+    ]
+  },
+  {
+    "id": "adambeyer_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 392.9193424036281
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 22.706190476190475
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 13.988548752834467
+      },
+      {
+        "id": "startround_01",
+        "seconds": 13.960975056689342
+      },
+      {
+        "id": "startround_02",
+        "seconds": 13.955170068027211
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 13.955170068027211
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 13.946462585034014
+      },
+      {
+        "id": "startaction_03",
+        "seconds": 13.946462585034014
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 37.595986394557826
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 10.446054421768707
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 10.451859410430838
+      },
+      {
+        "id": "wonround",
+        "seconds": 6.93984126984127
+      },
+      {
+        "id": "lostround",
+        "seconds": 6.93984126984127
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 8.14437641723356
+      },
+      {
+        "id": "deathcam",
+        "seconds": 5.195442176870748
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 45.47916099773243
+      }
+    ]
+  },
+  {
+    "id": "alrt_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 194.62673469387755
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 22.38111111111111
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 15.397709750566893
+      },
+      {
+        "id": "startround_01",
+        "seconds": 21.971859410430838
+      },
+      {
+        "id": "startround_02",
+        "seconds": 21.757074829931973
+      },
+      {
+        "id": "startround_03",
+        "seconds": 21.858662131519274
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 14.37312925170068
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 13.371768707482993
+      },
+      {
+        "id": "startaction_03",
+        "seconds": 13.281791383219955
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 36.86746031746032
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 12.11498866213152
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 12.109183673469389
+      },
+      {
+        "id": "wonround",
+        "seconds": 7.941201814058957
+      },
+      {
+        "id": "lostround",
+        "seconds": 7.906371882086168
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 7.974580498866213
+      },
+      {
+        "id": "roundmvpanthem_02",
+        "seconds": 7.920884353741497
+      },
+      {
+        "id": "deathcam",
+        "seconds": 4.989365079365079
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 44.99444444444445
+      }
+    ]
+  },
+  {
+    "id": "altare_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 195.36396825396827
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 22.21857142857143
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 13.653310657596371
+      },
+      {
+        "id": "startround_01",
+        "seconds": 21.945736961451246
+      },
+      {
+        "id": "startround_02",
+        "seconds": 21.939931972789115
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 13.229546485260771
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 13.659115646258503
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 36.789092970521544
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 11.514172335600907
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 11.078798185941043
+      },
+      {
+        "id": "wonround",
+        "seconds": 8.524603174603175
+      },
+      {
+        "id": "lostround",
+        "seconds": 6.8034240362811795
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 10.228367346938775
+      },
+      {
+        "id": "roundmvpanthem_02",
+        "seconds": 10.228367346938775
+      },
+      {
+        "id": "deathcam",
+        "seconds": 6.788911564625851
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 44.51843537414966
+      }
+    ]
+  },
+  {
+    "id": "amontobin_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": true,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 153.89893424036282
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 27.77394557823129
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 8.45249433106576
+      },
+      {
+        "id": "startround_01",
+        "seconds": 33.32206349206349
+      },
+      {
+        "id": "startround_02",
+        "seconds": 33.32206349206349
+      },
+      {
+        "id": "startround_03",
+        "seconds": 33.32496598639456
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 20.810861678004535
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 19.435079365079364
+      },
+      {
+        "id": "startaction_03",
+        "seconds": 20.825374149659865
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 40.695850340136055
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 12.471995464852608
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 12.48360544217687
+      },
+      {
+        "id": "wonround",
+        "seconds": 10.18482993197279
+      },
+      {
+        "id": "lostround",
+        "seconds": 9.717528344671202
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 10.18482993197279
+      },
+      {
+        "id": "deathcam",
+        "seconds": 7.917981859410431
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 93.69585034013605
+      }
+    ]
+  },
+  {
+    "id": "austinwintory_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 163.4191156462585
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 25.96278911564626
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 43.288231292517004
+      },
+      {
+        "id": "startround_01",
+        "seconds": 26.630362811791382
+      },
+      {
+        "id": "startround_02",
+        "seconds": 27.643333333333334
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 19.170952380952382
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 19.16514739229025
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 43.36034013605442
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 16.349727891156462
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 17.443968253968254
+      },
+      {
+        "id": "wonround",
+        "seconds": 11.668004535147393
+      },
+      {
+        "id": "lostround",
+        "seconds": 10.425736961451246
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 10.672448979591836
+      },
+      {
+        "id": "deathcam",
+        "seconds": 8.428820861678005
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 43.288231292517004
+      }
+    ]
+  },
+  {
+    "id": "austinwintory_02",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": true,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 181.26655328798185
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 27.67816326530612
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 7.285691609977325
+      },
+      {
+        "id": "startround_01",
+        "seconds": 21.69612244897959
+      },
+      {
+        "id": "startround_02",
+        "seconds": 20.616394557823128
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 16.996984126984128
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 16.985374149659865
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 40.22854875283447
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 16.584829931972788
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 17.011496598639457
+      },
+      {
+        "id": "wonround",
+        "seconds": 10.51861678004535
+      },
+      {
+        "id": "lostround",
+        "seconds": 10.080340136054422
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 12.434263038548753
+      },
+      {
+        "id": "deathcam",
+        "seconds": 8.283696145124717
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 47.18628117913832
+      }
+    ]
+  },
+  {
+    "id": "austinwintory_03",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": true,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 207.16260770975057
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 25.068820861678006
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 8.191269841269841
+      },
+      {
+        "id": "startround_01",
+        "seconds": 17.28142857142857
+      },
+      {
+        "id": "startround_02",
+        "seconds": 18.927142857142858
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 18.927142857142858
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 18.941655328798188
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 38.46673469387755
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 14.135124716553287
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 13.4559410430839
+      },
+      {
+        "id": "wonround",
+        "seconds": 10.077437641723357
+      },
+      {
+        "id": "lostround",
+        "seconds": 8.481065759637188
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 9.853945578231292
+      },
+      {
+        "id": "roundmvpanthem_02",
+        "seconds": 9.833628117913833
+      },
+      {
+        "id": "deathcam",
+        "seconds": 5.999433106575964
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 45.44768707482993
+      }
+    ]
+  },
+  {
+    "id": "austinwintory_04",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 174.05385487528343
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 26.575215419501134
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 17.359795918367347
+      },
+      {
+        "id": "startround_01",
+        "seconds": 16.306190476190476
+      },
+      {
+        "id": "startround_02",
+        "seconds": 14.69530612244898
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 19.728231292517005
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 19.333492063492063
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 44.40233560090703
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 14.837528344671203
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 19.551179138321995
+      },
+      {
+        "id": "wonround",
+        "seconds": 10.727596371882086
+      },
+      {
+        "id": "lostround",
+        "seconds": 8.306916099773243
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 13.815850340136054
+      },
+      {
+        "id": "deathcam",
+        "seconds": 10.585374149659865
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 49.88804988662132
+      }
+    ]
+  },
+  {
+    "id": "awolnation_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 148.00396825396825
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 35.491678004535146
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 56.08968253968254
+      },
+      {
+        "id": "startround_01",
+        "seconds": 16.133492063492064
+      },
+      {
+        "id": "startround_02",
+        "seconds": 24.010861678004535
+      },
+      {
+        "id": "startround_03",
+        "seconds": 25.820566893424036
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 22.555260770975057
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 22.154716553287983
+      },
+      {
+        "id": "startaction_03",
+        "seconds": 30.005963718820862
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 34.58609977324263
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 10.083242630385488
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 11.009138321995465
+      },
+      {
+        "id": "wonround",
+        "seconds": 14.875260770975057
+      },
+      {
+        "id": "lostround",
+        "seconds": 12.837709750566894
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 8.843877551020409
+      },
+      {
+        "id": "deathcam",
+        "seconds": 4.330498866213152
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 56.08968253968254
+      }
+    ]
+  },
+  {
+    "id": "bbnos_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": true,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 151.42891156462585
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 24.070362811791384
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 7.433718820861678
+      },
+      {
+        "id": "startround_01",
+        "seconds": 18.171043083900226
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 23.246054421768708
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 34.02301587301587
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 15.79390022675737
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 11.47063492063492
+      },
+      {
+        "id": "wonround",
+        "seconds": 12.08015873015873
+      },
+      {
+        "id": "lostround",
+        "seconds": 5.067732426303855
+      },
+      {
+        "id": "roundmvpanthem",
+        "seconds": 7.351995464852608
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 7.351995464852608
+      },
+      {
+        "id": "deathcam",
+        "seconds": 6.945646258503402
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 45.685691609977326
+      }
+    ]
+  },
+  {
+    "id": "beartooth_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 197.8949433106576
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 27.57077097505669
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 44.8991156462585
+      },
+      {
+        "id": "startround_01",
+        "seconds": 22.65829931972789
+      },
+      {
+        "id": "startround_02",
+        "seconds": 9.87281179138322
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 9.401156462585034
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 10.579569160997732
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 49.554263038548754
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 15.246780045351475
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 12.056938775510204
+      },
+      {
+        "id": "wonround",
+        "seconds": 7.926689342403628
+      },
+      {
+        "id": "lostround",
+        "seconds": 4.362426303854876
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 7.912176870748299
+      },
+      {
+        "id": "deathcam",
+        "seconds": 3.5236054421768706
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 44.8991156462585
+      }
+    ]
+  },
+  {
+    "id": "beartooth_02",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 166.39126984126983
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 28.13095238095238
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 39.46419501133787
+      },
+      {
+        "id": "startround_01",
+        "seconds": 20.005419501133787
+      },
+      {
+        "id": "startround_02",
+        "seconds": 11.527233560090703
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 15.319342403628118
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 11.508367346938776
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 37.50600907029479
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 11.508367346938776
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 10.49249433106576
+      },
+      {
+        "id": "wonround",
+        "seconds": 10.077437641723357
+      },
+      {
+        "id": "lostround",
+        "seconds": 12.141111111111112
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 9.258934240362812
+      },
+      {
+        "id": "deathcam",
+        "seconds": 5.012585034013606
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 39.46419501133787
+      }
+    ]
+  },
+  {
+    "id": "benbromfield_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 147.5918140589569
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 27.730408163265306
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 14.445691609977324
+      },
+      {
+        "id": "startround_01",
+        "seconds": 16.753174603174603
+      },
+      {
+        "id": "startround_02",
+        "seconds": 18.462743764172334
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 17.728412698412697
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 14.187369614512471
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 41.58691609977324
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 13.978390022675738
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 12.074353741496598
+      },
+      {
+        "id": "wonround",
+        "seconds": 8.359160997732426
+      },
+      {
+        "id": "lostround",
+        "seconds": 8.684240362811792
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 9.476621315192745
+      },
+      {
+        "id": "deathcam",
+        "seconds": 6.550907029478458
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 48.805419501133784
+      }
+    ]
+  },
+  {
+    "id": "blitzkids_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 196.01702947845806
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 26.554897959183673
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 7.6426984126984125
+      },
+      {
+        "id": "startround_01",
+        "seconds": 13.1381179138322
+      },
+      {
+        "id": "startround_02",
+        "seconds": 20.6062358276644
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 10.441700680272108
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 11.66219954648526
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 37.25349206349206
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 11.165873015873016
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 10.547641723356008
+      },
+      {
+        "id": "wonround",
+        "seconds": 8.382380952380952
+      },
+      {
+        "id": "lostround",
+        "seconds": 8.019569160997733
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 8.007959183673469
+      },
+      {
+        "id": "deathcam",
+        "seconds": 4.342108843537415
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 51.8418820861678
+      }
+    ]
+  },
+  {
+    "id": "borne_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 137.43308390022676
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 22.563968253968255
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 16.622562358276642
+      },
+      {
+        "id": "startround_01",
+        "seconds": 23.597256235827665
+      },
+      {
+        "id": "startround_02",
+        "seconds": 23.597256235827665
+      },
+      {
+        "id": "startround_03",
+        "seconds": 21.45231292517007
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 16.05077097505669
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 16.288775510204083
+      },
+      {
+        "id": "startaction_03",
+        "seconds": 16.628367346938777
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 42.434444444444445
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 13.94936507936508
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 14.573401360544217
+      },
+      {
+        "id": "wonround",
+        "seconds": 12.901564625850341
+      },
+      {
+        "id": "lostround",
+        "seconds": 7.113990929705215
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 12.878344671201814
+      },
+      {
+        "id": "roundmvpanthem_02",
+        "seconds": 13.540113378684808
+      },
+      {
+        "id": "deathcam",
+        "seconds": 4.2956689342403624
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 43.720249433106574
+      }
+    ]
+  },
+  {
+    "id": "chipzel_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": true,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 156.83916099773242
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 22.645238095238096
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 37.93167800453515
+      },
+      {
+        "id": "startround_01",
+        "seconds": 23.77140589569161
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 23.76560090702948
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 37.50310657596372
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 12.193356009070294
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 11.728956916099774
+      },
+      {
+        "id": "wonround",
+        "seconds": 8.504285714285714
+      },
+      {
+        "id": "lostround",
+        "seconds": 8.690045351473923
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 8.910634920634921
+      },
+      {
+        "id": "deathcam",
+        "seconds": 5.6525850340136055
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 37.93167800453515
+      }
+    ]
+  },
+  {
+    "id": "damjanmravunac_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 214.86873015873016
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 24.1284126984127
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 8.139024943310657
+      },
+      {
+        "id": "startround_01",
+        "seconds": 28.485056689342404
+      },
+      {
+        "id": "startround_02",
+        "seconds": 23.893310657596373
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 16.216213151927438
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 16.930226757369613
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 38.50736961451247
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 11.308095238095238
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 11.316802721088436
+      },
+      {
+        "id": "wonround",
+        "seconds": 8.21984126984127
+      },
+      {
+        "id": "lostround",
+        "seconds": 8.234353741496598
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 7.813492063492063
+      },
+      {
+        "id": "deathcam",
+        "seconds": 5.984920634920635
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 58.69757369614513
+      }
+    ]
+  },
+  {
+    "id": "danielsadowski_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 152.82791383219956
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 25.042698412698414
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 6.443968253968254
+      },
+      {
+        "id": "startround_01",
+        "seconds": 22.877437641723358
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 16.185736961451248
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 37.72659863945578
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 12.762244897959183
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 12.750634920634921
+      },
+      {
+        "id": "wonround",
+        "seconds": 10.187732426303855
+      },
+      {
+        "id": "lostround",
+        "seconds": 9.946825396825396
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 9.052857142857142
+      },
+      {
+        "id": "deathcam",
+        "seconds": 6.008140589569161
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 39.93585034013606
+      }
+    ]
+  },
+  {
+    "id": "danielsadowski_02",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 151.34764172335602
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 28.415396825396826
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 8.040340136054422
+      },
+      {
+        "id": "startround_01",
+        "seconds": 25.85249433106576
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 14.553083900226758
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 40.80034013605442
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 13.284693877551021
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 13.029274376417234
+      },
+      {
+        "id": "wonround",
+        "seconds": 12.466190476190476
+      },
+      {
+        "id": "lostround",
+        "seconds": 9.888775510204082
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 6.144557823129252
+      },
+      {
+        "id": "deathcam",
+        "seconds": 10.019387755102041
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 66.58655328798186
+      }
+    ]
+  },
+  {
+    "id": "danielsadowski_03",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 138.09775510204082
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 25.408412698412697
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 8.943015873015874
+      },
+      {
+        "id": "startround_01",
+        "seconds": 23.896213151927437
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 15.81857142857143
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 41.21249433106576
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 11.937936507936508
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 11.273265306122449
+      },
+      {
+        "id": "wonround",
+        "seconds": 8.066009070294784
+      },
+      {
+        "id": "lostround",
+        "seconds": 7.8599319727891155
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 8.057301587301588
+      },
+      {
+        "id": "deathcam",
+        "seconds": 6.263560090702948
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 54.352539682539685
+      }
+    ]
+  },
+  {
+    "id": "danielsadowski_04",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": true,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 161.8778911564626
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 22.816485260770975
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 62.653673469387755
+      },
+      {
+        "id": "startround_01",
+        "seconds": 20.210045351473923
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 10.91045351473923
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 36.96034013605442
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 10.26609977324263
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 10.242879818594105
+      },
+      {
+        "id": "wonround",
+        "seconds": 7.2358956916099775
+      },
+      {
+        "id": "lostround",
+        "seconds": 7.697392290249433
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 6.96015873015873
+      },
+      {
+        "id": "deathcam",
+        "seconds": 4.942925170068027
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 62.653673469387755
+      }
+    ]
+  },
+  {
+    "id": "danielsadowski_05",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 127.99417233560091
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 24.363514739229025
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 14.233809523809525
+      },
+      {
+        "id": "startround_01",
+        "seconds": 19.186916099773242
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 14.198979591836734
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 38.8440589569161
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 9.891678004535148
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 9.932312925170068
+      },
+      {
+        "id": "wonround",
+        "seconds": 8.158888888888889
+      },
+      {
+        "id": "lostround",
+        "seconds": 8.364965986394559
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 8.373673469387755
+      },
+      {
+        "id": "deathcam",
+        "seconds": 5.445056689342404
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 51.330589569161
+      }
+    ]
+  },
+  {
+    "id": "darude_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 170.62600907029477
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 22.520430839002266
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 9.29421768707483
+      },
+      {
+        "id": "startround_01",
+        "seconds": 20.154897959183675
+      },
+      {
+        "id": "startround_02",
+        "seconds": 20.160702947845806
+      },
+      {
+        "id": "startround_03",
+        "seconds": 20.16360544217687
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 11.935034013605442
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 11.943741496598639
+      },
+      {
+        "id": "startaction_03",
+        "seconds": 11.940839002267573
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 41.54628117913832
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 13.139569160997732
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 13.136666666666667
+      },
+      {
+        "id": "wonround",
+        "seconds": 7.529047619047619
+      },
+      {
+        "id": "lostround",
+        "seconds": 7.517437641723356
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 7.523242630385488
+      },
+      {
+        "id": "deathcam",
+        "seconds": 7.529047619047619
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 46.852494331065756
+      }
+    ]
+  },
+  {
+    "id": "denzelcurry_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 192.0115873015873
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 26.046961451247167
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 42.23462585034014
+      },
+      {
+        "id": "startround_01",
+        "seconds": 16.029002267573695
+      },
+      {
+        "id": "startround_02",
+        "seconds": 22.559614512471654
+      },
+      {
+        "id": "startround_03",
+        "seconds": 24.051496598639456
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 15.548639455782313
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 11.055578231292516
+      },
+      {
+        "id": "startaction_03",
+        "seconds": 18.053492063492065
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 37.031451247165535
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 10.430090702947846
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 10.26609977324263
+      },
+      {
+        "id": "wonround",
+        "seconds": 10.03390022675737
+      },
+      {
+        "id": "lostround",
+        "seconds": 8.775668934240363
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 9.035442176870749
+      },
+      {
+        "id": "deathcam",
+        "seconds": 9.04124716553288
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 42.23462585034014
+      }
+    ]
+  },
+  {
+    "id": "dren_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 215.62047619047618
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 22.172131519274377
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 52.357074829931975
+      },
+      {
+        "id": "startround_01",
+        "seconds": 23.1618820861678
+      },
+      {
+        "id": "startround_02",
+        "seconds": 23.43471655328798
+      },
+      {
+        "id": "startround_03",
+        "seconds": 22.947097505668935
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 19.28124716553288
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 14.08578231292517
+      },
+      {
+        "id": "startaction_03",
+        "seconds": 22.235986394557823
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 38.39126984126984
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 11.624467120181405
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 12.431360544217688
+      },
+      {
+        "id": "wonround",
+        "seconds": 10.82047619047619
+      },
+      {
+        "id": "lostround",
+        "seconds": 6.489954648526077
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 11.357437641723356
+      },
+      {
+        "id": "deathcam",
+        "seconds": 4.585918367346939
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 52.357074829931975
+      }
+    ]
+  },
+  {
+    "id": "dren_02",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": true,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 178.06219954648526
+      },
+      {
+        "id": "mainmenu_02",
+        "seconds": 197.77013605442176
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 24.03263038548753
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 50.79117913832199
+      },
+      {
+        "id": "startround_01",
+        "seconds": 23.77140589569161
+      },
+      {
+        "id": "startround_02",
+        "seconds": 21.80641723356009
+      },
+      {
+        "id": "startround_03",
+        "seconds": 27.08895691609977
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 20.003968253968253
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 17.21467120181406
+      },
+      {
+        "id": "startaction_03",
+        "seconds": 17.705192743764172
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 40.31852607709751
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 13.83907029478458
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 14.492131519274377
+      },
+      {
+        "id": "wonround",
+        "seconds": 4.211496598639456
+      },
+      {
+        "id": "lostround",
+        "seconds": 4.940022675736961
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 11.77249433106576
+      },
+      {
+        "id": "deathcam",
+        "seconds": 6.379659863945578
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 50.79117913832199
+      }
+    ]
+  },
+  {
+    "id": "dren_03",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 168.89612244897958
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 27.564965986394558
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 13.908730158730158
+      },
+      {
+        "id": "startround_01",
+        "seconds": 20.468367346938777
+      },
+      {
+        "id": "startround_02",
+        "seconds": 19.73984126984127
+      },
+      {
+        "id": "startround_03",
+        "seconds": 22.38111111111111
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 19.687596371882087
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 19.824013605442175
+      },
+      {
+        "id": "startaction_03",
+        "seconds": 20.340657596371884
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 40.989002267573696
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 14.016122448979592
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 13.618480725623582
+      },
+      {
+        "id": "wonround",
+        "seconds": 10.466371882086168
+      },
+      {
+        "id": "lostround",
+        "seconds": 8.899024943310657
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 10.985918367346938
+      },
+      {
+        "id": "deathcam",
+        "seconds": 5.860113378684807
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 41.801700680272106
+      }
+    ]
+  },
+  {
+    "id": "dryden_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 192.44115646258504
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 15.959342403628117
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 14.936213151927438
+      },
+      {
+        "id": "startround_01",
+        "seconds": 9.98891156462585
+      },
+      {
+        "id": "startround_02",
+        "seconds": 9.9381179138322
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 15.94047619047619
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 15.988367346938775
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 28.46909297052154
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 9.946825396825396
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 9.949727891156462
+      },
+      {
+        "id": "wonround",
+        "seconds": 15.952086167800454
+      },
+      {
+        "id": "lostround",
+        "seconds": 15.943378684807255
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 15.94047619047619
+      },
+      {
+        "id": "deathcam",
+        "seconds": 10.948185941043084
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 48.94764172335601
+      }
+    ]
+  },
+  {
+    "id": "feedme_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 129.97657596371883
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 22.616213151927436
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 7.837165532879818
+      },
+      {
+        "id": "startround_01",
+        "seconds": 29.146825396825395
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 29.643151927437643
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 29.033628117913832
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 76.28913832199547
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 14.436984126984127
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 13.902925170068027
+      },
+      {
+        "id": "wonround",
+        "seconds": 8.21984126984127
+      },
+      {
+        "id": "lostround",
+        "seconds": 12.907369614512472
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 9.839433106575964
+      },
+      {
+        "id": "deathcam",
+        "seconds": 3.9386621315192745
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 50.44
+      }
+    ]
+  },
+  {
+    "id": "freakydna_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": true,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 260.0083219954648
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 22.40142857142857
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 55.20297052154195
+      },
+      {
+        "id": "startround_01",
+        "seconds": 19.24206349206349
+      },
+      {
+        "id": "startround_02",
+        "seconds": 19.19997732426304
+      },
+      {
+        "id": "startround_03",
+        "seconds": 25.63045351473923
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 9.631904761904762
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 12.788367346938776
+      },
+      {
+        "id": "startaction_03",
+        "seconds": 14.4137641723356
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 36.43063492063492
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 10.026643990929704
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 9.99907029478458
+      },
+      {
+        "id": "wonround",
+        "seconds": 8.010861678004535
+      },
+      {
+        "id": "lostround",
+        "seconds": 7.601609977324263
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 8.019569160997733
+      },
+      {
+        "id": "deathcam",
+        "seconds": 5.212857142857143
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 55.20297052154195
+      }
+    ]
+  },
+  {
+    "id": "ghost_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 255.9361224489796
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 27.062834467120183
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 11.949546485260772
+      },
+      {
+        "id": "startround_01",
+        "seconds": 15.973854875283447
+      },
+      {
+        "id": "startround_02",
+        "seconds": 10.56795918367347
+      },
+      {
+        "id": "startround_03",
+        "seconds": 23.513083900226757
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 13.307913832199546
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 14.074172335600908
+      },
+      {
+        "id": "startaction_03",
+        "seconds": 11.949546485260772
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 36.98501133786848
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 10.202244897959183
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 9.94392290249433
+      },
+      {
+        "id": "wonround",
+        "seconds": 8.954172335600907
+      },
+      {
+        "id": "lostround",
+        "seconds": 8.933854875283446
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 8.939659863945579
+      },
+      {
+        "id": "deathcam",
+        "seconds": 5.204149659863946
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 67.94156462585035
+      }
+    ]
+  },
+  {
+    "id": "hades_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": true,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 143.24097505668934
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 24.006507936507937
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 7.346643990929706
+      },
+      {
+        "id": "startround_01",
+        "seconds": 15.908548752834466
+      },
+      {
+        "id": "startround_02",
+        "seconds": 21.707732426303856
+      },
+      {
+        "id": "startround_03",
+        "seconds": 21.803514739229026
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 19.28124716553288
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 13.937755102040816
+      },
+      {
+        "id": "startaction_03",
+        "seconds": 13.998707482993197
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 39.51163265306123
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 10.826281179138322
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 11.595442176870748
+      },
+      {
+        "id": "wonround",
+        "seconds": 8.089229024943311
+      },
+      {
+        "id": "lostround",
+        "seconds": 8.022471655328799
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 8.089229024943311
+      },
+      {
+        "id": "deathcam",
+        "seconds": 5.015487528344671
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 63.242879818594105
+      }
+    ]
+  },
+  {
+    "id": "halo_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": true,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 141.99580498866214
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 27.57657596371882
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 8.363968253968254
+      },
+      {
+        "id": "startround_01",
+        "seconds": 18.256666666666668
+      },
+      {
+        "id": "startround_02",
+        "seconds": 19.546825396825398
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 21.12142857142857
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 24.000702947845806
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 48.819931972789114
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 11.017845804988662
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 18.332131519274377
+      },
+      {
+        "id": "wonround",
+        "seconds": 7.143015873015873
+      },
+      {
+        "id": "lostround",
+        "seconds": 9.215396825396825
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 15.11907029478458
+      },
+      {
+        "id": "deathcam",
+        "seconds": 5.314444444444445
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 64.24133786848073
+      }
+    ]
+  },
+  {
+    "id": "health_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 146.01285714285714
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 22.009591836734693
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 14.44859410430839
+      },
+      {
+        "id": "startround_01",
+        "seconds": 19.500385487528344
+      },
+      {
+        "id": "startround_02",
+        "seconds": 14.792539682539683
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 18.532403628117915
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 15.255487528344672
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 38.02990929705216
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 9.028185941043084
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 9.987460317460318
+      },
+      {
+        "id": "wonround",
+        "seconds": 7.938299319727891
+      },
+      {
+        "id": "lostround",
+        "seconds": 7.9963492063492065
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 8.640702947845805
+      },
+      {
+        "id": "deathcam",
+        "seconds": 6.4957596371882085
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 57.457755102040814
+      }
+    ]
+  },
+  {
+    "id": "hlalyx_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 187.74201814058958
+      },
+      {
+        "id": "loading",
+        "seconds": 84.64297052154195
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 32.676258503401364
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 12.402789115646259
+      },
+      {
+        "id": "startround_01",
+        "seconds": 24.977392290249433
+      },
+      {
+        "id": "startround_02",
+        "seconds": 24.980294784580497
+      },
+      {
+        "id": "startround_03",
+        "seconds": 24.980294784580497
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 24.917891156462584
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 24.923696145124715
+      },
+      {
+        "id": "startaction_03",
+        "seconds": 24.917891156462584
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 43.67671201814059
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 18.303106575963717
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 17.83
+      },
+      {
+        "id": "wonround",
+        "seconds": 11.769591836734694
+      },
+      {
+        "id": "lostround",
+        "seconds": 10.707278911564625
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 16.63997732426304
+      },
+      {
+        "id": "deathcam",
+        "seconds": 6.545102040816326
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 45.92804988662132
+      }
+    ]
+  },
+  {
+    "id": "hlb_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": true,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 135.09657596371883
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 26.99607709750567
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 7.481609977324263
+      },
+      {
+        "id": "startround_01",
+        "seconds": 27.190544217687076
+      },
+      {
+        "id": "startround_02",
+        "seconds": 28.531496598639457
+      },
+      {
+        "id": "startround_03",
+        "seconds": 28.531496598639457
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 16.33231292517007
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 18.06800453514739
+      },
+      {
+        "id": "startaction_03",
+        "seconds": 17.374308390022676
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 66.83861678004536
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 15.278707482993198
+      },
+      {
+        "id": "bombtenseccountx",
+        "seconds": 11.592539682539682
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 12.950907029478458
+      },
+      {
+        "id": "wonround",
+        "seconds": 9.003514739229026
+      },
+      {
+        "id": "lostround",
+        "seconds": 9.389546485260771
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 10.887233560090703
+      },
+      {
+        "id": "deathcam",
+        "seconds": 7.534852607709751
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 48.65494331065759
+      }
+    ]
+  },
+  {
+    "id": "hotlinemiami_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 289.7443764172336
+      },
+      {
+        "id": "mainmenu_02",
+        "seconds": 396.1411111111111
+      },
+      {
+        "id": "mainmenu_03",
+        "seconds": 212.2971201814059
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 21.960249433106576
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 7.953265306122449
+      },
+      {
+        "id": "startround_01",
+        "seconds": 23.991995464852607
+      },
+      {
+        "id": "startround_02",
+        "seconds": 22.394172335600906
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 15.374489795918368
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 17.461383219954648
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 37.35507936507936
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 10.007777777777777
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 9.99326530612245
+      },
+      {
+        "id": "wonround",
+        "seconds": 6.907913832199546
+      },
+      {
+        "id": "lostround",
+        "seconds": 7.915079365079365
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 7.093673469387755
+      },
+      {
+        "id": "roundmvpanthem_02",
+        "seconds": 8.907732426303856
+      },
+      {
+        "id": "deathcam",
+        "seconds": 5.999433106575964
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 60.54936507936508
+      }
+    ]
+  },
+  {
+    "id": "hundredth_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 146.82555555555555
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 22.070544217687075
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 50.29775510204082
+      },
+      {
+        "id": "startround_01",
+        "seconds": 12.844965986394557
+      },
+      {
+        "id": "startround_02",
+        "seconds": 20.8181179138322
+      },
+      {
+        "id": "startround_03",
+        "seconds": 29.534308390022677
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 13.386281179138322
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 21.286870748299318
+      },
+      {
+        "id": "startaction_03",
+        "seconds": 16.300385487528345
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 30.83607709750567
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 9.81766439909297
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 13.008956916099773
+      },
+      {
+        "id": "wonround",
+        "seconds": 3.3813832199546487
+      },
+      {
+        "id": "lostround",
+        "seconds": 5.471179138321996
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 5.22156462585034
+      },
+      {
+        "id": "deathcam",
+        "seconds": 6.272267573696145
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 50.29775510204082
+      }
+    ]
+  },
+  {
+    "id": "ianhultquist_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 169.68269841269841
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 31.52687074829932
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 6.943197278911565
+      },
+      {
+        "id": "startround_01",
+        "seconds": 16.953446712018142
+      },
+      {
+        "id": "startround_02",
+        "seconds": 16.953446712018142
+      },
+      {
+        "id": "startround_03",
+        "seconds": 16.953446712018142
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 17.731315192743764
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 17.728412698412697
+      },
+      {
+        "id": "startaction_03",
+        "seconds": 19.646961451247165
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 45.07861678004535
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 16.56451247165533
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 17.737120181405896
+      },
+      {
+        "id": "wonround",
+        "seconds": 7.381020408163265
+      },
+      {
+        "id": "lostround",
+        "seconds": 8.803242630385487
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 11.035260770975057
+      },
+      {
+        "id": "deathcam",
+        "seconds": 7.711904761904762
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 47.9931746031746
+      }
+    ]
+  },
+  {
+    "id": "isoxo_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 198.0371655328798
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 24.1197052154195
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 15.223560090702948
+      },
+      {
+        "id": "startround_01",
+        "seconds": 30.423922902494333
+      },
+      {
+        "id": "startround_02",
+        "seconds": 30.423922902494333
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 15.18873015873016
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 15.18002267573696
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 45.71426303854875
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 10.263197278911564
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 18.044784580498867
+      },
+      {
+        "id": "wonround",
+        "seconds": 16.13204081632653
+      },
+      {
+        "id": "lostround",
+        "seconds": 16.13204081632653
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 11.932131519274376
+      },
+      {
+        "id": "deathcam",
+        "seconds": 8.745192743764173
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 44.66646258503401
+      }
+    ]
+  },
+  {
+    "id": "jamesandthecoldgun_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 221.23099773242632
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 25.054308390022676
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 12.617120181405896
+      },
+      {
+        "id": "startround_01",
+        "seconds": 21.945736961451246
+      },
+      {
+        "id": "startround_02",
+        "seconds": 22.000884353741498
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 12.038072562358277
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 11.946643990929704
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 43.79281179138322
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 10.981564625850341
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 10.216757369614513
+      },
+      {
+        "id": "wonround",
+        "seconds": 11.952448979591837
+      },
+      {
+        "id": "lostround",
+        "seconds": 8.231451247165532
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 7.97312925170068
+      },
+      {
+        "id": "deathcam",
+        "seconds": 5.761428571428572
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 54.343378684807256
+      }
+    ]
+  },
+  {
+    "id": "jesseharlin_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": true,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 144.0159410430839
+      },
+      {
+        "id": "mainmenu_02",
+        "seconds": 146.01285714285714
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 26.02374149659864
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 7.932947845804988
+      },
+      {
+        "id": "startround_01",
+        "seconds": 24.012312925170068
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 18.009954648526076
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 43.01204081632653
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 13.992902494331066
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 13.987097505668935
+      },
+      {
+        "id": "wonround",
+        "seconds": 9.009319727891157
+      },
+      {
+        "id": "lostround",
+        "seconds": 9.009319727891157
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 9.534671201814058
+      },
+      {
+        "id": "deathcam",
+        "seconds": 10.007777777777777
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 52.953537414965986
+      }
+    ]
+  },
+  {
+    "id": "jonathanyoung_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 227.94736961451247
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 25.109455782312924
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 16.123333333333335
+      },
+      {
+        "id": "startround_01",
+        "seconds": 15.943378684807255
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 14.968140589569161
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 36.41467120181406
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 15.17421768707483
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 15.240975056689342
+      },
+      {
+        "id": "wonround",
+        "seconds": 6.977573696145125
+      },
+      {
+        "id": "lostround",
+        "seconds": 7.987641723356009
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 8.666825396825397
+      },
+      {
+        "id": "deathcam",
+        "seconds": 7.154625850340136
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 60.04097505668934
+      }
+    ]
+  },
+  {
+    "id": "juelz_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": true,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 259.9880045351474
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 35.950272108843535
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 53.23798185941043
+      },
+      {
+        "id": "startround_01",
+        "seconds": 16.951995464852608
+      },
+      {
+        "id": "startround_02",
+        "seconds": 16.21185941043084
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 16.094308390022675
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 19.91108843537415
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 31.883877551020408
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 16.306190476190476
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 10.994625850340135
+      },
+      {
+        "id": "wonround",
+        "seconds": 7.30265306122449
+      },
+      {
+        "id": "lostround",
+        "seconds": 8.521700680272108
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 8.939659863945579
+      },
+      {
+        "id": "deathcam",
+        "seconds": 8.611678004535147
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 53.23798185941043
+      }
+    ]
+  },
+  {
+    "id": "juelz_02",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 212.1607029478458
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 35.459750566893426
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 14.300566893424037
+      },
+      {
+        "id": "startround_01",
+        "seconds": 19.635351473922903
+      },
+      {
+        "id": "startround_02",
+        "seconds": 27.443061224489796
+      },
+      {
+        "id": "startround_03",
+        "seconds": 34.49902494331066
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 17.049229024943312
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 20.78764172335601
+      },
+      {
+        "id": "startaction_03",
+        "seconds": 19.13612244897959
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 69.1577097505669
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 10.936575963718822
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 13.493673469387755
+      },
+      {
+        "id": "wonround",
+        "seconds": 16.201700680272108
+      },
+      {
+        "id": "lostround",
+        "seconds": 13.273083900226757
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 8.58265306122449
+      },
+      {
+        "id": "deathcam",
+        "seconds": 6.016848072562358
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 50.451133786848075
+      }
+    ]
+  },
+  {
+    "id": "kellybailey_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 166.96015873015872
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 24.77566893424036
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 41.64541950113379
+      },
+      {
+        "id": "startround_01",
+        "seconds": 8.375124716553287
+      },
+      {
+        "id": "startround_02",
+        "seconds": 8.375124716553287
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 24.012312925170068
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 24.012312925170068
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 60.786916099773244
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 14.631451247165533
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 13.75780045351474
+      },
+      {
+        "id": "wonround",
+        "seconds": 14.631451247165533
+      },
+      {
+        "id": "lostround",
+        "seconds": 13.638798185941043
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 26.22981859410431
+      },
+      {
+        "id": "deathcam",
+        "seconds": 9.769773242630386
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 41.64541950113379
+      }
+    ]
+  },
+  {
+    "id": "killermike_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 113.94609977324264
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 21.954444444444444
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 11.946643990929704
+      },
+      {
+        "id": "startround_01",
+        "seconds": 22.192448979591838
+      },
+      {
+        "id": "startround_02",
+        "seconds": 23.193809523809524
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 10.66954648526077
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 13.699750566893425
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 36.951632653061225
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 10.434444444444445
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 9.952630385487529
+      },
+      {
+        "id": "wonround",
+        "seconds": 9.94827664399093
+      },
+      {
+        "id": "lostround",
+        "seconds": 8.022471655328799
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 8.933854875283446
+      },
+      {
+        "id": "deathcam",
+        "seconds": 6.565419501133787
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 54.050226757369614
+      }
+    ]
+  },
+  {
+    "id": "killscript_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 200.89902494331065
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 23.75689342403628
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 11.856666666666667
+      },
+      {
+        "id": "startround_01",
+        "seconds": 16.134943310657597
+      },
+      {
+        "id": "startround_02",
+        "seconds": 16.13784580498866
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 8.994807256235827
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 8.994807256235827
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 30.905736961451247
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 16.14074829931973
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 16.13784580498866
+      },
+      {
+        "id": "wonround",
+        "seconds": 16.134943310657597
+      },
+      {
+        "id": "lostround",
+        "seconds": 16.14074829931973
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 8.994807256235827
+      },
+      {
+        "id": "deathcam",
+        "seconds": 8.518798185941042
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 44.95090702947846
+      }
+    ]
+  },
+  {
+    "id": "kitheory_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 157.06555555555556
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 21.22301587301587
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 40.133219954648524
+      },
+      {
+        "id": "startround_01",
+        "seconds": 27.649138321995466
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 20.30873015873016
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 37.33185941043084
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 16.277165532879817
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 16.103015873015874
+      },
+      {
+        "id": "wonround",
+        "seconds": 7.340385487528344
+      },
+      {
+        "id": "lostround",
+        "seconds": 7.000793650793651
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 7.999251700680272
+      },
+      {
+        "id": "deathcam",
+        "seconds": 5.517619047619047
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 40.133219954648524
+      }
+    ]
+  },
+  {
+    "id": "knock2_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": true,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 200.1501814058957
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 25.00496598639456
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 64.74637188208617
+      },
+      {
+        "id": "startround_01",
+        "seconds": 15.24968253968254
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 15.8040589569161
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 15.72859410430839
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 30.84768707482993
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 16.776394557823128
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 16.770589569160997
+      },
+      {
+        "id": "wonround",
+        "seconds": 8.324331065759637
+      },
+      {
+        "id": "lostround",
+        "seconds": 8.147278911564626
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 10.350272108843537
+      },
+      {
+        "id": "deathcam",
+        "seconds": 5.909455782312925
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 64.74637188208617
+      }
+    ]
+  },
+  {
+    "id": "knock2_02",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 234.23997732426304
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 32.55145124716553
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 12.814489795918368
+      },
+      {
+        "id": "startround_01",
+        "seconds": 21.81222222222222
+      },
+      {
+        "id": "startround_02",
+        "seconds": 20.85439909297052
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 16.381655328798185
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 14.64015873015873
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 45.23390022675737
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 9.917800453514738
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 15.307732426303854
+      },
+      {
+        "id": "wonround",
+        "seconds": 14.077074829931973
+      },
+      {
+        "id": "lostround",
+        "seconds": 19.95172335600907
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 10.269002267573697
+      },
+      {
+        "id": "deathcam",
+        "seconds": 10.411224489795918
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 43.855215419501135
+      }
+    ]
+  },
+  {
+    "id": "laurashigihara_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": true,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 142.90138321995465
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 23.759795918367345
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 7.303106575963719
+      },
+      {
+        "id": "startround_01",
+        "seconds": 18.245056689342405
+      },
+      {
+        "id": "startround_02",
+        "seconds": 16.692222222222224
+      },
+      {
+        "id": "startround_03",
+        "seconds": 17.063741496598638
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 18.24795918367347
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 18.012857142857143
+      },
+      {
+        "id": "startaction_03",
+        "seconds": 18.009954648526076
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 39.52904761904762
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 10.80596371882086
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 10.80015873015873
+      },
+      {
+        "id": "wonround",
+        "seconds": 7.682879818594104
+      },
+      {
+        "id": "lostround",
+        "seconds": 7.671269841269841
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 7.674172335600907
+      },
+      {
+        "id": "deathcam",
+        "seconds": 6.463832199546485
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 46.05285714285714
+      }
+    ]
+  },
+  {
+    "id": "lenniemoore_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 241.91707482993198
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 17.147913832199546
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 50.1381179138322
+      },
+      {
+        "id": "startround_01",
+        "seconds": 24.24015873015873
+      },
+      {
+        "id": "startround_02",
+        "seconds": 23.24750566893424
+      },
+      {
+        "id": "startround_03",
+        "seconds": 24.115351473922903
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 14.706916099773242
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 14.268639455782314
+      },
+      {
+        "id": "startaction_03",
+        "seconds": 12.451678004535147
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 40.21984126984127
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 10.95108843537415
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 11.131043083900227
+      },
+      {
+        "id": "wonround",
+        "seconds": 8.544920634920635
+      },
+      {
+        "id": "lostround",
+        "seconds": 8.417210884353741
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 8.402698412698413
+      },
+      {
+        "id": "deathcam",
+        "seconds": 6.446417233560091
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 50.1381179138322
+      }
+    ]
+  },
+  {
+    "id": "mateomessina_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 158.08142857142857
+      },
+      {
+        "id": "mainmenu_02",
+        "seconds": 162.97213151927437
+      },
+      {
+        "id": "mainmenu_03",
+        "seconds": 218.18628117913832
+      },
+      {
+        "id": "loading",
+        "seconds": 78.83798185941043
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 22.51172335600907
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 6.64281179138322
+      },
+      {
+        "id": "startround_01",
+        "seconds": 23.00659863945578
+      },
+      {
+        "id": "startround_02",
+        "seconds": 22.952902494331067
+      },
+      {
+        "id": "startround_03",
+        "seconds": 22.86002267573696
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 14.18156462585034
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 14.393446712018141
+      },
+      {
+        "id": "startaction_03",
+        "seconds": 14.40795918367347
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 38.69893424036281
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 10.004875283446712
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 10.2559410430839
+      },
+      {
+        "id": "wonround",
+        "seconds": 7.778662131519274
+      },
+      {
+        "id": "lostround",
+        "seconds": 7.006598639455782
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 7.317165532879819
+      },
+      {
+        "id": "roundmvpanthem_02",
+        "seconds": 7.415850340136054
+      },
+      {
+        "id": "roundmvpanthem_03",
+        "seconds": 7.363605442176871
+      },
+      {
+        "id": "deathcam",
+        "seconds": 5.749818594104308
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 55.33358276643991
+      }
+    ]
+  },
+  {
+    "id": "mattlange_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 199.72641723356008
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 23.069002267573698
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 10.289773242630385
+      },
+      {
+        "id": "startround_01",
+        "seconds": 22.312902494331066
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 16.010136054421768
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 14.249773242630386
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 39.460839002267576
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 10.316893424036282
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 10.316893424036282
+      },
+      {
+        "id": "wonround",
+        "seconds": 6.4406122448979595
+      },
+      {
+        "id": "lostround",
+        "seconds": 7.288140589569161
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 7.276530612244898
+      },
+      {
+        "id": "roundmvpanthem_02",
+        "seconds": 8.150181405895692
+      },
+      {
+        "id": "deathcam",
+        "seconds": 5.7890022675736965
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 41.04170068027211
+      }
+    ]
+  },
+  {
+    "id": "mattlevine_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": true,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 148.97340136054422
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 29.41965986394558
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 57.49884353741496
+      },
+      {
+        "id": "startround_01",
+        "seconds": 18.105736961451246
+      },
+      {
+        "id": "startround_02",
+        "seconds": 17.203061224489797
+      },
+      {
+        "id": "startround_03",
+        "seconds": 17.37721088435374
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 18.889410430839003
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 18.889410430839003
+      },
+      {
+        "id": "startaction_03",
+        "seconds": 18.889410430839003
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 42.6840589569161
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 14.04514739229025
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 14.053854875283447
+      },
+      {
+        "id": "wonround",
+        "seconds": 10.306734693877551
+      },
+      {
+        "id": "lostround",
+        "seconds": 10.315442176870748
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 10.315442176870748
+      },
+      {
+        "id": "deathcam",
+        "seconds": 8.440430839002268
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 57.49884353741496
+      }
+    ]
+  },
+  {
+    "id": "mattlevine_02",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 240.86927437641722
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 30.873809523809523
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 18.398888888888887
+      },
+      {
+        "id": "startround_01",
+        "seconds": 29.104739229024943
+      },
+      {
+        "id": "startround_02",
+        "seconds": 29.06265306122449
+      },
+      {
+        "id": "startround_03",
+        "seconds": 29.065555555555555
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 19.806598639455782
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 19.797891156462587
+      },
+      {
+        "id": "startaction_03",
+        "seconds": 19.806598639455782
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 51.89077097505669
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 15.580566893424036
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 14.730136054421768
+      },
+      {
+        "id": "wonround",
+        "seconds": 12.30655328798186
+      },
+      {
+        "id": "lostround",
+        "seconds": 10.32705215419501
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 10.5737641723356
+      },
+      {
+        "id": "deathcam",
+        "seconds": 10.657936507936508
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 63.63716553287982
+      }
+    ]
+  },
+  {
+    "id": "meechydarko_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": true,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 240.11462585034013
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 22.714897959183673
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 7.982290249433107
+      },
+      {
+        "id": "startround_01",
+        "seconds": 25.98310657596372
+      },
+      {
+        "id": "startround_02",
+        "seconds": 24.698752834467122
+      },
+      {
+        "id": "startround_03",
+        "seconds": 12.489410430839003
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 14.207687074829932
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 14.230907029478457
+      },
+      {
+        "id": "startaction_03",
+        "seconds": 15.560249433106575
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 37.096757369614515
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 10.051315192743765
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 10.086145124716554
+      },
+      {
+        "id": "wonround",
+        "seconds": 8.216938775510204
+      },
+      {
+        "id": "lostround",
+        "seconds": 9.981655328798185
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 8.533310657596372
+      },
+      {
+        "id": "deathcam",
+        "seconds": 8.06891156462585
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 45.79888888888889
+      }
+    ]
+  },
+  {
+    "id": "michaelbross_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 191.70392290249433
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 25.121065759637187
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 8.136122448979592
+      },
+      {
+        "id": "startround_01",
+        "seconds": 27.756530612244898
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 17.266916099773244
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 47.432539682539684
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 13.183106575963718
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 13.232448979591837
+      },
+      {
+        "id": "wonround",
+        "seconds": 10.739206349206349
+      },
+      {
+        "id": "lostround",
+        "seconds": 11.186190476190475
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 10.332857142857144
+      },
+      {
+        "id": "deathcam",
+        "seconds": 8.138571428571428
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 49.24269841269841
+      }
+    ]
+  },
+  {
+    "id": "midnightriders_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 211.21739229024942
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 20.73829931972789
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 7.200068027210884
+      },
+      {
+        "id": "startround_01",
+        "seconds": 25.40986394557823
+      },
+      {
+        "id": "startround_02",
+        "seconds": 15.001519274376417
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 16.880884353741497
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 16.880884353741497
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 42.82047619047619
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 11.357437641723356
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 11.357437641723356
+      },
+      {
+        "id": "wonround",
+        "seconds": 4.922607709750567
+      },
+      {
+        "id": "lostround",
+        "seconds": 5.093854875283447
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 6.730861678004535
+      },
+      {
+        "id": "deathcam",
+        "seconds": 4.643968253968254
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 57.55544217687075
+      }
+    ]
+  },
+  {
+    "id": "mordfustang_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 194.43226757369615
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 22.517528344671202
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 48.65494331065759
+      },
+      {
+        "id": "startround_01",
+        "seconds": 15.03344671201814
+      },
+      {
+        "id": "startround_02",
+        "seconds": 15.017482993197278
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 16.875079365079365
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 15.014580498866213
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 52.99662131519274
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 10.107913832199547
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 11.280521541950113
+      },
+      {
+        "id": "wonround",
+        "seconds": 7.627732426303855
+      },
+      {
+        "id": "lostround",
+        "seconds": 9.737845804988662
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 11.39517006802721
+      },
+      {
+        "id": "deathcam",
+        "seconds": 7.511632653061224
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 48.65494331065759
+      }
+    ]
+  },
+  {
+    "id": "neckdeep_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 165.05902494331065
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 25.045600907029478
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 6.9983446712018145
+      },
+      {
+        "id": "startround_01",
+        "seconds": 10.760975056689343
+      },
+      {
+        "id": "startround_02",
+        "seconds": 17.15517006802721
+      },
+      {
+        "id": "startround_03",
+        "seconds": 11.083151927437642
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 11.20360544217687
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 16.866371882086167
+      },
+      {
+        "id": "startaction_03",
+        "seconds": 20.523514739229025
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 34.34809523809524
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 18.184104308390022
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 16.799614512471656
+      },
+      {
+        "id": "wonround",
+        "seconds": 10.803061224489795
+      },
+      {
+        "id": "lostround",
+        "seconds": 10.329954648526076
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 10.834988662131519
+      },
+      {
+        "id": "deathcam",
+        "seconds": 2.552721088435374
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 41.503197278911564
+      }
+    ]
+  },
+  {
+    "id": "neckdeep_02",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": true,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 186.6216553287982
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 52.207142857142856
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 6.992539682539682
+      },
+      {
+        "id": "startround_01",
+        "seconds": 15.354172335600907
+      },
+      {
+        "id": "startround_02",
+        "seconds": 20.365328798185942
+      },
+      {
+        "id": "startround_03",
+        "seconds": 23.174943310657596
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 16.89249433106576
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 19.16514739229025
+      },
+      {
+        "id": "startaction_03",
+        "seconds": 19.8559410430839
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 38.13294784580499
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 11.003333333333334
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 11.56641723356009
+      },
+      {
+        "id": "wonround",
+        "seconds": 7.862834467120181
+      },
+      {
+        "id": "lostround",
+        "seconds": 6.733764172335601
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 12.184648526077098
+      },
+      {
+        "id": "deathcam",
+        "seconds": 7.511632653061224
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 44.990544217687074
+      }
+    ]
+  },
+  {
+    "id": "newbeatfund_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 206.09448979591838
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 29.872448979591837
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 53.28442176870748
+      },
+      {
+        "id": "startround_01",
+        "seconds": 30.043696145124716
+      },
+      {
+        "id": "startround_02",
+        "seconds": 12.83625850340136
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 6.530589569160997
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 3.218843537414966
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 37.27961451247165
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 16.608049886621316
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 10.747913832199547
+      },
+      {
+        "id": "wonround",
+        "seconds": 9.078979591836735
+      },
+      {
+        "id": "lostround",
+        "seconds": 9.972947845804988
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 13.316621315192744
+      },
+      {
+        "id": "deathcam",
+        "seconds": 9.018027210884354
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 53.28442176870748
+      }
+    ]
+  },
+  {
+    "id": "noisia_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 129.7763038548753
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 29.30936507936508
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 8.284149659863946
+      },
+      {
+        "id": "startround_01",
+        "seconds": 29.30936507936508
+      },
+      {
+        "id": "startround_02",
+        "seconds": 27.927777777777777
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 26.50265306122449
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 25.997619047619047
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 50.60206349206349
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 14.643061224489795
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 13.83907029478458
+      },
+      {
+        "id": "wonround",
+        "seconds": 15.351269841269842
+      },
+      {
+        "id": "lostround",
+        "seconds": 15.354172335600907
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 8.37077097505669
+      },
+      {
+        "id": "roundmvpanthem_02",
+        "seconds": 8.469455782312926
+      },
+      {
+        "id": "deathcam",
+        "seconds": 6.812131519274376
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 50.036530612244896
+      }
+    ]
+  },
+  {
+    "id": "perfectworld_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 206.63290249433106
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 18.538208616780047
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 7.988095238095238
+      },
+      {
+        "id": "startround_01",
+        "seconds": 18.85748299319728
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 8.626190476190477
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 25.521609977324264
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 16.663197278911564
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 15.017482993197278
+      },
+      {
+        "id": "wonround",
+        "seconds": 8.954172335600907
+      },
+      {
+        "id": "lostround",
+        "seconds": 11.322607709750567
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 7.993446712018141
+      },
+      {
+        "id": "deathcam",
+        "seconds": 9.003514739229026
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 35.9391156462585
+      }
+    ]
+  },
+  {
+    "id": "perfectworld_02",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 205.66201814058957
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 19.368321995464854
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 18.252312925170067
+      },
+      {
+        "id": "startround_01",
+        "seconds": 18.234897959183673
+      },
+      {
+        "id": "startround_02",
+        "seconds": 18.252312925170067
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 10.228367346938775
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 18.230544217687076
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 12.799977324263038
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 9.093492063492063
+      },
+      {
+        "id": "wonround",
+        "seconds": 9.087687074829931
+      },
+      {
+        "id": "lostround",
+        "seconds": 4.5075510204081635
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 9.141383219954648
+      },
+      {
+        "id": "deathcam",
+        "seconds": 4.5075510204081635
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 58.79
+      }
+    ]
+  },
+  {
+    "id": "pirapus_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 200.51009070294785
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 22.230181405895692
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 12.289138321995464
+      },
+      {
+        "id": "startround_01",
+        "seconds": 22.233083900226756
+      },
+      {
+        "id": "startround_02",
+        "seconds": 22.238888888888887
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 17.09566893424036
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 12.97702947845805
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 37.494399092970525
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 10.913356009070295
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 9.920702947845806
+      },
+      {
+        "id": "wonround",
+        "seconds": 8.17920634920635
+      },
+      {
+        "id": "lostround",
+        "seconds": 11.25875283446712
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 8.17920634920635
+      },
+      {
+        "id": "roundmvpanthem_02",
+        "seconds": 8.170498866213151
+      },
+      {
+        "id": "deathcam",
+        "seconds": 5.088049886621315
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 50.00414965986395
+      }
+    ]
+  },
+  {
+    "id": "proxy_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 141.16278911564626
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 25.759614512471654
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 8.432176870748298
+      },
+      {
+        "id": "startround_01",
+        "seconds": 32.84750566893424
+      },
+      {
+        "id": "startround_02",
+        "seconds": 28.287687074829932
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 25.716077097505668
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 16.46873015873016
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 39.75544217687075
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 11.072993197278912
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 11.5402947845805
+      },
+      {
+        "id": "wonround",
+        "seconds": 6.925328798185941
+      },
+      {
+        "id": "lostround",
+        "seconds": 7.743832199546485
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 9.71172335600907
+      },
+      {
+        "id": "deathcam",
+        "seconds": 7.822199546485261
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 57.53367346938776
+      }
+    ]
+  },
+  {
+    "id": "pvris_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 152.06746031746033
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 29.12360544217687
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 11.9597052154195
+      },
+      {
+        "id": "startround_01",
+        "seconds": 15.798253968253968
+      },
+      {
+        "id": "startround_02",
+        "seconds": 12.997346938775511
+      },
+      {
+        "id": "startround_03",
+        "seconds": 21.934126984126983
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 12.332675736961452
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 12.29204081632653
+      },
+      {
+        "id": "startaction_03",
+        "seconds": 13.685238095238095
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 36.94002267573696
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 9.935215419501134
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 9.874263038548753
+      },
+      {
+        "id": "wonround",
+        "seconds": 7.526145124716553
+      },
+      {
+        "id": "lostround",
+        "seconds": 7.910725623582766
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 6.5436507936507935
+      },
+      {
+        "id": "deathcam",
+        "seconds": 6.115532879818594
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 57.15299319727891
+      }
+    ]
+  },
+  {
+    "id": "radcat_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 165.66564625850341
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 26.12532879818594
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 15.185827664399094
+      },
+      {
+        "id": "startround_01",
+        "seconds": 15.190181405895691
+      },
+      {
+        "id": "startround_02",
+        "seconds": 15.18873015873016
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 15.185827664399094
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 15.185827664399094
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 30.426825396825397
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 15.182925170068026
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 17.086961451247166
+      },
+      {
+        "id": "wonround",
+        "seconds": 8.991904761904761
+      },
+      {
+        "id": "lostround",
+        "seconds": 9.45920634920635
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 10.411224489795918
+      },
+      {
+        "id": "deathcam",
+        "seconds": 6.379659863945578
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 46.61403628117914
+      }
+    ]
+  },
+  {
+    "id": "repiet_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 243.684693877551
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 22.444965986394557
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 16.901201814058957
+      },
+      {
+        "id": "startround_01",
+        "seconds": 22.436258503401362
+      },
+      {
+        "id": "startround_02",
+        "seconds": 22.450770975056688
+      },
+      {
+        "id": "startround_03",
+        "seconds": 22.453673469387756
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 16.114625850340136
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 16.828639455782312
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 46.81140589569161
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 12.431360544217688
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 10.061473922902495
+      },
+      {
+        "id": "wonround",
+        "seconds": 10.727596371882086
+      },
+      {
+        "id": "lostround",
+        "seconds": 9.775578231292517
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 10.161609977324263
+      },
+      {
+        "id": "roundmvpanthem_02",
+        "seconds": 10.187732426303855
+      },
+      {
+        "id": "deathcam",
+        "seconds": 6.025555555555556
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 45.88551020408163
+      }
+    ]
+  },
+  {
+    "id": "roam_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 184.55507936507937
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 15.15390022675737
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 6.73421768707483
+      },
+      {
+        "id": "startround_01",
+        "seconds": 20.977755102040817
+      },
+      {
+        "id": "startround_02",
+        "seconds": 19.439433106575965
+      },
+      {
+        "id": "startround_03",
+        "seconds": 9.887324263038549
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 21.254943310657595
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 19.371224489795917
+      },
+      {
+        "id": "startaction_03",
+        "seconds": 17.67326530612245
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 30.899931972789116
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 10.271904761904763
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 10.579569160997732
+      },
+      {
+        "id": "wonround",
+        "seconds": 6.314353741496599
+      },
+      {
+        "id": "lostround",
+        "seconds": 8.240158730158731
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 7.775759637188209
+      },
+      {
+        "id": "deathcam",
+        "seconds": 5.331859410430839
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 46.53902494331066
+      }
+    ]
+  },
+  {
+    "id": "robertallaire_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 139.8537641723356
+      },
+      {
+        "id": "loading",
+        "seconds": 92.34909297052154
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 22.534943310657596
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 8.144829931972788
+      },
+      {
+        "id": "startround_01",
+        "seconds": 22.366598639455784
+      },
+      {
+        "id": "startround_02",
+        "seconds": 24.177755102040816
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 22.354988662131518
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 24.90047619047619
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 55.54210884353741
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 10.49249433106576
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 11.206507936507936
+      },
+      {
+        "id": "wonround",
+        "seconds": 11.01204081632653
+      },
+      {
+        "id": "lostround",
+        "seconds": 11.165873015873016
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 11.165873015873016
+      },
+      {
+        "id": "deathcam",
+        "seconds": 9.71172335600907
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 49.58954648526077
+      }
+    ]
+  },
+  {
+    "id": "sammarshall_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": true,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 197.99362811791383
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 22.987732426303854
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 7.93875283446712
+      },
+      {
+        "id": "startround_01",
+        "seconds": 26.067278911564625
+      },
+      {
+        "id": "startround_02",
+        "seconds": 29.5618820861678
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 17.09566893424036
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 14.272993197278911
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 39.604512471655326
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 12.750634920634921
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 11.874081632653061
+      },
+      {
+        "id": "wonround",
+        "seconds": 10.42283446712018
+      },
+      {
+        "id": "lostround",
+        "seconds": 9.740748299319728
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 7.888956916099773
+      },
+      {
+        "id": "deathcam",
+        "seconds": 3.567142857142857
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 59.791814058956916
+      }
+    ]
+  },
+  {
+    "id": "sammarshall_02",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 169.49693877551022
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 24.691496598639457
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 17.197256235827666
+      },
+      {
+        "id": "startround_01",
+        "seconds": 23.417301587301587
+      },
+      {
+        "id": "startround_02",
+        "seconds": 26.0353514739229
+      },
+      {
+        "id": "startround_03",
+        "seconds": 28.64469387755102
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 21.463922902494332
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 24.735034013605443
+      },
+      {
+        "id": "startaction_03",
+        "seconds": 20.151995464852607
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 43.438707482993195
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 13.067006802721089
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 14.187369614512471
+      },
+      {
+        "id": "wonround",
+        "seconds": 11.19780045351474
+      },
+      {
+        "id": "lostround",
+        "seconds": 8.954172335600907
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 11.679614512471655
+      },
+      {
+        "id": "deathcam",
+        "seconds": 6.3245124716553285
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 47.949183673469385
+      }
+    ]
+  },
+  {
+    "id": "sarahschachner_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": true,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 178.02156462585035
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 26.401065759637188
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 57.28986394557823
+      },
+      {
+        "id": "startround_01",
+        "seconds": 20.366780045351472
+      },
+      {
+        "id": "startround_02",
+        "seconds": 20.36387755102041
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 14.268639455782314
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 14.25702947845805
+      },
+      {
+        "id": "startaction_03",
+        "seconds": 20.31453514739229
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 42.87272108843538
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 17.33077097505669
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 14.724331065759637
+      },
+      {
+        "id": "wonround",
+        "seconds": 11.871179138321995
+      },
+      {
+        "id": "lostround",
+        "seconds": 10.689863945578232
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 10.6840589569161
+      },
+      {
+        "id": "deathcam",
+        "seconds": 10.672448979591836
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 57.28986394557823
+      }
+    ]
+  },
+  {
+    "id": "sasha_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 140.5822902494331
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 22.900657596371882
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 8.60342403628118
+      },
+      {
+        "id": "startround_01",
+        "seconds": 26.32269841269841
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 18.08251700680272
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 42.06002267573696
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 12.074353741496598
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 11.781201814058957
+      },
+      {
+        "id": "wonround",
+        "seconds": 6.48124716553288
+      },
+      {
+        "id": "lostround",
+        "seconds": 8.765510204081632
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 9.087687074829931
+      },
+      {
+        "id": "deathcam",
+        "seconds": 5.224467120181406
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 46.90473922902494
+      }
+    ]
+  },
+  {
+    "id": "scarlxrd_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": true,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 220.60696145124717
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 16.642879818594103
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 6.490408163265307
+      },
+      {
+        "id": "startround_01",
+        "seconds": 9.425827664399092
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 14.370226757369615
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 37.62210884353742
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 9.296666666666667
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 10.173219954648527
+      },
+      {
+        "id": "wonround",
+        "seconds": 6.521882086167801
+      },
+      {
+        "id": "lostround",
+        "seconds": 7.865736961451248
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 9.523061224489796
+      },
+      {
+        "id": "deathcam",
+        "seconds": 4.626553287981859
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 42.29557823129252
+      }
+    ]
+  },
+  {
+    "id": "scarlxrd_02",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": true,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 212.1955328798186
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 35.181111111111115
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 7.089773242630385
+      },
+      {
+        "id": "startround_01",
+        "seconds": 15.521065759637189
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 15.232267573696145
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 13.836167800453515
+      },
+      {
+        "id": "startaction_03",
+        "seconds": 15.412222222222223
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 27.760884353741496
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 12.173038548752835
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 22.610408163265305
+      },
+      {
+        "id": "wonround",
+        "seconds": 7.20687074829932
+      },
+      {
+        "id": "lostround",
+        "seconds": 13.2440589569161
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 6.870181405895692
+      },
+      {
+        "id": "deathcam",
+        "seconds": 2.156530612244898
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 97.29784580498867
+      }
+    ]
+  },
+  {
+    "id": "seanmurray_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 159.7648752834467
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 27.129591836734694
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 6.1348526077097505
+      },
+      {
+        "id": "startround_01",
+        "seconds": 28.18609977324263
+      },
+      {
+        "id": "startround_02",
+        "seconds": 28.15707482993197
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 29.338390022675735
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 26.80160997732426
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 45.68233560090703
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 14.814308390022676
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 14.07126984126984
+      },
+      {
+        "id": "wonround",
+        "seconds": 17.80968253968254
+      },
+      {
+        "id": "lostround",
+        "seconds": 13.2440589569161
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 13.94936507936508
+      },
+      {
+        "id": "deathcam",
+        "seconds": 7.1880045351473925
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 44.59580498866213
+      }
+    ]
+  },
+  {
+    "id": "selectiveresponse_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 361.55208616780044
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 25.547732426303856
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 12.750634920634921
+      },
+      {
+        "id": "startround_01",
+        "seconds": 19.141927437641723
+      },
+      {
+        "id": "startround_02",
+        "seconds": 19.13902494331066
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 12.747732426303855
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 12.739024943310657
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 38.350634920634924
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 10.350272108843537
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 10.34156462585034
+      },
+      {
+        "id": "wonround",
+        "seconds": 7.941201814058957
+      },
+      {
+        "id": "lostround",
+        "seconds": 6.389818594104308
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 9.941020408163265
+      },
+      {
+        "id": "deathcam",
+        "seconds": 6.341927437641723
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 54.33467120181406
+      }
+    ]
+  },
+  {
+    "id": "shockone_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 206.00741496598638
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 23.2634693877551
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 14.016122448979592
+      },
+      {
+        "id": "startround_01",
+        "seconds": 13.659115646258503
+      },
+      {
+        "id": "startround_02",
+        "seconds": 13.659115646258503
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 12.968321995464853
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 12.968321995464853
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 38.336122448979594
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 12.97702947845805
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 12.29204081632653
+      },
+      {
+        "id": "wonround",
+        "seconds": 12.283333333333333
+      },
+      {
+        "id": "lostround",
+        "seconds": 11.592539682539682
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 13.653310657596371
+      },
+      {
+        "id": "roundmvpanthem_02",
+        "seconds": 13.664920634920636
+      },
+      {
+        "id": "deathcam",
+        "seconds": 5.0967573696145125
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 53.431995464852605
+      }
+    ]
+  },
+  {
+    "id": "skog_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 91.6549433106576
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 50.43081632653061
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 43.54365079365079
+      },
+      {
+        "id": "startround_01",
+        "seconds": 37.35798185941043
+      },
+      {
+        "id": "startround_02",
+        "seconds": 35.14918367346939
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 41.70882086167801
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 41.610136054421766
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 40.74519274376417
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 11.901655328798187
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 12.701292517006802
+      },
+      {
+        "id": "wonround",
+        "seconds": 7.566780045351474
+      },
+      {
+        "id": "lostround",
+        "seconds": 7.3868253968253965
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 11.749274376417233
+      },
+      {
+        "id": "deathcam",
+        "seconds": 5.482789115646258
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 43.54365079365079
+      }
+    ]
+  },
+  {
+    "id": "skog_02",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 238.4631065759637
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 46.74755102040816
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 42.70918367346939
+      },
+      {
+        "id": "startround_01",
+        "seconds": 45.412403628117914
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 16.375850340136054
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 45.49367346938776
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 11.447414965986395
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 11.43
+      },
+      {
+        "id": "wonround",
+        "seconds": 4.394353741496599
+      },
+      {
+        "id": "lostround",
+        "seconds": 6.550907029478458
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 7.648049886621315
+      },
+      {
+        "id": "deathcam",
+        "seconds": 4.37984126984127
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 42.70918367346939
+      }
+    ]
+  },
+  {
+    "id": "skog_03",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 293.80496598639456
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 25.62609977324263
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 40.358163265306125
+      },
+      {
+        "id": "startround_01",
+        "seconds": 75.04977324263038
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 6.661201814058957
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 40.04424036281179
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 10.176122448979593
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 10.213854875283447
+      },
+      {
+        "id": "wonround",
+        "seconds": 9.845238095238095
+      },
+      {
+        "id": "lostround",
+        "seconds": 7.439070294784581
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 7.555170068027211
+      },
+      {
+        "id": "deathcam",
+        "seconds": 6.315804988662132
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 40.358163265306125
+      }
+    ]
+  },
+  {
+    "id": "sullivanking_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": true,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 160.2408843537415
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 34.61222222222222
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 51.734489795918364
+      },
+      {
+        "id": "startround_01",
+        "seconds": 10.122426303854875
+      },
+      {
+        "id": "startround_02",
+        "seconds": 21.310090702947846
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 21.803514739229026
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 25.959886621315192
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 31.53267573696145
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 14.117709750566894
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 14.495034013605443
+      },
+      {
+        "id": "wonround",
+        "seconds": 9.32859410430839
+      },
+      {
+        "id": "lostround",
+        "seconds": 6.1387528344671205
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 6.620566893424036
+      },
+      {
+        "id": "deathcam",
+        "seconds": 5.568412698412699
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 51.734489795918364
+      }
+    ]
+  },
+  {
+    "id": "theverkkars_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 154.02374149659863
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 33.50637188208617
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 8.403151927437642
+      },
+      {
+        "id": "startround_01",
+        "seconds": 16.034807256235826
+      },
+      {
+        "id": "startround_02",
+        "seconds": 16.899750566893424
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 16.506462585034015
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 16.50936507936508
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 32.52532879818594
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 10.10936507936508
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 10.10936507936508
+      },
+      {
+        "id": "wonround",
+        "seconds": 2.9953514739229026
+      },
+      {
+        "id": "lostround",
+        "seconds": 3.4945804988662132
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 6.249047619047619
+      },
+      {
+        "id": "deathcam",
+        "seconds": 1.999795918367347
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 47.897392290249435
+      }
+    ]
+  },
+  {
+    "id": "theverkkars_02",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": true,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 157.80859410430838
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 33.622471655328795
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 8.284149659863946
+      },
+      {
+        "id": "startround_01",
+        "seconds": 20.159251700680272
+      },
+      {
+        "id": "startround_02",
+        "seconds": 17.030362811791385
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 15.313537414965987
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 15.348367346938776
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 29.334036281179138
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 15.908548752834466
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 15.393356009070295
+      },
+      {
+        "id": "wonround",
+        "seconds": 9.865555555555556
+      },
+      {
+        "id": "lostround",
+        "seconds": 4.408866213151928
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 9.341655328798186
+      },
+      {
+        "id": "deathcam",
+        "seconds": 3.4742630385487527
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 46.05575963718821
+      }
+    ]
+  },
+  {
+    "id": "tigercub_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 220.37766439909296
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 22.12278911564626
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 10.932222222222222
+      },
+      {
+        "id": "startround_01",
+        "seconds": 21.62936507936508
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 15.534126984126985
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 41.729138321995464
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 10.930770975056689
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 10.727596371882086
+      },
+      {
+        "id": "wonround",
+        "seconds": 8.690045351473923
+      },
+      {
+        "id": "lostround",
+        "seconds": 5.581473922902494
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 6.074897959183674
+      },
+      {
+        "id": "deathcam",
+        "seconds": 5.804965986394558
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 55.48696145124717
+      }
+    ]
+  },
+  {
+    "id": "timhuling_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": true,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 144.99698412698413
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 28.032267573696146
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 39.99390022675737
+      },
+      {
+        "id": "startround_01",
+        "seconds": 18.54981859410431
+      },
+      {
+        "id": "startround_02",
+        "seconds": 18.57013605442177
+      },
+      {
+        "id": "startround_03",
+        "seconds": 17.757437641723357
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 19.71081632653061
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 19.71081632653061
+      },
+      {
+        "id": "startaction_03",
+        "seconds": 19.72532879818594
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 45.368866213151925
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 16.11172335600907
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 15.856303854875284
+      },
+      {
+        "id": "wonround",
+        "seconds": 9.055759637188208
+      },
+      {
+        "id": "lostround",
+        "seconds": 8.780022675736962
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 8.980294784580499
+      },
+      {
+        "id": "deathcam",
+        "seconds": 6.054580498866213
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 39.99390022675737
+      }
+    ]
+  },
+  {
+    "id": "timhuling_02",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 128.94619047619048
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 22.29113378684807
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 14.22219954648526
+      },
+      {
+        "id": "startround_01",
+        "seconds": 13.487868480725623
+      },
+      {
+        "id": "startround_02",
+        "seconds": 12.219478458049887
+      },
+      {
+        "id": "startround_03",
+        "seconds": 12.747732426303855
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 16.007233560090704
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 20.02138321995465
+      },
+      {
+        "id": "startaction_03",
+        "seconds": 17.75453514739229
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 41.37503401360544
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 9.285056689342404
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 9.377936507936507
+      },
+      {
+        "id": "wonround",
+        "seconds": 10.097755102040816
+      },
+      {
+        "id": "lostround",
+        "seconds": 6.501564625850341
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 11.038163265306123
+      },
+      {
+        "id": "deathcam",
+        "seconds": 6.466734693877551
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 39.80768707482993
+      }
+    ]
+  },
+  {
+    "id": "treeadams_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 256.4875963718821
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 24.18936507936508
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 15.67344671201814
+      },
+      {
+        "id": "startround_01",
+        "seconds": 17.031814058956915
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 14.69530612244898
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 16.0159410430839
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 41.57240362811791
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 12.971224489795919
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 15.766326530612245
+      },
+      {
+        "id": "wonround",
+        "seconds": 10.202244897959183
+      },
+      {
+        "id": "lostround",
+        "seconds": 8.524603174603175
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 8.916439909297052
+      },
+      {
+        "id": "deathcam",
+        "seconds": 5.848503401360544
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 102.61185941043084
+      }
+    ]
+  },
+  {
+    "id": "troelsfolmann_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 245.0430612244898
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 28.89140589569161
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 50.936303854875284
+      },
+      {
+        "id": "startround_01",
+        "seconds": 24.555079365079365
+      },
+      {
+        "id": "startround_02",
+        "seconds": 24.557981859410432
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 16.52097505668934
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 18.590453514739227
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 36.301473922902495
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 14.837528344671203
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 12.25140589569161
+      },
+      {
+        "id": "wonround",
+        "seconds": 9.5056462585034
+      },
+      {
+        "id": "lostround",
+        "seconds": 13.598163265306123
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 9.824920634920636
+      },
+      {
+        "id": "deathcam",
+        "seconds": 3.9241496598639456
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 50.936303854875284
+      }
+    ]
+  },
+  {
+    "id": "twerl_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 228.18537414965985
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 24.82936507936508
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 13.037981859410431
+      },
+      {
+        "id": "startround_01",
+        "seconds": 12.355895691609977
+      },
+      {
+        "id": "startround_02",
+        "seconds": 12.350090702947846
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 10.968503401360545
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 12.358798185941042
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 29.953718820861678
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 12.559070294784581
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 12.364603174603175
+      },
+      {
+        "id": "wonround",
+        "seconds": 24.79888888888889
+      },
+      {
+        "id": "lostround",
+        "seconds": 11.67671201814059
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 10.988820861678004
+      },
+      {
+        "id": "deathcam",
+        "seconds": 6.159070294784581
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 46.486326530612246
+      }
+    ]
+  },
+  {
+    "id": "twinatlantic_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 224.02174603174603
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 27.215215419501135
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 45.53476190476191
+      },
+      {
+        "id": "startround_01",
+        "seconds": 19.73984126984127
+      },
+      {
+        "id": "startround_02",
+        "seconds": 27.89439909297052
+      },
+      {
+        "id": "startround_03",
+        "seconds": 13.196167800453514
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 12.274625850340136
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 13.116349206349206
+      },
+      {
+        "id": "startaction_03",
+        "seconds": 11.839251700680272
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 37.381201814058954
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 12.026462585034013
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 10.495396825396826
+      },
+      {
+        "id": "wonround",
+        "seconds": 10.402517006802722
+      },
+      {
+        "id": "lostround",
+        "seconds": 10.504104308390023
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 8.240158730158731
+      },
+      {
+        "id": "deathcam",
+        "seconds": 4.635260770975057
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 45.53476190476191
+      }
+    ]
+  },
+  {
+    "id": "valve_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 128.78074829931973
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 21.671451247165532
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 47.94092970521542
+      },
+      {
+        "id": "startround_01",
+        "seconds": 25.553537414965987
+      },
+      {
+        "id": "startround_02",
+        "seconds": 23.585646258503402
+      },
+      {
+        "id": "startround_03",
+        "seconds": 23.112539682539683
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 39.05013605442177
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 41.09639455782313
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 12.692585034013605
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 15.56315192743764
+      },
+      {
+        "id": "wonround",
+        "seconds": 33.43961451247166
+      },
+      {
+        "id": "lostround",
+        "seconds": 17.85612244897959
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 33.442517006802724
+      },
+      {
+        "id": "deathcam",
+        "seconds": 5.038707482993197
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 47.94092970521542
+      }
+    ]
+  },
+  {
+    "id": "valve_02",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 51.11290249433107
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 18.43081632653061
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 51.12596371882086
+      },
+      {
+        "id": "startround_01",
+        "seconds": 33.98528344671202
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 36.40015873015873
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 37.92251700680272
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 13.175850340136055
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 19.792086167800452
+      },
+      {
+        "id": "wonround",
+        "seconds": 12.509727891156462
+      },
+      {
+        "id": "lostround",
+        "seconds": 12.170136054421768
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 12.509727891156462
+      },
+      {
+        "id": "deathcam",
+        "seconds": 3.4220181405895693
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 51.12596371882086
+      }
+    ]
+  },
+  {
+    "id": "valve_cs2_01",
+    "imageWidth": 256,
+    "imageHeight": 198,
+    "model": false,
+    "tracks": [
+      {
+        "id": "mainmenu",
+        "seconds": 207.11326530612246
+      },
+      {
+        "id": "chooseteam",
+        "seconds": 46.753356009070295
+      },
+      {
+        "id": "startofmatch",
+        "seconds": 14.349909297052154
+      },
+      {
+        "id": "startround_01",
+        "seconds": 35.636802721088436
+      },
+      {
+        "id": "startaction_01",
+        "seconds": 25.280702947845803
+      },
+      {
+        "id": "startaction_02",
+        "seconds": 20.816666666666666
+      },
+      {
+        "id": "bombplanted",
+        "seconds": 39.09947845804989
+      },
+      {
+        "id": "bombtenseccount",
+        "seconds": 11.946643990929704
+      },
+      {
+        "id": "roundtenseccount",
+        "seconds": 11.946643990929704
+      },
+      {
+        "id": "wonround",
+        "seconds": 6.156167800453515
+      },
+      {
+        "id": "lostround",
+        "seconds": 7.2562131519274375
+      },
+      {
+        "id": "roundmvpanthem_01",
+        "seconds": 10.794353741496598
+      },
+      {
+        "id": "deathcam",
+        "seconds": 7.244603174603174
+      },
+      {
+        "id": "endofmatch",
+        "seconds": 44.350090702947846
+      }
+    ]
+  }
+]

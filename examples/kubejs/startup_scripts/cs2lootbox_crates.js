@@ -22,6 +22,16 @@ CS2LootboxEvents.register(event => {
         crate.scale(78)
         crate.rotation(0, 180, 0) // pitch, yaw, roll
 
+        // Item contexts are separate from the opening preview above.
+        // x, y, z, rotationX, rotationY, rotationZ, scale
+        crate.gui(0, -3, 0, 30, 135, 0, 1.5)
+        crate.guiCarousel(0, -3, 0, 30, 135, 0, 1.8)
+        crate.guiReveal(0, -3, 0, 30, 135, 0, 2.2)
+
+        // Optional collection artwork (provide this PNG).
+        // crate.collection('The Revolution Collection', 'kubejs:textures/gui/collections/revolution.png')
+        // crate.collectionImageScale(0.8)
+
         // GeckoLib animation names inside the animation JSON.
         crate.animations('fall', 'idle', 'open', 'open_idle')
         crate.itemIdleAnimation('idle')
@@ -30,6 +40,9 @@ CS2LootboxEvents.register(event => {
         // Nothing is required here for the normal case flow.
         //
         // Optional per-case overrides are still available:
+        // crate.noDropSound()
+        // crate.openLoopSound('cs2lootbox:case_pins_fall', 0.45, 1.0)
+        // crate.noOpenLoopSound() // clear an existing loop
         // crate.openSound('cs2lootbox:case_unlock', 1.0, 1.0)
         // crate.carouselTickSound('cs2lootbox:csgo_ui_crate_item_scroll')
         // These are the AWARDED sounds played when the result UI closes.
@@ -143,8 +156,9 @@ CS2LootboxEvents.register(event => {
         // a filler gold panel averages roughly once every 385 carousel slots.
         // The server-selected winning slot is always forced.
         //
-        // tooltip() accepts literal text or a translation key. The same text
-        // is used in the case tooltip AND on the gold primary-carousel card.
+        // tooltip() accepts literal text or a translation key for the case tooltip.
+        // itemListName() names the gold entry in the case-content list.
+        // The gold primary-carousel card shows foreground artwork without text.
         //
         // foreground() is optional. When omitted, the mod automatically uses:
         //   cs2lootbox:textures/gui/default_rare_item.png

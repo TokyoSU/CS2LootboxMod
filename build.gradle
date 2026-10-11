@@ -16,6 +16,11 @@ base {
 // Mojang ships Java 17 to end users in 1.18+, so your mod should target Java 17.
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
+mixin {
+    add sourceSets.main, 'cs2lootbox.refmap.json'
+    config 'cs2lootbox.mixins.json'
+}
+
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 minecraft {
     mappings channel: mapping_channel, version: mapping_version
@@ -46,6 +51,11 @@ minecraft {
 
         gameTestServer {
             property 'forge.enabledGameTestNamespaces', mod_id
+            property 'cs2lootbox.testProjectRoot', projectDir.absolutePath
+            workingDirectory project.file('build/music-kit-gametest')
+            mods {
+                "${mod_id}" { source sourceSets.test }
+            }
         }
 
         data {
@@ -55,8 +65,104 @@ minecraft {
     }
 }
 
+// Each music kit is independently installable; shared geometry stays in the mod.
+def musicAssets = file('resourcepacks/cs2lootbox-music/assets/cs2lootbox')
+def musicManifest = new File(musicAssets, 'sounds.json')
+// The optional audio library need not be present to build the mod itself.
+def musicSounds = musicManifest.isFile() ? new groovy.json.JsonSlurper().parse(musicManifest, 'UTF-8') : [:]
+def musicLanguage = new groovy.json.JsonSlurper().parse(file('src/main/resources/assets/cs2lootbox/lang/en_us.json'), 'UTF-8')
+def musicPackTasks = []
+(new File(musicAssets, 'sounds/music').listFiles() ?: []).findAll { it.directory }.sort { it.name }.each { kitDirectory ->
+    def kitId = kitDirectory.name
+    def kitSounds = musicSounds.findAll { event, definition -> event.startsWith("music.${kitId}.") }
+    def soundJson = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(kitSounds)) + '\n'
+    def title = musicLanguage["item.cs2lootbox.music_kit_${kitId}"] ?: kitId
+    def metadata = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson([
+        pack: [pack_format: 15, description: "CS2 Lootbox - ${title}"]
+    ])) + '\n'
+    def generated = layout.buildDirectory.dir("generated/music-packs/${kitId}")
+    def prepare = tasks.register("prepareMusicPack_${kitId}") {
+        inputs.property('sounds', soundJson)
+        inputs.property('metadata', metadata)
+        outputs.dir(generated)
+        doLast {
+            def directory = generated.get().asFile
+            directory.mkdirs()
+            new File(directory, 'pack.mcmeta').setText(metadata, 'UTF-8')
+            def definitions = new File(directory, 'assets/cs2lootbox/sounds.json')
+            definitions.parentFile.mkdirs()
+            definitions.setText(soundJson, 'UTF-8')
+        }
+    }
+    musicPackTasks.add(tasks.register("musicResourcePack_${kitId}", Zip) {
+        dependsOn prepare
+        archiveFileName = "cs2lootbox-music-${kitId}.zip"
+        destinationDirectory = layout.buildDirectory.dir('resourcepacks')
+        entryCompression = ZipEntryCompression.STORED
+        from generated
+        from('resourcepacks/cs2lootbox-music') {
+            include "assets/cs2lootbox/sounds/music/${kitId}/*.ogg"
+            exclude '**/*.partial.ogg'
+            include "assets/cs2lootbox/textures/gui/music/${kitId}.png"
+            include "assets/cs2lootbox/textures/musickits/music_kit_${kitId}.png"
+        }
+        from(new File(musicAssets, "textures/gui/music/${kitId}.png")) {
+            rename { 'pack.png' }
+        }
+    })
+}
+tasks.register('musicResourcePacks') {
+    group = 'build'
+    description = 'Builds one optional resource-pack ZIP per music kit, using its GUI artwork as the icon.'
+    dependsOn musicPackTasks
+    doFirst {
+        if (!musicManifest.isFile() || musicPackTasks.isEmpty()) {
+            throw new GradleException('Music pack source assets are missing from resourcepacks/cs2lootbox-music; the mod can still be built without them.')
+        }
+    }
+}
+tasks.register('musicResourcePack') {
+    group = 'build'
+    description = 'Alias for musicResourcePacks: builds separate packs for every kit.'
+    dependsOn 'musicResourcePacks'
+}
+
+tasks.register('musicResourcePackFull', Zip) {
+    group = 'build'
+    description = 'Builds the complete music collection as one resource pack for CurseForge.'
+    archiveFileName = 'cs2lootbox-music-full.zip'
+    destinationDirectory = layout.buildDirectory.dir('resourcepacks')
+    entryCompression = ZipEntryCompression.STORED
+    doFirst {
+        if (!musicManifest.isFile()) {
+            throw new GradleException('Full music pack source assets are missing from resourcepacks/cs2lootbox-music.')
+        }
+    }
+    from('resourcepacks/cs2lootbox-music') {
+        include 'pack.mcmeta'
+        include 'assets/cs2lootbox/sounds.json'
+        include 'assets/cs2lootbox/sounds/music/**/*.ogg'
+        include 'assets/cs2lootbox/textures/gui/music/*.png'
+        include 'assets/cs2lootbox/textures/musickits/*.png'
+        exclude '**/*.partial.ogg'
+    }
+    from('docs/curseforge/music-kits-project-logo.png') {
+        rename { 'pack.png' }
+    }
+}
+
 // Include resources generated by data generators.
 sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+tasks.matching { it.name == 'runGameTestServer' }.configureEach {
+    dependsOn 'musicResourcePack_treeadams_benbromfield_01', 'musicResourcePack_bbnos_01'
+    doFirst {
+        copy {
+            from 'src/test/resources/music_kit_api_check.js'
+            into 'build/music-kit-gametest/kubejs/startup_scripts'
+        }
+    }
+}
 
 repositories {
 
@@ -142,6 +248,7 @@ tasks.named('jar', Jar).configure {
                 'Implementation-Title'    : project.name,
                 'Implementation-Version'  : project.jar.archiveVersion,
                 'Implementation-Vendor'   : mod_authors,
+                'MixinConfigs'           : 'cs2lootbox.mixins.json',
                 'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }
@@ -166,4 +273,66 @@ publishing {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+}
+
+tasks.register('renderCommandCheck', JavaExec) {
+    group = 'verification'
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'net.tokyosu.cs2lootbox.client.renderer.RenderCommandCheck'
+    workingDir layout.buildDirectory.dir('render-command-check').get().asFile
+    doFirst { workingDir.mkdirs() }
+}
+
+tasks.register('heldCaseCacheCheck', JavaExec) {
+    group = 'verification'
+    description = 'Checks static held poses, GPU mesh reuse and buffer ordering in a hidden GL window.'
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'net.tokyosu.cs2lootbox.client.renderer.HeldCaseCacheCheck'
+    args projectDir.absolutePath,
+            new File(gradle.gradleUserHomeDir, "caches/forge_gradle/minecraft_repo/versions/${minecraft_version}/client-extra.jar").absolutePath
+    systemProperty 'org.lwjgl.librarypath', layout.buildDirectory.dir('render-gl-natives').get().asFile.absolutePath
+    workingDir layout.buildDirectory.dir('render-cache-check').get().asFile
+    doFirst {
+        workingDir.mkdirs()
+        ['lwjgl', 'lwjgl-glfw', 'lwjgl-opengl', 'lwjgl-stb'].each { library ->
+            def cache = new File(gradle.gradleUserHomeDir, "caches/modules-2/files-2.1/org.lwjgl/${library}/3.3.1")
+            def natives = project.fileTree(cache).matching { include '**/*-natives-windows.jar' }.files
+            if (natives.isEmpty()) throw new GradleException("Cached Windows natives missing for ${library}")
+            natives.each { nativeJar ->
+                project.copy {
+                    from project.zipTree(nativeJar)
+                    include '*.dll'
+                    into layout.buildDirectory.dir('render-gl-natives')
+                }
+            }
+        }
+    }
+}
+
+tasks.register('musicKitAudioCheck', JavaExec) {
+    group = 'verification'
+    description = 'Checks preview timing and decodes every built-in music track with Minecraft\'s Vorbis reader.'
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'net.tokyosu.cs2lootbox.music.MusicKitAudioCheck'
+    args projectDir.absolutePath
+    systemProperty 'org.lwjgl.librarypath', layout.buildDirectory.dir('render-gl-natives').get().asFile.absolutePath
+    workingDir layout.buildDirectory.dir('music-audio-check').get().asFile
+    doFirst {
+        workingDir.mkdirs()
+        ['lwjgl', 'lwjgl-stb'].each { library ->
+            def cache = new File(gradle.gradleUserHomeDir, "caches/modules-2/files-2.1/org.lwjgl/${library}/3.3.1")
+            def natives = project.fileTree(cache).matching { include '**/*-natives-windows.jar' }.files
+            if (natives.isEmpty()) throw new GradleException("Cached Windows natives missing for ${library}")
+            natives.each { nativeJar ->
+                project.copy {
+                    from project.zipTree(nativeJar)
+                    include '*.dll'
+                    into layout.buildDirectory.dir('render-gl-natives')
+                }
+            }
+        }
+    }
 }
