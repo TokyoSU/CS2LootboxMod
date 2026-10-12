@@ -60,6 +60,11 @@ public final class ClientRenderDiagnostics {
                             context.getSource().sendSuccess(() -> Component.literal(
                                     "CS2 GPU cache (all contexts): uploads=" + cache.uploads() + ", hits=" + cache.hits()
                                             + ", evictions=" + cache.evictions() + ", entries=" + cache.entries()), false);
+                            var scratch = RenderBufferPool.statistics();
+                            context.getSource().sendSuccess(() -> Component.literal(
+                                    "CS2 native scratch buffers: created=" + scratch.created()
+                                            + ", pooled=" + scratch.available() + ", in use=" + scratch.borrowed()
+                                            + ", peak concurrent=" + scratch.peakBorrowed()), false);
                             return 1;
                         }))
                         .then(Commands.literal("reset").executes(creativeOnly(creativePlayer, context -> {

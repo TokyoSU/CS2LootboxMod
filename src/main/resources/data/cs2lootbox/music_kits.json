@@ -73,13 +73,14 @@
         "id": "endofmatch",
         "seconds": 44.289591836734694
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x1024.geo.json"
   },
   {
     "id": "adambeyer_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -145,13 +146,14 @@
         "id": "endofmatch",
         "seconds": 45.47916099773243
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_cs2_2048x1024.geo.json"
   },
   {
     "id": "alrt_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -225,13 +227,14 @@
         "id": "endofmatch",
         "seconds": 44.99444444444445
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_cs2_2048x1024.geo.json"
   },
   {
     "id": "altare_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -297,7 +300,8 @@
         "id": "endofmatch",
         "seconds": 44.51843537414966
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_cs2_2048x1024.geo.json"
   },
   {
     "id": "amontobin_01",
@@ -373,13 +377,14 @@
         "id": "endofmatch",
         "seconds": 93.69585034013605
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x1024.geo.json"
   },
   {
     "id": "austinwintory_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -441,7 +446,8 @@
         "id": "endofmatch",
         "seconds": 43.288231292517004
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x512.geo.json"
   },
   {
     "id": "austinwintory_02",
@@ -509,7 +515,8 @@
         "id": "endofmatch",
         "seconds": 47.18628117913832
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x1024.geo.json"
   },
   {
     "id": "austinwintory_03",
@@ -581,13 +588,14 @@
         "id": "endofmatch",
         "seconds": 45.44768707482993
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x1024.geo.json"
   },
   {
     "id": "austinwintory_04",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -649,13 +657,14 @@
         "id": "endofmatch",
         "seconds": 49.88804988662132
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_cs2_2048x1024.geo.json"
   },
   {
     "id": "awolnation_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -725,7 +734,8 @@
         "id": "endofmatch",
         "seconds": 56.08968253968254
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x512.geo.json"
   },
   {
     "id": "bbnos_01",
@@ -789,13 +799,14 @@
         "id": "endofmatch",
         "seconds": 45.685691609977326
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x1024.geo.json"
   },
   {
     "id": "beartooth_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -857,13 +868,14 @@
         "id": "endofmatch",
         "seconds": 44.8991156462585
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x512.geo.json"
   },
   {
     "id": "beartooth_02",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -925,13 +937,14 @@
         "id": "endofmatch",
         "seconds": 39.46419501133787
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x512.geo.json"
   },
   {
     "id": "benbromfield_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -993,13 +1006,14 @@
         "id": "endofmatch",
         "seconds": 48.805419501133784
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_cs2_2048x1024.geo.json"
   },
   {
     "id": "blitzkids_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -1061,13 +1075,14 @@
         "id": "endofmatch",
         "seconds": 51.8418820861678
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x512.geo.json"
   },
   {
     "id": "borne_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -1141,7 +1156,8 @@
         "id": "endofmatch",
         "seconds": 43.720249433106574
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_cs2_2048x1024.geo.json"
   },
   {
     "id": "chipzel_01",
@@ -1201,13 +1217,14 @@
         "id": "endofmatch",
         "seconds": 37.93167800453515
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x1024.geo.json"
   },
   {
     "id": "damjanmravunac_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -1269,13 +1286,14 @@
         "id": "endofmatch",
         "seconds": 58.69757369614513
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x512.geo.json"
   },
   {
     "id": "danielsadowski_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -1329,13 +1347,14 @@
         "id": "endofmatch",
         "seconds": 39.93585034013606
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x512.geo.json"
   },
   {
     "id": "danielsadowski_02",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -1389,13 +1408,14 @@
         "id": "endofmatch",
         "seconds": 66.58655328798186
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x512.geo.json"
   },
   {
     "id": "danielsadowski_03",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -1449,7 +1469,8 @@
         "id": "endofmatch",
         "seconds": 54.352539682539685
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x512.geo.json"
   },
   {
     "id": "danielsadowski_04",
@@ -1509,13 +1530,14 @@
         "id": "endofmatch",
         "seconds": 62.653673469387755
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x1024.geo.json"
   },
   {
     "id": "danielsadowski_05",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -1569,13 +1591,14 @@
         "id": "endofmatch",
         "seconds": 51.330589569161
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_cs2_2048x1024.geo.json"
   },
   {
     "id": "darude_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -1645,13 +1668,14 @@
         "id": "endofmatch",
         "seconds": 46.852494331065756
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x512.geo.json"
   },
   {
     "id": "denzelcurry_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -1721,13 +1745,14 @@
         "id": "endofmatch",
         "seconds": 42.23462585034014
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x1024.geo.json"
   },
   {
     "id": "dren_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -1797,7 +1822,8 @@
         "id": "endofmatch",
         "seconds": 52.357074829931975
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x512.geo.json"
   },
   {
     "id": "dren_02",
@@ -1877,13 +1903,14 @@
         "id": "endofmatch",
         "seconds": 50.79117913832199
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x1024.geo.json"
   },
   {
     "id": "dren_03",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -1953,13 +1980,14 @@
         "id": "endofmatch",
         "seconds": 41.801700680272106
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_cs2_2048x1024.geo.json"
   },
   {
     "id": "dryden_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -2021,13 +2049,14 @@
         "id": "endofmatch",
         "seconds": 48.94764172335601
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_cs2_2048x1024.geo.json"
   },
   {
     "id": "feedme_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -2085,7 +2114,8 @@
         "id": "endofmatch",
         "seconds": 50.44
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x512.geo.json"
   },
   {
     "id": "freakydna_01",
@@ -2161,13 +2191,14 @@
         "id": "endofmatch",
         "seconds": 55.20297052154195
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x1024.geo.json"
   },
   {
     "id": "ghost_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -2237,7 +2268,8 @@
         "id": "endofmatch",
         "seconds": 67.94156462585035
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_cs2_2048x1024.geo.json"
   },
   {
     "id": "hades_01",
@@ -2313,7 +2345,8 @@
         "id": "endofmatch",
         "seconds": 63.242879818594105
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x1024.geo.json"
   },
   {
     "id": "halo_01",
@@ -2381,13 +2414,14 @@
         "id": "endofmatch",
         "seconds": 64.24133786848073
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x1024.geo.json"
   },
   {
     "id": "health_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -2449,13 +2483,14 @@
         "id": "endofmatch",
         "seconds": 57.457755102040814
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_cs2_2048x1024.geo.json"
   },
   {
     "id": "hlalyx_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -2529,7 +2564,8 @@
         "id": "endofmatch",
         "seconds": 45.92804988662132
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x1024.geo.json"
   },
   {
     "id": "hlb_01",
@@ -2609,13 +2645,14 @@
         "id": "endofmatch",
         "seconds": 48.65494331065759
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x1024.geo.json"
   },
   {
     "id": "hotlinemiami_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -2689,13 +2726,14 @@
         "id": "endofmatch",
         "seconds": 60.54936507936508
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x512.geo.json"
   },
   {
     "id": "hundredth_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -2765,13 +2803,14 @@
         "id": "endofmatch",
         "seconds": 50.29775510204082
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x512.geo.json"
   },
   {
     "id": "ianhultquist_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -2841,13 +2880,14 @@
         "id": "endofmatch",
         "seconds": 47.9931746031746
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x512.geo.json"
   },
   {
     "id": "isoxo_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -2909,13 +2949,14 @@
         "id": "endofmatch",
         "seconds": 44.66646258503401
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_cs2_2048x1024.geo.json"
   },
   {
     "id": "jamesandthecoldgun_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -2977,7 +3018,8 @@
         "id": "endofmatch",
         "seconds": 54.343378684807256
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_cs2_2048x1024.geo.json"
   },
   {
     "id": "jesseharlin_01",
@@ -3041,13 +3083,14 @@
         "id": "endofmatch",
         "seconds": 52.953537414965986
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x1024.geo.json"
   },
   {
     "id": "jonathanyoung_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -3101,7 +3144,8 @@
         "id": "endofmatch",
         "seconds": 60.04097505668934
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_cs2_2048x1024.geo.json"
   },
   {
     "id": "juelz_01",
@@ -3169,13 +3213,14 @@
         "id": "endofmatch",
         "seconds": 53.23798185941043
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x1024.geo.json"
   },
   {
     "id": "juelz_02",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -3245,13 +3290,14 @@
         "id": "endofmatch",
         "seconds": 50.451133786848075
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_cs2_2048x1024.geo.json"
   },
   {
     "id": "kellybailey_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -3313,13 +3359,14 @@
         "id": "endofmatch",
         "seconds": 41.64541950113379
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x512.geo.json"
   },
   {
     "id": "killermike_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -3381,13 +3428,14 @@
         "id": "endofmatch",
         "seconds": 54.050226757369614
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_cs2_2048x1024.geo.json"
   },
   {
     "id": "killscript_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -3449,13 +3497,14 @@
         "id": "endofmatch",
         "seconds": 44.95090702947846
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_cs2_2048x1024.geo.json"
   },
   {
     "id": "kitheory_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -3509,7 +3558,8 @@
         "id": "endofmatch",
         "seconds": 40.133219954648524
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x512.geo.json"
   },
   {
     "id": "knock2_01",
@@ -3573,13 +3623,14 @@
         "id": "endofmatch",
         "seconds": 64.74637188208617
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x1024.geo.json"
   },
   {
     "id": "knock2_02",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -3641,7 +3692,8 @@
         "id": "endofmatch",
         "seconds": 43.855215419501135
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_cs2_2048x1024.geo.json"
   },
   {
     "id": "laurashigihara_01",
@@ -3717,13 +3769,14 @@
         "id": "endofmatch",
         "seconds": 46.05285714285714
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x1024.geo.json"
   },
   {
     "id": "lenniemoore_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -3793,13 +3846,14 @@
         "id": "endofmatch",
         "seconds": 50.1381179138322
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x512.geo.json"
   },
   {
     "id": "mateomessina_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -3889,13 +3943,14 @@
         "id": "endofmatch",
         "seconds": 55.33358276643991
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x512.geo.json"
   },
   {
     "id": "mattlange_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -3957,7 +4012,8 @@
         "id": "endofmatch",
         "seconds": 41.04170068027211
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x512.geo.json"
   },
   {
     "id": "mattlevine_01",
@@ -4033,13 +4089,14 @@
         "id": "endofmatch",
         "seconds": 57.49884353741496
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x1024.geo.json"
   },
   {
     "id": "mattlevine_02",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -4109,7 +4166,8 @@
         "id": "endofmatch",
         "seconds": 63.63716553287982
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_cs2_2048x1024.geo.json"
   },
   {
     "id": "meechydarko_01",
@@ -4185,13 +4243,14 @@
         "id": "endofmatch",
         "seconds": 45.79888888888889
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x1024.geo.json"
   },
   {
     "id": "michaelbross_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -4245,13 +4304,14 @@
         "id": "endofmatch",
         "seconds": 49.24269841269841
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x512.geo.json"
   },
   {
     "id": "midnightriders_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -4313,13 +4373,14 @@
         "id": "endofmatch",
         "seconds": 57.55544217687075
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x512.geo.json"
   },
   {
     "id": "mordfustang_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -4381,13 +4442,14 @@
         "id": "endofmatch",
         "seconds": 48.65494331065759
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x512.geo.json"
   },
   {
     "id": "neckdeep_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -4457,7 +4519,8 @@
         "id": "endofmatch",
         "seconds": 41.503197278911564
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x512.geo.json"
   },
   {
     "id": "neckdeep_02",
@@ -4533,13 +4596,14 @@
         "id": "endofmatch",
         "seconds": 44.990544217687074
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x1024.geo.json"
   },
   {
     "id": "newbeatfund_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -4601,13 +4665,14 @@
         "id": "endofmatch",
         "seconds": 53.28442176870748
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x512.geo.json"
   },
   {
     "id": "noisia_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -4673,13 +4738,14 @@
         "id": "endofmatch",
         "seconds": 50.036530612244896
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x512.geo.json"
   },
   {
     "id": "perfectworld_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -4733,13 +4799,14 @@
         "id": "endofmatch",
         "seconds": 35.9391156462585
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_cs2_2048x1024.geo.json"
   },
   {
     "id": "perfectworld_02",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -4797,13 +4864,14 @@
         "id": "endofmatch",
         "seconds": 58.79
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_cs2_2048x1024.geo.json"
   },
   {
     "id": "pirapus_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -4869,13 +4937,14 @@
         "id": "endofmatch",
         "seconds": 50.00414965986395
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_cs2_2048x1024.geo.json"
   },
   {
     "id": "proxy_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -4937,13 +5006,14 @@
         "id": "endofmatch",
         "seconds": 57.53367346938776
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x512.geo.json"
   },
   {
     "id": "pvris_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -5013,13 +5083,14 @@
         "id": "endofmatch",
         "seconds": 57.15299319727891
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_cs2_2048x1024.geo.json"
   },
   {
     "id": "radcat_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -5081,13 +5152,14 @@
         "id": "endofmatch",
         "seconds": 46.61403628117914
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_cs2_2048x1024.geo.json"
   },
   {
     "id": "repiet_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -5157,13 +5229,14 @@
         "id": "endofmatch",
         "seconds": 45.88551020408163
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_cs2_2048x1024.geo.json"
   },
   {
     "id": "roam_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -5233,13 +5306,14 @@
         "id": "endofmatch",
         "seconds": 46.53902494331066
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x512.geo.json"
   },
   {
     "id": "robertallaire_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -5305,7 +5379,8 @@
         "id": "endofmatch",
         "seconds": 49.58954648526077
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x512.geo.json"
   },
   {
     "id": "sammarshall_01",
@@ -5373,13 +5448,14 @@
         "id": "endofmatch",
         "seconds": 59.791814058956916
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x1024.geo.json"
   },
   {
     "id": "sammarshall_02",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -5449,7 +5525,8 @@
         "id": "endofmatch",
         "seconds": 47.949183673469385
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_cs2_2048x1024.geo.json"
   },
   {
     "id": "sarahschachner_01",
@@ -5521,13 +5598,14 @@
         "id": "endofmatch",
         "seconds": 57.28986394557823
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x1024.geo.json"
   },
   {
     "id": "sasha_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -5581,7 +5659,8 @@
         "id": "endofmatch",
         "seconds": 46.90473922902494
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x512.geo.json"
   },
   {
     "id": "scarlxrd_01",
@@ -5641,7 +5720,8 @@
         "id": "endofmatch",
         "seconds": 42.29557823129252
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x1024.geo.json"
   },
   {
     "id": "scarlxrd_02",
@@ -5709,13 +5789,14 @@
         "id": "endofmatch",
         "seconds": 97.29784580498867
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x1024.geo.json"
   },
   {
     "id": "seanmurray_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -5777,13 +5858,14 @@
         "id": "endofmatch",
         "seconds": 44.59580498866213
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x512.geo.json"
   },
   {
     "id": "selectiveresponse_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -5845,13 +5927,14 @@
         "id": "endofmatch",
         "seconds": 54.33467120181406
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_cs2_2048x1024.geo.json"
   },
   {
     "id": "shockone_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -5917,13 +6000,14 @@
         "id": "endofmatch",
         "seconds": 53.431995464852605
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_cs2_2048x1024.geo.json"
   },
   {
     "id": "skog_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -5985,13 +6069,14 @@
         "id": "endofmatch",
         "seconds": 43.54365079365079
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x512.geo.json"
   },
   {
     "id": "skog_02",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -6045,13 +6130,14 @@
         "id": "endofmatch",
         "seconds": 42.70918367346939
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x512.geo.json"
   },
   {
     "id": "skog_03",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -6105,7 +6191,8 @@
         "id": "endofmatch",
         "seconds": 40.358163265306125
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x512.geo.json"
   },
   {
     "id": "sullivanking_01",
@@ -6173,13 +6260,14 @@
         "id": "endofmatch",
         "seconds": 51.734489795918364
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x1024.geo.json"
   },
   {
     "id": "theverkkars_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -6241,7 +6329,8 @@
         "id": "endofmatch",
         "seconds": 47.897392290249435
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x512.geo.json"
   },
   {
     "id": "theverkkars_02",
@@ -6309,13 +6398,14 @@
         "id": "endofmatch",
         "seconds": 46.05575963718821
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x1024.geo.json"
   },
   {
     "id": "tigercub_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -6369,7 +6459,8 @@
         "id": "endofmatch",
         "seconds": 55.48696145124717
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_cs2_2048x1024.geo.json"
   },
   {
     "id": "timhuling_01",
@@ -6445,13 +6536,14 @@
         "id": "endofmatch",
         "seconds": 39.99390022675737
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x1024.geo.json"
   },
   {
     "id": "timhuling_02",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -6521,13 +6613,14 @@
         "id": "endofmatch",
         "seconds": 39.80768707482993
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_cs2_2048x1024.geo.json"
   },
   {
     "id": "treeadams_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -6585,13 +6678,14 @@
         "id": "endofmatch",
         "seconds": 102.61185941043084
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_cs2_2048x1024.geo.json"
   },
   {
     "id": "troelsfolmann_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -6653,13 +6747,14 @@
         "id": "endofmatch",
         "seconds": 50.936303854875284
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x512.geo.json"
   },
   {
     "id": "twerl_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -6721,13 +6816,14 @@
         "id": "endofmatch",
         "seconds": 46.486326530612246
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_cs2_2048x1024.geo.json"
   },
   {
     "id": "twinatlantic_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -6797,13 +6893,14 @@
         "id": "endofmatch",
         "seconds": 45.53476190476191
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_standard_1024x512.geo.json"
   },
   {
     "id": "valve_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -6865,13 +6962,15 @@
         "id": "endofmatch",
         "seconds": 47.94092970521542
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_valve_csgo_2048x1024.geo.json"
   },
   {
     "id": "valve_02",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
+    "modelResource": "cs2lootbox:geo/music_kit_valve_csgo_2048x1024.geo.json",
     "tracks": [
       {
         "id": "mainmenu",
@@ -6931,7 +7030,7 @@
     "id": "valve_cs2_01",
     "imageWidth": 256,
     "imageHeight": 198,
-    "model": false,
+    "model": true,
     "tracks": [
       {
         "id": "mainmenu",
@@ -6989,6 +7088,7 @@
         "id": "endofmatch",
         "seconds": 44.350090702947846
       }
-    ]
+    ],
+    "modelResource": "cs2lootbox:geo/music_kit_cs2_2048x1024.geo.json"
   }
 ]

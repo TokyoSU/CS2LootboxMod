@@ -2,6 +2,7 @@
 // Startup script changes require a full game restart.
 
 CS2LootboxEvents.register(event => {
+    const Grade = Java.loadClass('net.tokyosu.cs2lootbox.api.lootbox.LootRarityGrade')
     event.addCrate('kubejs:revolution', crate => {
         // Registered items. If omitted, defaults are:
         //   kubejs:revolution_case
@@ -15,6 +16,8 @@ CS2LootboxEvents.register(event => {
         crate.animation('kubejs:animations/revolution.animation.json')
 
         // Normal generated-item texture syntax (no textures/ prefix and no .png).
+        // A 128-pixel maximum side is sufficient for the bundled key icons.
+        // Preserve aspect ratio and transparency if resizing your own key PNG.
         crate.keyTexture('kubejs:item/revolution_key')
 
         // Transform of the 3D model inside the LDLib preview widget.
@@ -65,7 +68,8 @@ CS2LootboxEvents.register(event => {
         // ---------------------------------------------------------------------
         // Loot entry helpers used below:
         //   loot.count(min, max)
-        //   loot.rarity(translationKey, color)
+        //   loot.rarityGrade(Grade.MIL_SPEC) // shared label, color and sound tier
+        //   loot.rarity(translationKey, color) // optional custom grade override
         //   loot.description(translationKey)
         //   loot.nbt('{...}') / loot.tag('{...}')
         //   loot.position(x, y[, z])   // item_list only
@@ -78,18 +82,18 @@ CS2LootboxEvents.register(event => {
         // relative weights are used only when the legendary roll misses.
         crate.loot('minecraft:iron_ingot', 55, loot => {
             loot.count(1, 4)
-            loot.rarity('rarity.kubejs.industrial', 0x5E98D9)
+            loot.rarityGrade(Grade.INDUSTRIAL_GRADE)
             loot.description('loot.kubejs.iron.description')
         })
 
         crate.loot('minecraft:gold_ingot', 25, loot => {
             loot.count(1, 3)
-            loot.rarity('rarity.kubejs.milspec', 0x4B69FF)
+            loot.rarityGrade(Grade.MIL_SPEC)
         })
 
         crate.loot('minecraft:diamond', 12, loot => {
             loot.count(1, 2)
-            loot.rarity('rarity.kubejs.classified', 0xD32CE6)
+            loot.rarityGrade(Grade.CLASSIFIED)
             loot.description('loot.kubejs.diamond.description')
 
             // Optional transform used ONLY by this entry in the case item_list.
@@ -107,7 +111,7 @@ CS2LootboxEvents.register(event => {
 
         crate.loot('minecraft:emerald', 8, loot => {
             loot.count(1)
-            loot.rarity('rarity.kubejs.covert', 0xEB4B4B)
+            loot.rarityGrade(Grade.COVERT)
             loot.description('loot.kubejs.emerald.description')
         })
 
@@ -124,7 +128,7 @@ CS2LootboxEvents.register(event => {
         // Example:
         // crate.loot('#forge:ingots/iron', 10, loot => {
         //     loot.count(1, 3)
-        //     loot.rarity('rarity.kubejs.milspec', 0x4B69FF)
+        //     loot.rarityGrade(Grade.MIL_SPEC)
         //
         //     // NBT works with tag-backed entries too.
         //     loot.nbt('{CustomModelData:7}')
@@ -172,11 +176,11 @@ CS2LootboxEvents.register(event => {
             .subLootCarousel(false)
             .subLoot()
                 .add('minecraft:netherite_ingot', 5.0, loot => {
-                    loot.rarity('rarity.kubejs.covert', 0xEB4B4B)
+                    loot.rarityGrade(Grade.COVERT)
                     loot.description('loot.kubejs.netherite.description')
                 })
                 .add('minecraft:nether_star', 4.0, loot => {
-                    loot.rarity('rarity.kubejs.covert', 0xEB4B4B)
+                    loot.rarityGrade(Grade.COVERT)
                     loot.description('loot.kubejs.nether_star.description')
 
                     // NBT/tag data is supported by legendary sub-loot as well.

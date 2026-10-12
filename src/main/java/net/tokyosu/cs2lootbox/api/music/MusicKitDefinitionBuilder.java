@@ -71,7 +71,11 @@ public final class MusicKitDefinitionBuilder {
     @HideFromJS
     public MusicKitDefinitionBuilder rarityGrade(LootRarityGrade value) { grade = Objects.requireNonNull(value); return this; }
 
-    public MusicKitDefinitionBuilder model(String value) { display.model(value); hasModel = true; return this; }
+    public MusicKitDefinitionBuilder model(String value) {
+        display.model(MusicKitModelResources.canonical(ResourceUtils.parseRequired(value, id.getNamespace()).toString()));
+        hasModel = true;
+        return this;
+    }
     public MusicKitDefinitionBuilder texture(String value) { display.texture(value); hasTexture = true; return this; }
     public MusicKitDefinitionBuilder firstPersonRight(float x, float y, float z, float rx, float ry, float rz, float s) { display.firstPersonRight(x, y, z, rx, ry, rz, s); return this; }
     public MusicKitDefinitionBuilder firstPersonLeft(float x, float y, float z, float rx, float ry, float rz, float s) { display.firstPersonLeft(x, y, z, rx, ry, rz, s); return this; }

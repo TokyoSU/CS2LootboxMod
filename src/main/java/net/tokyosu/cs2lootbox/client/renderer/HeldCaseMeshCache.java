@@ -60,9 +60,8 @@ public final class HeldCaseMeshCache {
     }
 
     private static Mesh bake(BakedGeoModel model, RenderType type, GeometryWriter writer) {
-        BufferBuilder builder = new BufferBuilder(4096);
         VertexBuffer vertices = null;
-        try {
+        try (RenderBufferPool.Builder builder = RenderBufferPool.acquire()) {
             builder.begin(type.mode(), type.format());
             writer.write(new PoseStack(), builder);
             BufferBuilder.RenderedBuffer data = builder.end();
@@ -79,7 +78,6 @@ public final class HeldCaseMeshCache {
             throw failure;
         } finally {
             VertexBuffer.unbind();
-            builder.discard();
         }
     }
 

@@ -5,6 +5,7 @@ import net.tokyosu.cs2lootbox.client.renderer.StaticGuiItemCache;
 import net.tokyosu.cs2lootbox.client.renderer.CarouselTextureRenderer;
 import net.tokyosu.cs2lootbox.client.renderer.GuiRenderBatch;
 import net.tokyosu.cs2lootbox.client.renderer.CarouselItemArtwork;
+import net.tokyosu.cs2lootbox.client.renderer.RenderBufferPool;
 
 import net.tokyosu.apocalypselib.utils.ResourceUtils;
 
@@ -197,7 +198,6 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
 
     private transient @Nullable LootboxAnimatable animatable;
     private transient @Nullable LootboxGuiRenderer renderer;
-    private transient @Nullable MultiBufferSource.BufferSource isolatedBufferSource;
 
     /** Required by LDLib's editor/reflection factory. */
     public LootboxModelWidget() {
@@ -664,7 +664,7 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
         PoseStack poseStack = graphics.pose();
         poseStack.pushPose();
 
-        try {
+        try (RenderBufferPool.Builder previewBuffer = RenderBufferPool.acquire()) {
             RenderSystem.enableDepthTest();
             RenderSystem.depthMask(true);
             RenderSystem.clearDepth(1.0D);
@@ -676,7 +676,7 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
             poseStack.mulPose(Axis.ZP.rotationDegrees(modelRoll));
             poseStack.scale(scale, -scale, scale);
 
-            MultiBufferSource.BufferSource bufferSource = getIsolatedBufferSource();
+            MultiBufferSource.BufferSource bufferSource = MultiBufferSource.immediate(previewBuffer);
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
             LootboxDefinition.PreviewImage image = definition().image();
@@ -1552,14 +1552,6 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
         if (renderer == null) {
             renderer = new LootboxGuiRenderer();
         }
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    private @NotNull MultiBufferSource.BufferSource getIsolatedBufferSource() {
-        if (isolatedBufferSource == null) {
-            isolatedBufferSource = MultiBufferSource.immediate(new BufferBuilder(4096));
-        }
-        return isolatedBufferSource;
     }
 
     @OnlyIn(Dist.CLIENT)

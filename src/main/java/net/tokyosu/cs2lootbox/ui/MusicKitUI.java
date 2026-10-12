@@ -10,7 +10,10 @@ import net.tokyosu.cs2lootbox.client.widget.MusicKitWidget;
 /** Reuses the case screen's responsive canvas and held-item networking, without any carousel. */
 public final class MusicKitUI {
     public static final int WIDTH = 800, HEIGHT = 480;
+    
     private MusicKitUI() { }
+    
+    @SuppressWarnings("resource")
     public static ModularUI create(Player player, HeldItemUIFactory.HeldItemHolder holder, MusicKitDefinition kit, int selected) {
         WidgetGroup root = new WidgetGroup(0, 0, WIDTH, HEIGHT);
         ScaledWidgetGroup canvas = new ScaledWidgetGroup(WIDTH, HEIGHT);

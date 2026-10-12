@@ -60,7 +60,7 @@ CS2 Lootbox provides a reusable, registry-driven case system designed for modpac
   - Main-hand StatTrak item is preferred; offhand is used when applicable
 
 - **Music kits and custom model items**
-  - 101 built-in kits with 1,563 tracks, enabled by optional resource packs
+  - 100 registered built-in kits with 1,548 tracks, enabled by optional resource packs
   - CS2-style listening screen with artwork, track selection and playback controls
   - Save a track for vanilla jukebox playback, starting at zero
   - Register custom kits and static 3D rewards through KubeJS
@@ -101,7 +101,7 @@ KubeJS also uses its normal dependencies such as Rhino and Architectury API.
 2. Install the required dependencies listed above.
 3. Place `cs2lootbox-<version>.jar` in your Minecraft `mods` folder.
 4. Start the game once so Forge can generate the configuration files.
-5. Optionally install `cs2lootbox-music-full.zip` or individual music-kit ZIPs in `resourcepacks/` and enable them in **Options → Resource Packs**. Music kits require **CS2 Lootbox v1.1.0+**. Packs supply audio and textures; the mod supplies shared geometry. Kits with missing required resources are hidden from creative tabs and cannot open their listening screen.
+5. Optionally install `cs2lootbox-music-full.zip` or individual music-kit ZIPs in `resourcepacks/` and enable them in **Options → Resource Packs**. Music kits require **CS2 Lootbox v1.1.0+**. Packs supply audio and listening-screen artwork; the mod supplies geometry and model textures. Kits with missing required resources are hidden from creative tabs and cannot open their listening screen.
 6. Add custom case, model-item or music-kit definitions to:
 
 ```text
@@ -450,7 +450,9 @@ Audio uses **Ogg Vorbis (`.ogg`)**, with `stream: true` in `sounds.json`. Use **
 
 Use `event.addMusicKit(...)` for a custom kit and `event.changeMusicKit(...)` to edit an existing one. Built-in kits are registered before KubeJS callbacks: edit them instead of registering their IDs again. Keep track IDs stable so saved selections survive reordering. `image(...)` sets the listening-screen artwork; `imageScale(...)` accepts values above zero up to 2. The optional `model(...)` and `texture(...)` must be supplied together; otherwise the item uses its artwork as a 2D texture.
 
-The catalogue includes 27 kits using the shared sleeve/record mesh and 74 using their original 2D artwork. The full collection ZIP enables all 101 kits in one installation, suitable for the CurseForge app. Individual kit ZIPs remain available and use their GUI artwork as the pack icon. See [registration, audio assets and packaging](docs/music-kits.md), the [missing-model list](docs/music-kit-missing-models.md) and the [KubeJS example](examples/kubejs/startup_scripts/cs2lootbox_music_kits.js).
+The catalogue assigns all 100 registered kits to four existing display models covering the three atlas layouts. Each kit retains its own atlas; no additional model conversions are required for these shared display shapes. Original source geometry may differ from the selected display mesh. See the [shared-model layouts](docs/music-kits.md#shared-model-layouts) and [model status](docs/music-kit-missing-models.md). The full collection ZIP supplies the registered collection in one installation, suitable for the CurseForge app. Individual kit ZIPs remain available and use their GUI artwork as the pack icon. See [registration, audio assets and packaging](docs/music-kits.md) and the [KubeJS example](examples/kubejs/startup_scripts/cs2lootbox_music_kits.js).
+
+The mod includes 101 atlas PNGs, including the explicit Valve 01 fallback for `valve_02`; the number of PNG files is separate from the 100 registered kit definitions. The PNGs are downsampled to half their original width and height, with their atlas layout and transparency preserved. Model filenames and UV reference dimensions keep the original sizes; they do not need to match the smaller PNG dimensions. An optional `assets/cs2lootbox/geo/music_kit_<kit_id>.geo.json` takes priority over the catalogue's shared model. Textures retain `assets/cs2lootbox/textures/musickits/music_kit_<kit_id>.png`. `valve_02` uses `music_kit_valve_csgo_2048x1024.geo.json` and shows the Valve 01 cover in 3D, while retaining its own GUI artwork and music. `valve_cs2_01` stays separate. Older KubeJS paths for the Tree Adams, Lennie Moore, Adam Beyer and Valve 01 meshes resolve to their renamed shared models. See [texture sizes and restoration](docs/texture-optimization.md).
 
 ---
 
@@ -636,7 +638,13 @@ Cases use GeckoLib / GeckoMesh for their animated 3D presentation.
 
 Reusable geometry uses a GPU cache. Eligible constant held-case idle poses also reuse evaluated bone transforms and avoid flushing empty fixed buffers; animated or incompatible models use the normal rendering path. These optimisations preserve geometry and texture quality. The [rendering guide](docs/held-case-rendering.md) describes cache eligibility and diagnostics.
 
+Held-item mesh baking, static GUI capture and case previews share reusable native scratch buffers, fixing allocation-lifetime defects that could cause rapid memory growth during repeated cache refreshes or preview creation. The [native-memory audit](docs/native-memory-audit.md) explains the fix and its validation.
+
+The separate texture optimisation reduces the affected 101 music atlases, 40 key icons and 3 container atlases from approximately **488 MiB to 123 MiB** of uncompressed base-level RGBA storage. Music atlas dimensions are halved, container atlases use **512×512**, and key icons have a maximum side of **128 pixels**. Transparency and atlas alignment are preserved; fine details may soften in close-up views. Listening-screen artwork and individual patch textures retain their resolution. Update enabled music packs alongside the mod so they use the smaller atlases. See [texture sizes and backups](docs/texture-optimization.md).
+
 In Creative mode, run `/cs2lootbox renderstats reset`, hold the case for about ten seconds, then run `/cs2lootbox renderstats`. Compare FPS against an empty hand at the same location and graphics settings; cache counters show path usage rather than an FPS guarantee.
+
+The command also reports native scratch buffers: `created`, `pooled`, `in use` and `peak concurrent`. `created` should stabilize after warmup, and `in use` should normally be zero between frames. Resetting diagnostic counters keeps the reusable pool and its lifetime counters intact.
 
 Carousel rewards use Minecraft's normal `ItemStack` renderer, which means:
 
@@ -669,9 +677,9 @@ gradlew.bat build
 
 Build one optional resource-pack ZIP per music kit with `gradlew.bat musicResourcePacks`; the ZIPs are placed in `build/resourcepacks/` and use each kit's GUI artwork as its icon. To package only selected kits, see [Music resource packs](docs/music-kits.md#optional-music-resource-packs).
 
-For one kit, run `gradlew.bat musicResourcePack_treeadams_benbromfield_01`. Alternatively, `python tools/build_music_resource_pack.py --kit treeadams_benbromfield_01` builds that kit with Python's standard library. Omit `--kit` to build all 101 separate ZIPs. A normal `build` produces the mod JAR without bundling music audio or textures.
+For one kit, run `gradlew.bat musicResourcePack_treeadams_benbromfield_01`; replace the suffix with the kit's source-folder ID to select another kit. Pack tasks are created from the optional source audio folders. A normal `build` produces the mod JAR containing definitions, shared geometry and model atlases; music audio and listening-screen artwork remain in optional packs. The source music library is only required for pack-building tasks.
 
-For the complete CurseForge collection, run `gradlew.bat musicResourcePackFull` or `python tools/build_music_resource_pack.py --combined`. Both produce `build/resourcepacks/cs2lootbox-music-full.zip`, with all audio, artwork and atlases, one merged sound manifest, and the collection logo. Geometry stays in the mod. On Linux/macOS, use `./gradlew` in place of `gradlew.bat`.
+For the complete CurseForge collection, run `gradlew.bat musicResourcePackFull`. It produces `build/resourcepacks/cs2lootbox-music-full.zip`, with audio, artwork and matching atlas copies from the source library, plus one merged sound manifest. Geometry stays in the mod. On Linux/macOS, use `./gradlew` in place of `gradlew.bat`.
 
 The built mod JAR will be placed in:
 
@@ -714,7 +722,7 @@ registry/
 
 integration/kubejs/
     CS2LootboxKubeJSPlugin
-    LootboxStartupRegisterEvent
+    event/LootboxStartupRegisterEvent
 
 api/music/
     MusicKitDefinition

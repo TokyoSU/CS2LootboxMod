@@ -119,7 +119,7 @@ public final class StaticGuiItemCache {
             throw failure;
         } finally {
             VertexBuffer.unbind();
-            for (BufferBuilder builder : capture.builders.values()) builder.discard();
+            for (RenderBufferPool.Builder builder : capture.builders.values()) builder.close();
         }
     }
 
@@ -157,10 +157,10 @@ public final class StaticGuiItemCache {
         }
     }
     private static final class Capture implements MultiBufferSource {
-        final Map<RenderType, BufferBuilder> builders = new LinkedHashMap<>();
+        final Map<RenderType, RenderBufferPool.Builder> builders = new LinkedHashMap<>();
         @Override public VertexConsumer getBuffer(RenderType type) {
             return builders.computeIfAbsent(type, key -> {
-                BufferBuilder builder = new BufferBuilder(4096);
+                RenderBufferPool.Builder builder = RenderBufferPool.acquire();
                 builder.begin(key.mode(), key.format());
                 return builder;
             });

@@ -2,12 +2,13 @@ package net.tokyosu.cs2lootbox.registry.music;
 
 import com.google.gson.Gson;
 import net.tokyosu.cs2lootbox.api.music.MusicKitDefinitionBuilder;
+import net.tokyosu.cs2lootbox.api.music.MusicKitModelResources;
 import net.tokyosu.cs2lootbox.registry.LootboxRegistrationService;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-/** Extracted kits share geometry only when their source mesh and atlas layout match. */
+/** Kits use shared display geometry with a matching atlas layout. */
 public final class BuiltInMusicKits {
     private BuiltInMusicKits() { }
 
@@ -20,8 +21,9 @@ public final class BuiltInMusicKits {
                         .name("item.cs2lootbox.music_kit_" + entry.id())
                         .image("cs2lootbox:textures/gui/music/" + entry.id() + ".png", entry.imageWidth(), entry.imageHeight())
                         .itemTexture("cs2lootbox:gui/music/" + entry.id());
-                if (entry.model()) {
-                    configureModel(kit, "cs2lootbox:geo/music_kit_treeadams_benbromfield_01.geo.json",
+                String model = resolveModel(entry);
+                if (model != null) {
+                    configureModel(kit, model,
                             "cs2lootbox:textures/musickits/music_kit_" + entry.id() + ".png");
                 }
                 for (var track : entry.tracks()) {
@@ -33,6 +35,28 @@ public final class BuiltInMusicKits {
         } catch (Exception exception) {
             throw new IllegalStateException("Unable to register built-in music kits", exception);
         }
+    }
+
+    private static String resolveModel(CatalogKit entry) {
+        String model = MusicKitModelResources.canonical("cs2lootbox:geo/music_kit_" + entry.id() + ".geo.json");
+        String filename = model.substring("cs2lootbox:".length());
+        // Converted geometry belongs in the mod. An exact per-kit filename takes
+        // priority over the catalogue's shared mesh and enables future conversions.
+        if (BuiltInMusicKits.class.getResource("/assets/cs2lootbox/" + filename) != null) {
+            return model;
+        }
+        // A shared model awaiting conversion can be selected as soon as it is
+        // added to the mod, while the kit keeps its 2D fallback until then.
+        String shared = MusicKitModelResources.canonical(entry.modelResource());
+        if (shared != null && shared.startsWith("cs2lootbox:")
+                && BuiltInMusicKits.class.getResource("/assets/cs2lootbox/"
+                + shared.substring("cs2lootbox:".length())) != null) {
+            return shared;
+        }
+        if (!entry.model()) return null;
+        return shared == null || shared.isBlank()
+                ? "cs2lootbox:geo/music_kit_standard_1024x1024.geo.json"
+                : shared;
     }
 
     static void configureModel(MusicKitDefinitionBuilder kit, String model, String texture) {
@@ -48,6 +72,7 @@ public final class BuiltInMusicKits {
                 .fixed(0, -4F, 0, 0, 180, 0, 2.75F);
     }
 
-    private record CatalogKit(String id, int imageWidth, int imageHeight, boolean model, List<CatalogTrack> tracks) { }
+    private record CatalogKit(String id, int imageWidth, int imageHeight, boolean model,
+                              String modelResource, List<CatalogTrack> tracks) { }
     private record CatalogTrack(String id, double seconds) { }
 }

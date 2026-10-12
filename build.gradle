@@ -336,3 +336,12 @@ tasks.register('musicKitAudioCheck', JavaExec) {
         }
     }
 }
+
+tasks.register('renderBufferPoolCheck', JavaExec) {
+    group = 'verification'
+    description = 'Checks native scratch reuse under cache churn and interrupted GUI rendering.'
+    dependsOn tasks.named('heldCaseCacheCheck')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'net.tokyosu.cs2lootbox.client.renderer.RenderBufferPoolCheck'
+    systemProperty 'org.lwjgl.librarypath', layout.buildDirectory.dir('render-gl-natives').get().asFile.absolutePath
+}

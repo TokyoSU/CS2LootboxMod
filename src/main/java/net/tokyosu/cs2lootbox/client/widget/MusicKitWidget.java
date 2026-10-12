@@ -12,6 +12,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.tokyosu.apocalypselib.utils.ModUtils;
 import net.tokyosu.cs2lootbox.api.music.MusicKitDefinition;
 import net.tokyosu.cs2lootbox.client.music.MusicKitPreview;
 import net.tokyosu.cs2lootbox.client.music.ClientMusicKitAvailability;
@@ -70,6 +71,7 @@ public final class MusicKitWidget extends Widget {
 
     @OnlyIn(Dist.CLIENT) public void closePreview() { if (preview != null) preview.close(); }
 
+    @SuppressWarnings("resource")
     @Override @OnlyIn(Dist.CLIENT) public void updateScreen() {
         super.updateScreen();
         if (!ClientMusicKitAvailability.isAvailable(kit)) {
@@ -80,11 +82,11 @@ public final class MusicKitWidget extends Widget {
         }
         if (preview != null) preview.tick();
     }
-
+    
     @Override @OnlyIn(Dist.CLIENT) public void drawInBackground(GuiGraphics g, int mouseX, int mouseY, float partialTicks) {
         if (!ClientMusicKitAvailability.isAvailable(kit)) return;
         super.drawInBackground(g, mouseX, mouseY, partialTicks);
-        Font font = Minecraft.getInstance().font;
+        Font font = ModUtils.getFont();
         g.pose().pushPose();
         g.pose().translate(getPositionX(), getPositionY(), 0);
         mouseX -= getPositionX(); mouseY -= getPositionY();
@@ -125,7 +127,7 @@ public final class MusicKitWidget extends Widget {
     }
 
     @OnlyIn(Dist.CLIENT) private void drawList(GuiGraphics g, int mx, int my) {
-        Font font = Minecraft.getInstance().font;
+        Font font = ModUtils.getFont();
         g.fill(LIST_X, LIST_Y, LIST_X + LIST_W, LIST_Y + LIST_H, 0xA52B2D2C);
         for (int row = 0; row < VISIBLE && scroll + row < kit.tracks().size(); row++) {
             int index = scroll + row, y = LIST_Y + row * ROW_H;
@@ -173,13 +175,14 @@ public final class MusicKitWidget extends Widget {
             g.fill(x + 29, 165, x + 32, 190, BLUE);
             g.fill(x + 18, 165, x + 32, 169, BLUE);
             g.fill(x + 20, 189, x + 31, 194, BLUE);
-            g.drawCenteredString(Minecraft.getInstance().font, Component.translatable("cs2lootbox.music.no_artwork"),
+            g.drawCenteredString(ModUtils.getFont(), Component.translatable("cs2lootbox.music.no_artwork"),
                     PLAYER_X + PLAYER_W / 2, 226, MUTED);
         }
         g.fill(PLAYER_X, 296, PLAYER_X + PLAYER_W, 298, 0xFF000000 | kit.grade().color());
     }
 
     @OnlyIn(Dist.CLIENT) private void drawControls(GuiGraphics g, int mx, int my) {
+        Font font = ModUtils.getFont();
         boolean playing = preview != null && preview.hasPlayback();
         boolean paused = preview != null && preview.state() == MusicKitPreview.State.PAUSED;
         button(g, 390, CONTROLS_Y, 34, 30, mx, my, false, !waitingForSave);
@@ -193,19 +196,17 @@ public final class MusicKitWidget extends Widget {
         iconNext(g, 535, 407);
         boolean hover = inside(mx, my, 614, CONTROLS_Y, 122, 30);
         g.fill(614, CONTROLS_Y, 736, CONTROLS_Y + 30, waitingForSave ? 0xFF3F4D43 : hover ? 0xFF528F65 : GREEN);
-        g.drawCenteredString(Minecraft.getInstance().font, Component.translatable("cs2lootbox.music.save"), 675, CONTROLS_Y + 11, TEXT);
+        g.drawCenteredString(font, Component.translatable("cs2lootbox.music.save"), 675, CONTROLS_Y + 11, TEXT);
         String tooltip = null;
         if (inside(mx, my, 390, CONTROLS_Y, 34, 30)) tooltip = "previous";
         else if (inside(mx, my, 430, CONTROLS_Y, 42, 30)) tooltip = playing ? "stop" : "play";
         else if (inside(mx, my, 478, CONTROLS_Y, 34, 30)) tooltip = paused ? "resume" : "pause";
         else if (inside(mx, my, 518, CONTROLS_Y, 34, 30)) tooltip = "next";
-        if (tooltip != null) g.drawCenteredString(Minecraft.getInstance().font,
-                Component.translatable("cs2lootbox.music." + tooltip), 472, 381, BLUE);
+        if (tooltip != null) g.drawCenteredString(font, Component.translatable("cs2lootbox.music." + tooltip), 472, 381, BLUE);
     }
 
     @OnlyIn(Dist.CLIENT) private Component status() {
-        return Component.translatable("cs2lootbox.music.state." + (preview == null ? "stopped"
-                : preview.state().name().toLowerCase(java.util.Locale.ROOT)));
+        return Component.translatable("cs2lootbox.music.state." + (preview == null ? "stopped" : preview.state().name().toLowerCase(java.util.Locale.ROOT)));
     }
 
     @Override @OnlyIn(Dist.CLIENT) public boolean mouseClicked(double mx, double my, int button) {
@@ -256,17 +257,22 @@ public final class MusicKitWidget extends Widget {
         selected = index; revealSelection(); error = null;
         preview().play(kit.tracks().get(index));
     }
+    
     @OnlyIn(Dist.CLIENT) private void playStop() {
         if (preview().hasPlayback()) preview.close(); else preview.play(kit.tracks().get(selected));
     }
+    
     @OnlyIn(Dist.CLIENT) private void save() {
         if (!ClientMusicKitAvailability.isAvailable(kit)) return;
         closePreview(); waitingForSave = true; error = null;
         writeClientAction(SAVE, out -> out.writeVarInt(selected));
     }
+    
     @OnlyIn(Dist.CLIENT) private void closeScreen() {
         closePreview();
-        if (Minecraft.getInstance().player != null) Minecraft.getInstance().player.closeContainer();
+        var instance = Minecraft.getInstance();
+        if (instance != null && instance.player != null)
+            instance.player.closeContainer();
     }
 
     private int maxScroll() { return Math.max(0, kit.tracks().size() - VISIBLE); }
@@ -288,13 +294,13 @@ public final class MusicKitWidget extends Widget {
         return String.format(java.util.Locale.ROOT, "%d:%02d", value / 60, value % 60);
     }
     @OnlyIn(Dist.CLIENT) private static Component fit(Component text, int width, float scale) {
-        Font font = Minecraft.getInstance().font;
+        Font font = ModUtils.getFont();
         String value = text.getString(); int limit = (int) (width / scale);
         return Component.literal(font.width(value) <= limit ? value : font.plainSubstrByWidth(value, Math.max(0, limit - font.width("..."))) + "...");
     }
     @OnlyIn(Dist.CLIENT) private static void label(GuiGraphics g, Component value, int x, int y, float scale, int color) {
         g.pose().pushPose(); g.pose().translate(x, y, 0); g.pose().scale(scale, scale, 1);
-        g.drawString(Minecraft.getInstance().font, value, 0, 0, color, false); g.pose().popPose();
+        g.drawString(ModUtils.getFont(), value, 0, 0, color, false); g.pose().popPose();
     }
     @OnlyIn(Dist.CLIENT) private static void button(GuiGraphics g, int x, int y, int w, int h, int mx, int my, boolean active, boolean enabled) {
         g.fill(x, y, x + w, y + h, active ? 0xFF486474 : enabled && inside(mx, my, x, y, w, h) ? 0xFF616560 : 0xB534393B);
