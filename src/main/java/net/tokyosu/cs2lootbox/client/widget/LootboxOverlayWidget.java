@@ -697,6 +697,7 @@ public final class LootboxOverlayWidget extends Widget {
         Minecraft.getInstance().renderBuffers().bufferSource().endBatch();
     }
 
+    @OnlyIn(Dist.CLIENT)
     private static boolean isGlintRenderType(@NotNull RenderType renderType) {
         return renderType == RenderType.glint()
                 || renderType == RenderType.glintDirect()

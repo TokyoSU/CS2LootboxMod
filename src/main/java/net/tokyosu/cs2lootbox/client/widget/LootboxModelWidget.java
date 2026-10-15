@@ -32,9 +32,9 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
+import net.tokyosu.cs2lootbox.client.ui.ClientUiActions;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
@@ -55,6 +55,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.tokyosu.cs2lootbox.CS2LootBoxMod;
 import net.tokyosu.cs2lootbox.api.lootbox.LegendaryLoot;
@@ -192,11 +193,14 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
     private transient PrizeAction pendingPrizeAction = PrizeAction.CLOSE;
     private transient boolean inventoryOpenQueued;
     private transient boolean caseDropSoundPlayed;
+    @OnlyIn(Dist.CLIENT)
     private transient @Nullable SoundInstance openLoopSoundInstance;
     private transient boolean carouselStartPending;
     private transient long carouselReadyAtMs;
 
+    @OnlyIn(Dist.CLIENT)
     private transient @Nullable LootboxAnimatable animatable;
+    @OnlyIn(Dist.CLIENT)
     private transient @Nullable LootboxGuiRenderer renderer;
 
     /** Required by LDLib's editor/reflection factory. */
@@ -215,7 +219,12 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
     public void setLootboxId(@NotNull ResourceLocation id) {
         this.lootboxId = Objects.requireNonNull(id, "id");
         applyPreviewTransform(definition().preview());
-        this.animatable = null;
+        if (FMLEnvironment.dist == Dist.CLIENT) clearClientAnimatable();
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    private void clearClientAnimatable() {
+        animatable = null;
     }
 
     private void applyPreviewTransform(@NotNull LootboxDefinition.PreviewTransform transform) {
@@ -257,9 +266,12 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
         carouselStartPending = false;
         carouselReadyAtMs = 0L;
 
-        if (animatable != null) {
-            animatable.setAnimationState(animationState);
-        }
+        if (FMLEnvironment.dist == Dist.CLIENT) resetClientAnimationState();
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    private void resetClientAnimationState() {
+        if (animatable != null) animatable.setAnimationState(animationState);
     }
 
     public @NotNull LootboxDefinition getDefinition() {
@@ -309,10 +321,7 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
             return;
         }
         playDefaultUiSound(ModSounds.BUTTON_CLICK.getId());
-        Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft.player != null) {
-            minecraft.player.closeContainer();
-        }
+        ClientUiActions.closeContainer();
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -345,6 +354,13 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
             return;
         }
 
+        if (player.level().isClientSide) {
+            handleClientUiClosed();
+        }
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    private void handleClientUiClosed() {
         // Never let a case-specific opening loop escape the UI if the player
         // closes the screen or the server closes the container unexpectedly.
         stopOpenLoopSound();
@@ -362,12 +378,7 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
         // the inventory screen again.
         if (pendingPrizeAction == PrizeAction.VIEW_INVENTORY && !inventoryOpenQueued) {
             inventoryOpenQueued = true;
-            Minecraft minecraft = Minecraft.getInstance();
-            minecraft.tell(() -> {
-                if (minecraft.player != null) {
-                    minecraft.setScreen(new InventoryScreen(minecraft.player));
-                }
-            });
+            ClientUiActions.openInventoryNextTick();
         }
     }
 
@@ -1616,6 +1627,7 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
                 () -> renderItemScaledForPurpose(graphics, stack, centerX, centerY, scale, alpha));
     }
 
+    @OnlyIn(Dist.CLIENT)
     private void renderItemScaledForPurpose(
             @NotNull GuiGraphics graphics,
             @NotNull ItemStack stack,
@@ -1958,6 +1970,7 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
     }
 
+    @OnlyIn(Dist.CLIENT)
     private static void glowVertex(BufferBuilder builder, Matrix4f matrix, float x, float y,
             float centerX, float centerY, float span, float cos, float sin, boolean mirrored) {
         float dx = x - centerX, dy = y - centerY;
@@ -2099,10 +2112,7 @@ public class LootboxModelWidget extends Widget implements IConfigurableWidget {
 
     @OnlyIn(Dist.CLIENT)
     private void closeUi() {
-        Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft.player != null) {
-            minecraft.player.closeContainer();
-        }
+        ClientUiActions.closeContainer();
     }
 
     @OnlyIn(Dist.CLIENT)

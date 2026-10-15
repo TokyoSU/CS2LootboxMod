@@ -24,6 +24,8 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.stats.Stats;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.tokyosu.cs2lootbox.client.renderer.ModelItemRenderer;
 import net.tokyosu.cs2lootbox.client.music.ClientMusicKitAvailability;
 import net.tokyosu.cs2lootbox.api.lootbox.LootboxDefinition;
@@ -63,7 +65,7 @@ public final class MusicKitItem extends RecordItem implements IUIHolder.ItemUI, 
     }
 
     @Override public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
-        if (level.isClientSide && !ClientMusicKitAvailability.isAvailable(definition)) {
+        if (level.isClientSide && !hasClientResources()) {
             player.displayClientMessage(Component.translatable("cs2lootbox.music.missing_resources"), true);
             return InteractionResultHolder.fail(player.getItemInHand(hand));
         }
@@ -75,6 +77,11 @@ public final class MusicKitItem extends RecordItem implements IUIHolder.ItemUI, 
         return MusicKitUI.create(player, holder, definition, MusicKitSelection.selectedTrack(holder.getHeld(), definition));
     }
 
+    @OnlyIn(Dist.CLIENT)
+    private boolean hasClientResources() {
+        return ClientMusicKitAvailability.isAvailable(definition);
+    }
+
     @Override public LootboxDefinition getDefinition() {
         if (definition.display() == null || !base) throw new IllegalStateException("This disc has no 3D model");
         return definition.display();
@@ -84,7 +91,7 @@ public final class MusicKitItem extends RecordItem implements IUIHolder.ItemUI, 
         if (cache == null) cache = GeckoLibUtil.createInstanceCache(this);
         return cache;
     }
-    @Override public void initializeClient(Consumer<IClientItemExtensions> consumer) {
+    @Override @OnlyIn(Dist.CLIENT) public void initializeClient(Consumer<IClientItemExtensions> consumer) {
         // Forge calls this from Item's constructor, before our definition/base fields are assigned.
         consumer.accept(new IClientItemExtensions() {
             private ModelItemRenderer<MusicKitItem> renderer;

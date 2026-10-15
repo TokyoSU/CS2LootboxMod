@@ -4,6 +4,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.tokyosu.cs2lootbox.api.lootbox.LootboxDefinition;
 import net.tokyosu.cs2lootbox.api.lootbox.ModelItemDefinitionBuilder;
 import net.tokyosu.cs2lootbox.client.renderer.ModelItemRenderer;
@@ -25,7 +27,7 @@ public final class ModelItem extends Item implements StaticModelledItem {
     @Override public String getDescriptionId(ItemStack stack) { return getDescriptionId(); }
     @Override public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {}
     @Override public AnimatableInstanceCache getAnimatableInstanceCache() { return cache; }
-    @Override public void initializeClient(Consumer<IClientItemExtensions> consumer) {
+    @Override @OnlyIn(Dist.CLIENT) public void initializeClient(Consumer<IClientItemExtensions> consumer) {
         consumer.accept(new IClientItemExtensions() {
             private ModelItemRenderer<ModelItem> renderer;
             @Override public BlockEntityWithoutLevelRenderer getCustomRenderer() {

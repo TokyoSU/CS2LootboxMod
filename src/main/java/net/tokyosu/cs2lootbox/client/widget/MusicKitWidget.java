@@ -4,6 +4,7 @@ import com.lowdragmc.lowdraglib.gui.factory.HeldItemUIFactory;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
+import net.tokyosu.cs2lootbox.client.ui.ClientUiActions;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.FriendlyByteBuf;
@@ -32,6 +33,7 @@ public final class MusicKitWidget extends Widget {
     private final MusicKitDefinition kit;
     private int selected, scroll;
     private boolean draggingScrollbar, waitingForSave;
+    @OnlyIn(Dist.CLIENT)
     private MusicKitPreview preview;
     private boolean artworkChecked, artworkAvailable;
     private Component error;
@@ -75,8 +77,7 @@ public final class MusicKitWidget extends Widget {
     @Override @OnlyIn(Dist.CLIENT) public void updateScreen() {
         super.updateScreen();
         if (!ClientMusicKitAvailability.isAvailable(kit)) {
-            if (Minecraft.getInstance().player != null) Minecraft.getInstance().player.displayClientMessage(
-                    Component.translatable("cs2lootbox.music.missing_resources"), true);
+            ClientUiActions.showActionBar(Component.translatable("cs2lootbox.music.missing_resources"));
             closeScreen();
             return;
         }
@@ -270,9 +271,7 @@ public final class MusicKitWidget extends Widget {
     
     @OnlyIn(Dist.CLIENT) private void closeScreen() {
         closePreview();
-        var instance = Minecraft.getInstance();
-        if (instance != null && instance.player != null)
-            instance.player.closeContainer();
+        ClientUiActions.closeContainer();
     }
 
     private int maxScroll() { return Math.max(0, kit.tracks().size() - VISIBLE); }

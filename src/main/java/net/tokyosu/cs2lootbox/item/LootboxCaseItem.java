@@ -19,6 +19,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.tokyosu.cs2lootbox.api.lootbox.LegendaryLoot;
 import net.tokyosu.cs2lootbox.api.lootbox.LootEntry;
 import net.tokyosu.cs2lootbox.api.lootbox.LootRarityGrade;
@@ -192,6 +194,7 @@ public final class LootboxCaseItem extends Item implements GeoItem, IUIHolder.It
     }
 
     @Override
+    @OnlyIn(Dist.CLIENT)
     public void initializeClient(@NotNull Consumer<IClientItemExtensions> consumer) {
         consumer.accept(new IClientItemExtensions() {
             private LootboxCaseItemRenderer renderer;
